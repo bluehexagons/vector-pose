@@ -2,6 +2,20 @@
 
 A simple utility I am developing for another game in a custom engine. May be useful to someone else some day.
 
+## Development
+
+### Install
+
+`bun i`
+
+### Run app locally
+
+`bun run tauri dev`
+
+### Package
+
+not there yet
+
 ## Tauri + Solid + Typescript
 
 This project is based on the default template for this configuration.
