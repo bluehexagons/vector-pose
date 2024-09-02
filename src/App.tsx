@@ -2,11 +2,13 @@ import {createEffect, createSignal, For} from 'solid-js';
 import logo from './assets/logo.svg';
 import {invoke} from '@tauri-apps/api/tauri';
 import './App.css';
+import {SkeleNode} from './utils/SkeleNode';
 
 const preventDefault = (e: MouseEvent) => {
   // e.preventDefault();
 };
 
+// temp
 function App() {
   // const [greetMsg, setGreetMsg] = createSignal('');
   // const [name, setName] = createSignal('');
@@ -16,13 +18,59 @@ function App() {
   //   setGreetMsg(await invoke("greet", { name: name() }));
   // }
 
-  const [skele, setSkele] = createSignal([
-    {
-      uri: '/tauri.svg',
-    },
-  ]);
+  const [skele, setSkele] = createSignal<SkeleNode>(new SkeleNode());
+
+  const renderSkele = () =>
+    skele()
+      .tickMove(0, 0, 100, 0)
+      .render(0, props => props);
+
+  const updateSkele = (base: SkeleNode) => {
+    base.tickMove(0, 0, 100, 0);
+    setSkele(base);
+
+    console.log('ticked skele', skele());
+    console.log(renderSkele());
+  };
 
   const [currentFiles, setCurrentFiles] = createSignal([] as string[]);
+
+  const pushCurrentFiles = () => {
+    const base = skele().clone();
+    const spriteRoot = base.children[0];
+    for (const f of currentFiles()) {
+      spriteRoot.add(
+        SkeleNode.fromData({
+          angle: 0,
+          mag: 1,
+          uri: f,
+        })
+      );
+    }
+
+    updateSkele(base);
+  };
+
+  // insert some test data
+  updateSkele(
+    SkeleNode.fromData({
+      mag: 1,
+      angle: 0,
+      children: [
+        {
+          mag: 0,
+          angle: 0,
+          children: [
+            {
+              mag: 1,
+              angle: 0,
+              uri: './tauri.svg',
+            },
+          ],
+        },
+      ],
+    })
+  );
 
   return (
     <div class="container" onContextMenu={preventDefault}>
@@ -32,9 +80,17 @@ function App() {
         <h2 class="title">editor</h2>
         <div class="editor-window">
           <div class="sprite-holder">
-            <For each={skele()} fallback={<div>...</div>}>
+            <For each={renderSkele()} fallback={<div>...</div>}>
               {node => (
-                <div>
+                <div
+                  style={{
+                    left: `${node.center[0]}px`,
+                    top: `${node.center[1]}px`,
+                    width: `${node.transform[0]}px`,
+                    height: `${node.transform[1]}px`,
+                    transform: `translate(-50%, -50%) rotate(${node.direction}deg)`,
+                  }}
+                >
                   <img src={node.uri} />
                 </div>
               )}
@@ -52,28 +108,23 @@ function App() {
               console.log(e);
               if (!e.target.files) return;
 
-              const uris: string[] = [];
+              const imageUris: string[] = [];
 
               for (const file of e.target.files) {
                 const blob = new Blob([await file.arrayBuffer()], {
-                  type: 'image/jpeg',
+                  type: file.type,
                 });
                 const imageUrl = URL.createObjectURL(blob);
 
-                uris.push(imageUrl);
-                setSkele([
-                  ...skele(),
-                  {
-                    uri: imageUrl,
-                  },
-                ]);
+                imageUris.push(imageUrl);
               }
 
-              setCurrentFiles(uris);
+              setCurrentFiles(imageUris);
+              pushCurrentFiles();
             }}
             multiple
           />
-          <button>+</button>
+          <button onClick={pushCurrentFiles}>+</button>
         </div>
       </div>
 
