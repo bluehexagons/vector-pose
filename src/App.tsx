@@ -3,6 +3,7 @@ import logo from './assets/logo.svg';
 import {invoke} from '@tauri-apps/api/tauri';
 import './App.css';
 import {SkeleNode} from './utils/SkeleNode';
+import {vec2} from 'gl-matrix';
 
 const preventDefault = (e: MouseEvent) => {
   // e.preventDefault();
@@ -20,13 +21,20 @@ function App() {
 
   const [skele, setSkele] = createSignal<SkeleNode>(new SkeleNode());
 
+  const [size, setSize] = createSignal(100);
+  const [rotation, setRotation] = createSignal(270);
+
+  const [cameraPosition, setCameraPosition] = createSignal(
+    vec2.fromValues(300, 300)
+  );
+
   const renderSkele = () =>
     skele()
-      .tickMove(0, 0, 100, 0)
+      .tickMove(cameraPosition()[0], cameraPosition()[0], size(), rotation())
       .render(0, props => props);
 
   const updateSkele = (base: SkeleNode) => {
-    base.tickMove(0, 0, 100, 0);
+    base.tickMove(cameraPosition()[0], cameraPosition()[0], size(), rotation());
     setSkele(base);
 
     console.log('ticked skele', skele());
@@ -51,26 +59,99 @@ function App() {
     updateSkele(base);
   };
 
+  const renderUris = async (skele: SkeleNode) => {
+    for (const node of skele.walk()) {
+      if (node.uri?.startsWith('sprite:')) {
+        node.uri = `./data/gfx/sprite/${node.uri.slice(7).replace('Still', 'Strawberry-001a_Still')}.PNG`;
+      }
+    }
+    return skele;
+  };
+
   // insert some test data
-  updateSkele(
-    SkeleNode.fromData({
-      mag: 1,
-      angle: 0,
-      children: [
-        {
-          mag: 0,
+  (async () => {
+    updateSkele(
+      await renderUris(
+        SkeleNode.fromData({
           angle: 0,
+          mag: 1,
           children: [
             {
-              mag: 1,
               angle: 0,
-              uri: './tauri.svg',
+              mag: -1,
+              children: [
+                {
+                  angle: 0,
+                  mag: 0.2,
+                  uri: 'sprite:strawberry/Still/Bottom/BB',
+                  props: {
+                    hueRot: 0,
+                  },
+                  id: 'Bottom/BB',
+                },
+              ],
+            },
+            {
+              angle: 0,
+              mag: 0,
+              children: [
+                {
+                  angle: 0,
+                  mag: 0.2,
+                  uri: 'sprite:strawberry/Still/Middle/MM',
+                  props: {
+                    hueRot: 0,
+                  },
+                  id: 'Middle/MM',
+                },
+              ],
+            },
+            {
+              angle: 0,
+              mag: 1,
+              children: [
+                {
+                  angle: 0,
+                  mag: 0.2,
+                  uri: 'sprite:strawberry/Still/Top/TBLO',
+                  props: {
+                    hueRot: 0,
+                  },
+                  id: 'Top/TBLO',
+                },
+              ],
+            },
+            // {
+            //   angle: 0,
+            //   mag: this.scale,
+            //   uri: 'sprite:strawberry/Still/Outline',
+            //   id: 'Outline',
+            // },
+            {
+              angle: 0,
+              mag: 0.7,
+              children: [
+                {
+                  angle: 0,
+                  mag: 0,
+                  // uri: 'gfx/sphere.png',
+                  id: 'FiringPoint',
+                },
+              ],
             },
           ],
-        },
-      ],
-    })
-  );
+        })
+      )
+    );
+  })();
+
+  const makeBlobUrl = async (file: File) => {
+    const blob = new Blob([await file.arrayBuffer()], {
+      type: file.type,
+    });
+    const imageUrl = URL.createObjectURL(blob);
+    return imageUrl;
+  };
 
   return (
     <div class="container" onContextMenu={preventDefault}>
@@ -88,7 +169,7 @@ function App() {
                     top: `${node.center[1]}px`,
                     width: `${node.transform[0]}px`,
                     height: `${node.transform[1]}px`,
-                    transform: `translate(-50%, -50%) rotate(${node.direction}deg)`,
+                    transform: `translate(-50%, -50%) rotate(${node.direction + 90}deg)`,
                   }}
                 >
                   <img src={node.uri} />
@@ -111,12 +192,8 @@ function App() {
               const imageUris: string[] = [];
 
               for (const file of e.target.files) {
-                const blob = new Blob([await file.arrayBuffer()], {
-                  type: file.type,
-                });
-                const imageUrl = URL.createObjectURL(blob);
-
-                imageUris.push(imageUrl);
+                const blobUrl = await makeBlobUrl(file);
+                imageUris.push(blobUrl);
               }
 
               setCurrentFiles(imageUris);
