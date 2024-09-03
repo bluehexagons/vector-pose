@@ -1,17 +1,26 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
+// Based on Tauri defaults
+
+* {
+  box-sizing: border-box;
+  /* user-select: none; */
 }
 
-.logo.solid:hover {
-  filter: drop-shadow(0 0 2em #2f5d90);
-}
+/* [draggable] {
+  user-select: auto;
+} */
 
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  /* 
+  * {
+    user-select: none;
+  }
 
-  contet
+  input {
+    user-select: auto;
+  } */
 }
 
 :root {
@@ -30,10 +39,6 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 .container {
   display: grid;
   grid-template-columns: [left-start] 1fr [left-end] 10px [right-start] 1fr [right-end];
@@ -50,12 +55,14 @@ body {
   padding: 4px;
 }
 
-.title, .page-title {
+.title,
+.page-title {
   text-align: center;
   vertical-align: middle;
 }
 
-.page-title, .footer {
+.page-title,
+.footer {
   grid-column-start: left-start;
   grid-column-end: right-end;
   grid-row-start: header-start;
@@ -85,6 +92,14 @@ body {
   padding: 0.5em;
   will-change: filter;
   transition: 0.75s;
+}
+
+.logo.vite:hover {
+  filter: drop-shadow(0 0 2em #747bff);
+}
+
+.logo.solid:hover {
+  filter: drop-shadow(0 0 2em #2f5d90);
 }
 
 .logo.tauri:hover {

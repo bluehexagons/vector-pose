@@ -9,7 +9,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "tauri": "tauri",
-    "run": "tauri dev"
+    "app": "tauri dev"
   },
   "license": "MIT",
   "dependencies": {

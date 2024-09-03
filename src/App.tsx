@@ -5,7 +5,7 @@ import './App.css';
 import {SkeleNode} from './utils/SkeleNode';
 import {vec2} from 'gl-matrix';
 
-const preventDefault = (e: MouseEvent) => {
+const preventDefault = (e: Event) => {
   // e.preventDefault();
 };
 
@@ -145,6 +145,14 @@ function App() {
     );
   })();
 
+  const dragStartNode = (e: DragEvent) => {
+    console.log('node', e);
+  };
+
+  const dragStartSprite = (e: DragEvent) => {
+    console.log('sprite', e);
+  };
+
   const makeBlobUrl = async (file: File) => {
     const blob = new Blob([await file.arrayBuffer()], {
       type: file.type,
@@ -154,7 +162,11 @@ function App() {
   };
 
   return (
-    <div class="container" onContextMenu={preventDefault}>
+    <div
+      class="container"
+      onContextMenu={preventDefault}
+      onSelect={preventDefault}
+    >
       <h1 class="page-title">vector-pose</h1>
 
       <div class="editor-pane">
@@ -164,6 +176,8 @@ function App() {
             <For each={renderSkele()} fallback={<div>...</div>}>
               {node => (
                 <div
+                  draggable={true}
+                  onDragStart={dragStartSprite}
                   style={{
                     left: `${node.center[0]}px`,
                     top: `${node.center[1]}px`,
@@ -181,7 +195,17 @@ function App() {
       </div>
 
       <div class="layers-pane">
-        <h2 class="title">layers</h2>
+        <h2 class="title">nodes</h2>
+        <ol class="node-tree">
+          <For each={Array.from(skele().walk())}>
+            {(node, index) => (
+              <div draggable={true} onDragStart={dragStartNode}>
+                node #{index() + 1}
+                {node.id ? ` (${node.id})` : ''}
+              </div>
+            )}
+          </For>
+        </ol>
         <div class="row">
           <input
             type="file"
