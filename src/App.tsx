@@ -2,8 +2,9 @@ import {createEffect, createSignal, For} from 'solid-js';
 import logo from './assets/logo.svg';
 import {invoke} from '@tauri-apps/api/tauri';
 import './App.css';
-import {SkeleNode} from './utils/SkeleNode';
+import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 import {vec2} from 'gl-matrix';
+import {toDegrees, toRadians} from './utils/Equa';
 
 const preventDefault = (e: Event) => {
   // e.preventDefault();
@@ -28,17 +29,17 @@ function App() {
     vec2.fromValues(300, 300)
   );
 
-  const renderSkele = () =>
-    skele()
-      .tickMove(cameraPosition()[0], cameraPosition()[0], size(), rotation())
-      .render(0, props => props);
+  const [renderedNodes, setRenderedNodes] = createSignal<SkeleNode[]>([]);
+  const [renderedInfo, setRenderedInfo] = createSignal<RenderInfo[]>([]);
 
   const updateSkele = (base: SkeleNode) => {
     base.tickMove(cameraPosition()[0], cameraPosition()[0], size(), rotation());
+
     setSkele(base);
+    setRenderedInfo(skele().renderAll(1, props => props));
+    setRenderedNodes(Array.from(base.walk()).slice(1));
 
     console.log('ticked skele', skele());
-    console.log(renderSkele());
   };
 
   const [currentFiles, setCurrentFiles] = createSignal([] as string[]);
@@ -82,7 +83,7 @@ function App() {
               children: [
                 {
                   angle: 0,
-                  mag: 0.2,
+                  mag: 1,
                   uri: 'sprite:strawberry/Still/Bottom/BB',
                   props: {
                     hueRot: 0,
@@ -97,7 +98,7 @@ function App() {
               children: [
                 {
                   angle: 0,
-                  mag: 0.2,
+                  mag: 1,
                   uri: 'sprite:strawberry/Still/Middle/MM',
                   props: {
                     hueRot: 0,
@@ -112,7 +113,7 @@ function App() {
               children: [
                 {
                   angle: 0,
-                  mag: 0.2,
+                  mag: 1,
                   uri: 'sprite:strawberry/Still/Top/TBLO',
                   props: {
                     hueRot: 0,
@@ -173,7 +174,7 @@ function App() {
         <h2 class="title">editor</h2>
         <div class="editor-window">
           <div class="sprite-holder">
-            <For each={renderSkele()} fallback={<div>...</div>}>
+            <For each={renderedInfo()} fallback={<div>...</div>}>
               {node => (
                 <div
                   draggable={true}
@@ -181,12 +182,29 @@ function App() {
                   style={{
                     left: `${node.center[0]}px`,
                     top: `${node.center[1]}px`,
-                    width: `${node.transform[0]}px`,
-                    height: `${node.transform[1]}px`,
+                    width: `${node.transform[0] * 2}px`,
+                    height: `${node.transform[1] * 2}px`,
                     transform: `translate(-50%, -50%) rotate(${node.direction + 90}deg)`,
                   }}
                 >
                   <img src={node.uri} />
+                </div>
+              )}
+            </For>
+          </div>
+          <div class="node-graph">
+            <For each={renderedNodes()}>
+              {(node, index) => (
+                <div
+                  draggable={true}
+                  onDragStart={dragStartNode}
+                  style={{
+                    left: `${node.state.mid.transform[0]}px`,
+                    top: `${node.state.mid.transform[1]}px`,
+                  }}
+                >
+                  node #{index() + 1}
+                  {node.id ? ` (${node.id})` : ''}
                 </div>
               )}
             </For>
@@ -197,11 +215,48 @@ function App() {
       <div class="layers-pane">
         <h2 class="title">nodes</h2>
         <ol class="node-tree">
-          <For each={Array.from(skele().walk())}>
+          <For each={renderedNodes()}>
             {(node, index) => (
               <div draggable={true} onDragStart={dragStartNode}>
-                node #{index() + 1}
-                {node.id ? ` (${node.id})` : ''}
+                <div>
+                  node #{index() + 1}
+                  {node.id ? ` (${node.id})` : ''}
+                </div>
+                <div>
+                  angle=
+                  <input
+                    value={toDegrees(node.rotation)}
+                    onChange={evt => {
+                      console.log('angle', evt.target.value);
+                      node.rotation = toRadians(
+                        parseFloat(evt.target.value) || 0
+                      );
+                      node.updateTransform();
+                      updateSkele(skele().clone());
+                    }}
+                  />
+                  &nbsp; mag=
+                  <input
+                    value={node.mag}
+                    onChange={evt => {
+                      console.log('mag', evt.target.value);
+                      node.mag = parseFloat(evt.target.value) || 0;
+                      node.updateTransform();
+                      updateSkele(skele().clone());
+                    }}
+                  />
+                </div>
+                <div>
+                  uri=
+                  <input
+                    value={node.uri || ''}
+                    onChange={evt => {
+                      console.log('uri', evt.target.value);
+                      node.uri = evt.target.value || null;
+                      updateSkele(skele().clone());
+                    }}
+                  />
+                </div>
               </div>
             )}
           </For>

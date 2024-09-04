@@ -19,7 +19,7 @@ export interface SkeleData {
 }
 
 export interface RenderInfo {
-  uri: string;
+  uri?: string;
   center: vec2;
   transform: vec2;
   direction: number;
@@ -90,13 +90,21 @@ export class SkeleNode {
     skele.id = data.id ?? null;
     skele.props = data.props ?? null;
 
-    vec2.set(skele.transform, mag * Math.cos(rads), mag * Math.sin(rads));
+    skele.updateTransform();
 
     for (const node of data.children ?? []) {
       skele.add(SkeleNode.fromData(node));
     }
 
     return skele;
+  }
+
+  updateTransform() {
+    vec2.set(
+      this.transform,
+      this.mag * Math.cos(this.rotation),
+      this.mag * Math.sin(this.rotation)
+    );
   }
 
   tickMove(x: number, y: number, size: number, direction: number) {
@@ -163,25 +171,29 @@ export class SkeleNode {
     }
   }
 
-  render(
+  /** This is a slight fork of the render method */
+  renderAll(
     time: number,
     propObjectDeduper: (props: ImageProps) => ImageProps
   ): RenderInfo[] {
     const views: RenderInfo[] = [];
     for (const node of this.walk()) {
-      if (!node.uri) continue;
+      if (!node.parent) continue;
 
       const state = node.stateAt(time);
       const size = node.mag * state.scale;
 
-      views.push({
-        uri: node.uri,
+      const view = {
+        uri: node.uri || undefined,
         props: propObjectDeduper(node.props),
         center: ((node as SkeleNode).parent as SkeleNode).stateAt(time)
           .transform,
         transform: vec2.fromValues(size, size),
         direction: toDegrees(state.rotation),
-      });
+      };
+      if (view.uri) {
+        views.push(view);
+      }
     }
     return views;
   }
@@ -189,8 +201,11 @@ export class SkeleNode {
   // deeply clones the node recursively
   clone(parent = this.parent) {
     const node = new SkeleNode();
-    node.uri = this.uri;
     node.parent = parent;
+    node.id = this.id;
+    node.uri = this.uri;
+    node.mag = this.mag;
+    node.rotation = this.rotation;
     vec2.copy(node.transform, this.transform);
     for (const child of this.children) {
       node.add(child.clone(node));
@@ -224,7 +239,7 @@ export class SkeleNode {
     const out = SkeleNode.fromData(testData);
     out.tickMove(100, 100, 10, 0);
     console.log(out);
-    console.log(out.render(1, props => props));
+    console.log(out.renderAll(1, props => props));
     console.log('walking');
     for (const node of out.walk()) {
       console.log(node);
