@@ -16,6 +16,7 @@ export interface SkeleData {
 
   uri?: string;
   props?: ImageProps;
+  sort?: number;
 }
 
 export interface RenderInfo {
@@ -24,7 +25,10 @@ export interface RenderInfo {
   transform: vec2;
   direction: number;
   props: ImageProps;
+  sort: number;
 }
+
+const sortRenderInfo = (a: RenderInfo, b: RenderInfo) => a.sort - b.sort;
 
 export class SkeleNode {
   id: string | null = null;
@@ -33,6 +37,7 @@ export class SkeleNode {
   uri: string | null = null;
   props: ImageProps = null;
   transform: vec2 = vec2.create();
+  sort = 0;
   /** Radians! */
   rotation = 0;
   mag = 1;
@@ -89,6 +94,7 @@ export class SkeleNode {
     skele.mag = mag;
     skele.id = data.id ?? null;
     skele.props = data.props ?? null;
+    skele.sort = data.sort ?? 0;
 
     skele.updateTransform();
 
@@ -190,12 +196,13 @@ export class SkeleNode {
           .transform,
         transform: vec2.fromValues(size, size),
         direction: toDegrees(state.rotation),
+        sort: node.sort,
       };
       if (view.uri) {
         views.push(view);
       }
     }
-    return views;
+    return views.sort(sortRenderInfo);
   }
 
   // deeply clones the node recursively

@@ -26,14 +26,14 @@ function App() {
   const [rotation, setRotation] = createSignal(270);
 
   const [cameraPosition, setCameraPosition] = createSignal(
-    vec2.fromValues(300, 300)
+    vec2.fromValues(300, 500)
   );
 
   const [renderedNodes, setRenderedNodes] = createSignal<SkeleNode[]>([]);
   const [renderedInfo, setRenderedInfo] = createSignal<RenderInfo[]>([]);
 
   const updateSkele = (base: SkeleNode) => {
-    base.tickMove(cameraPosition()[0], cameraPosition()[0], size(), rotation());
+    base.tickMove(cameraPosition()[0], cameraPosition()[1], size(), rotation());
 
     setSkele(base);
     setRenderedInfo(skele().renderAll(1, props => props));
@@ -79,64 +79,65 @@ function App() {
           children: [
             {
               angle: 0,
-              mag: -1,
-              children: [
-                {
-                  angle: 0,
-                  mag: 1,
-                  uri: 'sprite:strawberry/Still/Bottom/BB',
-                  props: {
-                    hueRot: 0,
-                  },
-                  id: 'Bottom/BB',
-                },
-              ],
+              mag: 0.3,
+              uri: 'sprite:strawberry/Still/Bottom/BB',
+              props: {
+                hueRot: 0,
+              },
+              id: 'BB',
             },
             {
               angle: 0,
-              mag: 0,
+              mag: 0.2,
               children: [
                 {
                   angle: 0,
-                  mag: 1,
+                  mag: 0.25,
                   uri: 'sprite:strawberry/Still/Middle/MM',
                   props: {
                     hueRot: 0,
                   },
-                  id: 'Middle/MM',
+                  id: 'MM',
                 },
               ],
             },
             {
               angle: 0,
-              mag: 1,
+              mag: 0.48,
               children: [
                 {
                   angle: 0,
-                  mag: 1,
-                  uri: 'sprite:strawberry/Still/Top/TBLO',
+                  mag: 0.05,
+                  uri: 'sprite:strawberry/Still/Bottom/BT',
+                  id: 'BT',
+                  sort: -1,
+                },
+                {
+                  angle: 0,
+                  mag: 0.07,
+                  children: [
+                    {
+                      angle: 0,
+                      mag: 0.05,
+                      uri: 'sprite:strawberry/Still/Middle/MT',
+                      id: 'MT',
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              angle: 180,
+              mag: 0.4,
+              children: [
+                {
+                  angle: 180,
+                  mag: 0.5,
+                  uri: 'sprite:strawberry/Still/Middle/MB',
                   props: {
                     hueRot: 0,
                   },
-                  id: 'Top/TBLO',
-                },
-              ],
-            },
-            // {
-            //   angle: 0,
-            //   mag: this.scale,
-            //   uri: 'sprite:strawberry/Still/Outline',
-            //   id: 'Outline',
-            // },
-            {
-              angle: 0,
-              mag: 0.7,
-              children: [
-                {
-                  angle: 0,
-                  mag: 0,
-                  // uri: 'gfx/sphere.png',
-                  id: 'FiringPoint',
+                  id: 'MB',
                 },
               ],
             },
@@ -171,7 +172,6 @@ function App() {
       <h1 class="page-title">vector-pose</h1>
 
       <div class="editor-pane">
-        <h2 class="title">editor</h2>
         <div class="editor-window">
           <div class="sprite-holder">
             <For each={renderedInfo()} fallback={<div>...</div>}>
@@ -203,8 +203,7 @@ function App() {
                     top: `${node.state.mid.transform[1]}px`,
                   }}
                 >
-                  node #{index() + 1}
-                  {node.id ? ` (${node.id})` : ''}
+                  {node.id ? node.id : `node #${index() + 1}`}
                 </div>
               )}
             </For>
@@ -285,18 +284,15 @@ function App() {
       </div>
 
       <footer class="footer">
-        <h4 class="row">made with...</h4>
-        <div class="row">
-          <a href="https://vitejs.dev" target="_blank">
-            <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-          </a>
-          <a href="https://tauri.app" target="_blank">
-            <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-          </a>
-          <a href="https://solidjs.com" target="_blank">
-            <img src={logo} class="logo solid" alt="Solid logo" />
-          </a>
-        </div>
+        <a href="https://vitejs.dev" target="_blank">
+          <img src="/vite.svg" class="logo vite" alt="Vite logo" />
+        </a>
+        <a href="https://tauri.app" target="_blank">
+          <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
+        </a>
+        <a href="https://solidjs.com" target="_blank">
+          <img src={logo} class="logo solid" alt="Solid logo" />
+        </a>
       </footer>
     </div>
   );
