@@ -1,10 +1,9 @@
-import {createEffect, createSignal, For} from 'solid-js';
-import logo from './assets/logo.svg';
-import {invoke} from '@tauri-apps/api/tauri';
-import './App.css';
-import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 import {vec2} from 'gl-matrix';
+import {createSignal, For} from 'solid-js';
+import './App.css';
+import logo from './assets/logo.svg';
 import {toDegrees, toRadians} from './utils/Equa';
+import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 
 const preventDefault = (e: Event) => {
   // e.preventDefault();
