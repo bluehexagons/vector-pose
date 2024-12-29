@@ -24,6 +24,8 @@ function App() {
   const [size, setSize] = createSignal(100);
   const [rotation, setRotation] = createSignal(270);
 
+  const time = 1;
+
   const [cameraPosition, setCameraPosition] = createSignal(
     vec2.fromValues(300, 500)
   );
@@ -35,7 +37,8 @@ function App() {
     base.tickMove(cameraPosition()[0], cameraPosition()[1], size(), rotation());
 
     setSkele(base);
-    setRenderedInfo(skele().renderAll(1, props => props));
+    skele().updateState(time);
+    setRenderedInfo(skele().render(1, props => props));
     setRenderedNodes(Array.from(base.walk()).slice(1));
 
     console.log('ticked skele', skele());
@@ -45,9 +48,8 @@ function App() {
 
   const pushCurrentFiles = () => {
     const base = skele().clone();
-    const spriteRoot = base.children[0];
     for (const f of currentFiles()) {
-      spriteRoot.add(
+      base.add(
         SkeleNode.fromData({
           angle: 0,
           mag: 1,

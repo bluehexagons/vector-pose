@@ -1,11 +1,7 @@
-// Partial port from game code, MIT license
-
 import {vec2} from 'gl-matrix';
 import {lerpAngleRad, toDegrees, toRadians} from './Equa';
 import {lerp} from '@bluehexagons/easing';
-
-/** TODO */
-type ImageProps = any;
+import type {ImagePropsRef} from './Renderer';
 
 export interface SkeleData {
   /** Degrees */
@@ -15,16 +11,16 @@ export interface SkeleData {
   mag: number;
 
   uri?: string;
-  props?: ImageProps;
+  props?: ImagePropsRef;
   sort?: number;
 }
 
 export interface RenderInfo {
-  uri?: string;
+  uri: string;
   center: vec2;
   transform: vec2;
   direction: number;
-  props: ImageProps;
+  props: ImagePropsRef;
   sort: number;
 }
 
@@ -35,7 +31,7 @@ export class SkeleNode {
   parent: SkeleNode | null = null;
   children: SkeleNode[] = [];
   uri: string | null = null;
-  props: ImageProps = null;
+  props: ImagePropsRef | null = null;
   transform: vec2 = vec2.create();
   sort = 0;
   /** Radians! */
@@ -96,7 +92,7 @@ export class SkeleNode {
     skele.props = data.props ?? null;
     skele.sort = data.sort ?? 0;
 
-    skele.updateTransform();
+    vec2.set(skele.transform, mag * Math.cos(rads), mag * Math.sin(rads));
 
     for (const node of data.children ?? []) {
       skele.add(SkeleNode.fromData(node));
@@ -123,7 +119,6 @@ export class SkeleNode {
     this.rotation = toRadians(direction);
 
     this.tick();
-    return this;
   }
 
   tick() {
@@ -156,7 +151,7 @@ export class SkeleNode {
 
   findId(nodeId: string): SkeleNode {
     if (this.nodeLookupCache.has(nodeId)) {
-      return this.nodeLookupCache.get(nodeId) as SkeleNode;
+      return this.nodeLookupCache.get(nodeId)!;
     }
     for (const node of this.walk()) {
       if (node.id !== nodeId) {
@@ -177,32 +172,33 @@ export class SkeleNode {
     }
   }
 
-  /** This is a slight fork of the render method */
-  renderAll(
+  render(
     time: number,
-    propObjectDeduper: (props: ImageProps) => ImageProps
+    propObjectDeduper: (props: ImagePropsRef) => ImagePropsRef
   ): RenderInfo[] {
     const views: RenderInfo[] = [];
     for (const node of this.walk()) {
-      if (!node.parent) continue;
+      if (!node.uri) continue;
 
       const state = node.stateAt(time);
       const size = node.mag * state.scale;
 
-      const view = {
-        uri: node.uri || undefined,
+      views.push({
+        uri: node.uri,
         props: propObjectDeduper(node.props),
-        center: ((node as SkeleNode).parent as SkeleNode).stateAt(time)
-          .transform,
+        center: node.parent!.stateAt(time).transform,
         transform: vec2.fromValues(size, size),
         direction: toDegrees(state.rotation),
         sort: node.sort,
-      };
-      if (view.uri) {
-        views.push(view);
-      }
+      });
     }
     return views.sort(sortRenderInfo);
+  }
+
+  updateState(time: number) {
+    for (const node of this.walk()) {
+      node.stateAt(time);
+    }
   }
 
   // deeply clones the node recursively
@@ -246,7 +242,7 @@ export class SkeleNode {
     const out = SkeleNode.fromData(testData);
     out.tickMove(100, 100, 10, 0);
     console.log(out);
-    console.log(out.renderAll(1, props => props));
+    console.log(out.render(1, props => props));
     console.log('walking');
     for (const node of out.walk()) {
       console.log(node);
