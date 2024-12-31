@@ -20,7 +20,9 @@
   "mainBinaryName": "vector-pose",
   "version": "0.1.0",
   "identifier": "com.vector-pose.app",
-  "plugins": {},
+  "plugins": {
+    "fs": {}
+  },
   "app": {
     "security": {
       "csp": null

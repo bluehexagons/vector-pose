@@ -22,6 +22,7 @@ export interface RenderInfo {
   direction: number;
   props: ImagePropsRef;
   sort: number;
+  node: SkeleNode;
 }
 
 const sortRenderInfo = (a: RenderInfo, b: RenderInfo) => a.sort - b.sort;
@@ -190,6 +191,7 @@ export class SkeleNode {
         transform: vec2.fromValues(size, size),
         direction: toDegrees(state.rotation),
         sort: node.sort,
+        node,
       });
     }
     return views.sort(sortRenderInfo);

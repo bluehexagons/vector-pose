@@ -16,6 +16,7 @@
   "dependencies": {
     "@bluehexagons/easing": "^0.4.2",
     "@tauri-apps/api": "^2.1.1",
+    "@tauri-apps/plugin-fs": "~2",
     "@tauri-apps/plugin-shell": "^2.2.0",
     "gl-matrix": "^3.4.3",
     "solid-js": "^1.9.3"

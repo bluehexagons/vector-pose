@@ -2,10 +2,12 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.validate": [
-    "typescript"
-  ],
+  "eslint.validate": ["typescript"],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnPaste": true,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "emmet.showAbbreviationSuggestions": true,
+  "tailwindCSS.emmetCompletions": true,
+  "emmet.showSuggestionsAsSnippets": true,
+  "editor.snippetSuggestions": "bottom"
 }

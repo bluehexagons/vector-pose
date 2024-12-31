@@ -1,13 +1,25 @@
 import {vec2} from 'gl-matrix';
-import {createSignal, For} from 'solid-js';
+import {createSignal, For, Ref} from 'solid-js';
 import './App.css';
 import logo from './assets/logo.svg';
 import {toDegrees, toRadians} from './utils/Equa';
 import {RenderInfo, SkeleNode} from './utils/SkeleNode';
+import {resolveResource} from '@tauri-apps/api/path';
+import {exists, BaseDirectory} from '@tauri-apps/plugin-fs';
 
 const preventDefault = (e: Event) => {
   // e.preventDefault();
 };
+
+interface UiNode {
+  node: RenderInfo;
+}
+
+resolveResource('test').then(async resPath => {
+  console.log(resPath);
+  console.log(await exists(resPath));
+});
+// const home = await readTextFile(resPath);
 
 // temp
 function App() {
@@ -19,12 +31,16 @@ function App() {
   //   setGreetMsg(await invoke("greet", { name: name() }));
   // }
 
+  let spriteHolder: HTMLDivElement | undefined;
+
   const [skele, setSkele] = createSignal<SkeleNode>(new SkeleNode());
 
   const [size, setSize] = createSignal(100);
   const [rotation, setRotation] = createSignal(270);
 
   const time = 1;
+
+  const [dragStart, setDragStart] = createSignal<vec2>();
 
   const [cameraPosition, setCameraPosition] = createSignal(
     vec2.fromValues(300, 500)
@@ -72,88 +88,51 @@ function App() {
 
   // insert some test data
   (async () => {
-    updateSkele(
-      await renderUris(
-        SkeleNode.fromData({
-          angle: 0,
-          mag: 1,
-          children: [
-            {
-              angle: 0,
-              mag: 0.3,
-              uri: 'sprite:strawberry/Still/Bottom/BB',
-              props: {
-                hueRot: 0,
-              },
-              id: 'BB',
-            },
-            {
-              angle: 0,
-              mag: 0.2,
-              children: [
-                {
-                  angle: 0,
-                  mag: 0.25,
-                  uri: 'sprite:strawberry/Still/Middle/MM',
-                  props: {
-                    hueRot: 0,
-                  },
-                  id: 'MM',
-                },
-              ],
-            },
-            {
-              angle: 0,
-              mag: 0.48,
-              children: [
-                {
-                  angle: 0,
-                  mag: 0.05,
-                  uri: 'sprite:strawberry/Still/Bottom/BT',
-                  id: 'BT',
-                  sort: -1,
-                },
-                {
-                  angle: 0,
-                  mag: 0.07,
-                  children: [
-                    {
-                      angle: 0,
-                      mag: 0.05,
-                      uri: 'sprite:strawberry/Still/Middle/MT',
-                      id: 'MT',
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              angle: 180,
-              mag: 0.4,
-              children: [
-                {
-                  angle: 180,
-                  mag: 0.5,
-                  uri: 'sprite:strawberry/Still/Middle/MB',
-                  props: {
-                    hueRot: 0,
-                  },
-                  id: 'MB',
-                },
-              ],
-            },
-          ],
-        })
-      )
-    );
+    updateSkele(await renderUris(SkeleNode.fromData({angle: 0, mag: 1})));
   })();
 
-  const dragStartNode = (e: DragEvent) => {
-    console.log('node', e);
+  const [lastActiveNode, setLastActiveNode] = createSignal<
+    RenderInfo | undefined
+  >(undefined);
+
+  const [activeNode, setActiveNode] = createSignal<RenderInfo | undefined>(
+    undefined
+  );
+
+  const dragOverSprite = (e: MouseEvent) => {
+    const node = activeNode();
+    // console.log('sprite over', e);
+    if (!node) {
+      return;
+    }
+
+    e.preventDefault();
+    // const originalNode = node.node;
   };
 
-  const dragStartSprite = (e: DragEvent) => {
-    console.log('sprite', e);
+  const dropSprite = (e: MouseEvent) => {
+    const {pageX, pageY} = e;
+
+    const node = activeNode();
+    const startPos = dragStart();
+
+    console.log('sprite drop', node);
+
+    if (startPos && node) {
+      console.log(vec2.sub(vec2.create(), [pageX, pageY], startPos));
+
+      const newSkele = skele();
+
+      node.node.mag *= 1.5;
+
+      updateSkele(newSkele.clone());
+
+      // setLastActiveNode(newSkele.find[]);
+    } else {
+      setLastActiveNode(undefined);
+    }
+
+    setActiveNode(undefined);
   };
 
   const makeBlobUrl = async (file: File) => {
@@ -164,22 +143,58 @@ function App() {
     return imageUrl;
   };
 
+  const handleMouseDown = (e: MouseEvent) => {
+    e.preventDefault();
+
+    let closestNode: RenderInfo | undefined = undefined;
+    let closestDistance = Infinity;
+    const {pageX, pageY} = e;
+
+    for (const node of renderedInfo()) {
+      const dist = vec2.dist(
+        vec2.add(vec2.create(), node.center, [
+          spriteHolder?.offsetLeft || 0,
+          spriteHolder?.offsetTop || 0,
+        ]),
+        [pageX, pageY]
+      );
+      if (
+        dist < Math.sqrt(vec2.dot(node.transform, node.transform)) &&
+        dist < closestDistance
+      ) {
+        closestNode = node;
+        closestDistance = dist;
+      }
+    }
+
+    if (closestNode) {
+      const node = closestNode;
+      console.log(node);
+      setActiveNode(node);
+      setDragStart(vec2.fromValues(pageX, pageY));
+    }
+  };
+
   return (
     <div
       class="container"
       onContextMenu={preventDefault}
       onSelect={preventDefault}
+      onMouseUp={dropSprite}
+      onMouseMove={dragOverSprite}
+      onMouseDown={handleMouseDown}
     >
       <h1 class="page-title">vector-pose</h1>
 
       <div class="editor-pane">
         <div class="editor-window">
-          <div class="sprite-holder">
+          <div class="sprite-holder" ref={spriteHolder}>
             <For each={renderedInfo()} fallback={<div>...</div>}>
               {node => (
                 <div
-                  draggable={true}
-                  onDragStart={dragStartSprite}
+                  classList={{
+                    active: node.node === activeNode()?.node,
+                  }}
                   style={{
                     left: `${node.center[0]}px`,
                     top: `${node.center[1]}px`,
@@ -197,8 +212,9 @@ function App() {
             <For each={renderedNodes()}>
               {(node, index) => (
                 <div
-                  draggable={true}
-                  onDragStart={dragStartNode}
+                  classList={{
+                    active: node === activeNode()?.node,
+                  }}
                   style={{
                     left: `${node.state.mid.transform[0]}px`,
                     top: `${node.state.mid.transform[1]}px`,
@@ -217,7 +233,11 @@ function App() {
         <ol class="node-tree">
           <For each={renderedNodes()}>
             {(node, index) => (
-              <div draggable={true} onDragStart={dragStartNode}>
+              <div
+                classList={{
+                  active: node === activeNode()?.node,
+                }}
+              >
                 <div>
                   node #{index() + 1}
                   {node.id ? ` (${node.id})` : ''}
