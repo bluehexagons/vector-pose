@@ -1,11 +1,21 @@
-import { vec2 } from "gl-matrix";
-import "./App.css";
-import { toDegrees, toRadians } from "./utils/Equa";
-import { RenderInfo, SkeleNode } from "./utils/SkeleNode";
-import { useEffect, useRef, useState } from "react";
-import { AngleInput } from "./components/AngleInput";
+import {vec2} from 'gl-matrix';
+import './App.css';
+import {toDegrees, toRadians} from './utils/Equa';
+import {RenderInfo, SkeleNode} from './utils/SkeleNode';
+import {useEffect, useRef, useState} from 'react';
+import {AngleInput} from './components/AngleInput';
 
-const preventDefault = (e: { preventDefault(): void }) => {
+import type {dialog} from 'electron';
+
+declare global {
+  interface Window {
+    native: {
+      showOpenDialog: typeof dialog.showOpenDialog;
+    };
+  }
+}
+
+const preventDefault = (e: {preventDefault(): void}) => {
   e.preventDefault();
 };
 
@@ -47,11 +57,11 @@ export const AppRoot = () => {
     base.tickMove(cameraPosition[0], cameraPosition[1], size, rotation);
 
     base.updateState(time);
-    setRenderedInfo(base.render(1, (props) => props));
+    setRenderedInfo(base.render(1, props => props));
     setRenderedNodes(Array.from(base.walk()).slice(1));
 
     setSkele(base);
-    console.log("ticked skele", base);
+    console.log('ticked skele', base);
   };
 
   const [currentFiles, setCurrentFiles] = useState([] as string[]);
@@ -73,10 +83,10 @@ export const AppRoot = () => {
 
   const renderUris = async (skele: SkeleNode) => {
     for (const node of skele.walk()) {
-      if (node.uri?.startsWith("sprite:")) {
+      if (node.uri?.startsWith('sprite:')) {
         node.uri = `./data/gfx/sprite/${node.uri
           .slice(7)
-          .replace("Still", "Strawberry-001a_Still")}.PNG`;
+          .replace('Still', 'Strawberry-001a_Still')}.PNG`;
       }
     }
     return skele;
@@ -85,7 +95,7 @@ export const AppRoot = () => {
   // insert some test data
   useEffect(() => {
     (async () => {
-      updateSkele(await renderUris(SkeleNode.fromData({ angle: 0, mag: 1 })));
+      updateSkele(await renderUris(SkeleNode.fromData({angle: 0, mag: 1})));
     })();
   }, []);
 
@@ -109,12 +119,12 @@ export const AppRoot = () => {
   };
 
   const dropSprite = (e: React.MouseEvent) => {
-    const { pageX, pageY } = e;
+    const {pageX, pageY} = e;
 
     const node = activeNode;
     const startPos = dragStart;
 
-    console.log("sprite drop", node);
+    console.log('sprite drop', node);
 
     if (startPos && node) {
       console.log(vec2.sub(vec2.create(), [pageX, pageY], startPos));
@@ -144,7 +154,7 @@ export const AppRoot = () => {
   const handleMouseDown = (e: React.MouseEvent) => {
     let closestNode: RenderInfo | undefined = undefined;
     let closestDistance = Infinity;
-    const { pageX, pageY } = e;
+    const {pageX, pageY} = e;
 
     for (const node of renderedInfo) {
       const dist = vec2.dist(
@@ -183,11 +193,11 @@ export const AppRoot = () => {
       <h1 className="page-title">vector-pose</h1>
 
       <div className="editor-pane">
-        <div className="editor-window"       onMouseDown={handleMouseDown}>
+        <div className="editor-window" onMouseDown={handleMouseDown}>
           <div className="sprite-holder" ref={spriteHolder}>
-            {renderedInfo.map((node) => (
+            {renderedInfo.map(node => (
               <div
-                className={node.node === activeNode?.node ? "active" : ""}
+                className={node.node === activeNode?.node ? 'active' : ''}
                 style={{
                   left: `${node.center[0]}px`,
                   top: `${node.center[1]}px`,
@@ -205,7 +215,7 @@ export const AppRoot = () => {
           <div className="node-graph">
             {renderedNodes.map((node, index) => (
               <div
-                className={node === activeNode?.node ? "active" : ""}
+                className={node === activeNode?.node ? 'active' : ''}
                 style={{
                   left: `${node.state.mid.transform[0]}px`,
                   top: `${node.state.mid.transform[1]}px`,
@@ -222,20 +232,18 @@ export const AppRoot = () => {
         <h2 className="title">nodes</h2>
         <ol className="node-tree">
           {renderedNodes.map((node, index) => (
-            <div className={node === activeNode?.node ? "active" : ""}>
+            <div className={node === activeNode?.node ? 'active' : ''}>
               <div>
                 node #{index + 1}
-                {node.id ? ` (${node.id})` : ""}
+                {node.id ? ` (${node.id})` : ''}
               </div>
               <div>
                 angle=
                 <AngleInput
                   value={node.rotation}
-                  onChange={(v) => {
-                    console.log("angle", toDegrees(v));
-                    node.rotation = 
-                      v
-                    ;
+                  onChange={v => {
+                    console.log('angle', toDegrees(v));
+                    node.rotation = v;
                     node.updateTransform();
                     updateSkele(skele.clone());
                   }}
@@ -243,8 +251,8 @@ export const AppRoot = () => {
                 &nbsp; mag=
                 <input
                   value={node.mag}
-                  onChange={(evt) => {
-                    console.log("mag", evt.target.value);
+                  onChange={evt => {
+                    console.log('mag', evt.target.value);
                     node.mag = parseFloat(evt.target.value) || 0;
                     node.updateTransform();
                     updateSkele(skele.clone());
@@ -254,9 +262,9 @@ export const AppRoot = () => {
               <div>
                 uri=
                 <input
-                  value={node.uri || ""}
-                  onChange={(evt) => {
-                    console.log("uri", evt.target.value);
+                  value={node.uri || ''}
+                  onChange={evt => {
+                    console.log('uri', evt.target.value);
                     node.uri = evt.target.value || null;
                     updateSkele(skele.clone());
                   }}
@@ -266,24 +274,46 @@ export const AppRoot = () => {
           ))}
         </ol>
         <div className="row">
-          <input
-            type="file"
-            onChange={async (e) => {
-              console.log(e);
-              if (!e.target.files) return;
+          <button
+            onClick={async () => {
+              const files = await window.native.showOpenDialog({
+                properties: [
+                  'openFile',
+                  'multiSelections',
+                  'treatPackageAsDirectory',
+                  'promptToCreate',
+                ],
+                filters: [
+                  {
+                    name: 'Supported Files',
+                    extensions: ['fab.json', 'jpg', 'jpeg', 'png', 'webp'],
+                  },
+                  {name: 'Prefab Files', extensions: ['fab.json']},
+                  {
+                    name: 'Image Files',
+                    extensions: ['jpg', 'jpeg', 'png', 'webp'],
+                  },
+                  {name: 'All Files', extensions: ['*']},
+                ],
+              });
+              console.log('got back');
+              console.log(files);
+              if (!files || files.canceled) return;
 
               const imageUris: string[] = [];
 
-              for (const file of e.target.files) {
-                const blobUrl = await makeBlobUrl(file);
-                imageUris.push(blobUrl);
+              for (const file of files.filePaths) {
+                console.log(file);
+                // const blobUrl = await makeBlobUrl(file);
+                // imageUris.push(blobUrl);
               }
 
               setCurrentFiles(imageUris);
               pushCurrentFiles();
             }}
-            multiple
-          />
+          >
+            Open File(s)
+          </button>
           <button onClick={pushCurrentFiles}>+</button>
         </div>
       </div>
