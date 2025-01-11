@@ -20,22 +20,15 @@ const preventDefault = (e: {preventDefault(): void}) => {
 };
 
 interface UiNode {
-  node: RenderInfo;
+  node: SkeleNode;
 }
 
-// const home = await readTextFile(resPath);
-
-// temp
 export const AppRoot = () => {
-  // const [greetMsg, setGreetMsg] = createSignal('');
-  // const [name, setName] = createSignal('');
-
-  // async function greet() {
-  //   // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-  //   setGreetMsg(await invoke("greet", { name: name() }));
-  // }
-
   const spriteHolder = useRef<HTMLDivElement | undefined>(undefined);
+
+  const [gameDirectory, setGameDirectory] = useState(
+    localStorage.getItem('gameDirectory') || './'
+  );
 
   const [skele, setSkele] = useState<SkeleNode>(new SkeleNode());
 
@@ -99,13 +92,11 @@ export const AppRoot = () => {
     })();
   }, []);
 
-  const [lastActiveNode, setLastActiveNode] = useState<RenderInfo | undefined>(
+  const [lastActiveNode, setLastActiveNode] = useState<UiNode | undefined>(
     undefined
   );
 
-  const [activeNode, setActiveNode] = useState<RenderInfo | undefined>(
-    undefined
-  );
+  const [activeNode, setActiveNode] = useState<UiNode | undefined>(undefined);
 
   const dragOverSprite = (e: React.MouseEvent) => {
     const node = activeNode;
@@ -124,22 +115,29 @@ export const AppRoot = () => {
     const node = activeNode;
     const startPos = dragStart;
 
-    console.log('sprite drop', node);
-
-    if (startPos && node) {
-      console.log(vec2.sub(vec2.create(), [pageX, pageY], startPos));
-
-      const newSkele = skele;
-
-      node.node.mag *= 1.5;
-
-      updateSkele(newSkele.clone());
-
-      // setLastActiveNode(newSkele.find[]);
-    } else {
+    if (!startPos || !node) {
       setLastActiveNode(undefined);
+      setActiveNode(undefined);
+      return;
     }
 
+    console.log(
+      'sprite drop',
+      node,
+      vec2.sub(vec2.create(), [pageX, pageY], startPos)
+    );
+
+    const newSkele = skele.clone();
+
+    const newNode = newSkele.findId(node.node.id);
+
+    newNode.mag *= 1.5;
+
+    updateSkele(newSkele);
+
+    setLastActiveNode({node: newNode});
+
+    setLastActiveNode(activeNode);
     setActiveNode(undefined);
   };
 
@@ -190,7 +188,36 @@ export const AppRoot = () => {
       onMouseUp={dropSprite}
       onMouseMove={dragOverSprite}
     >
-      <h1 className="page-title">vector-pose</h1>
+      <div className="page-title">
+        <h1 style={{flexGrow: 1, textAlign: 'left'}}>vector-pose</h1>
+        <p>
+          <button
+            onClick={async () => {
+              const response = await window.native.showOpenDialog({
+                properties: ['openDirectory', 'treatPackageAsDirectory'],
+                title: 'Open a fab file, or add image layers',
+                buttonLabel: 'Open',
+              });
+              console.log('got back');
+              console.log(response);
+              if (!response || response.canceled) return;
+
+              for (const file of response.filePaths) {
+                console.log(file);
+                // const blobUrl = await makeBlobUrl(file);
+                // imageUris.push(blobUrl);
+                if (file) {
+                  setGameDirectory(file);
+                  localStorage.setItem('gameDirectory', file);
+                  return;
+                }
+              }
+            }}
+          >
+            Choose Directory (currently: {gameDirectory})
+          </button>
+        </p>
+      </div>
 
       <div className="editor-pane">
         <div className="editor-window" onMouseDown={handleMouseDown}>
@@ -276,13 +303,15 @@ export const AppRoot = () => {
         <div className="row">
           <button
             onClick={async () => {
-              const files = await window.native.showOpenDialog({
+              const response = await window.native.showOpenDialog({
                 properties: [
                   'openFile',
                   'multiSelections',
                   'treatPackageAsDirectory',
                   'promptToCreate',
                 ],
+                title: 'Open a fab file, or add image layers',
+                buttonLabel: 'Open',
                 filters: [
                   {
                     name: 'Supported Files',
@@ -297,12 +326,12 @@ export const AppRoot = () => {
                 ],
               });
               console.log('got back');
-              console.log(files);
-              if (!files || files.canceled) return;
+              console.log(response);
+              if (!response || response.canceled) return;
 
               const imageUris: string[] = [];
 
-              for (const file of files.filePaths) {
+              for (const file of response.filePaths) {
                 console.log(file);
                 // const blobUrl = await makeBlobUrl(file);
                 // imageUris.push(blobUrl);
