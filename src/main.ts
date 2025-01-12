@@ -1,11 +1,66 @@
 import {app, BrowserWindow, dialog, ipcMain} from 'electron';
 import path from 'path';
+import fs from 'fs/promises';
 import squirrelStarted from 'electron-squirrel-startup';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (squirrelStarted) {
   app.quit();
 }
+
+// Add IPC handlers before the init function
+ipcMain.handle('dialog', async (_event, method: 'showOpenDialog', params) => {
+  const result = await dialog[method](params);
+  return result;
+});
+
+ipcMain.handle('fs:readdir', async (_event, dirPath: string) => {
+  try {
+    const entries = await fs.readdir(dirPath, {withFileTypes: true});
+    return entries.map(entry => ({
+      name: entry.name,
+      isDirectory: entry.isDirectory(),
+      path: path.join(dirPath, entry.name),
+      relativePath: path.relative(dirPath, path.join(dirPath, entry.name)),
+    }));
+  } catch (err) {
+    console.error('Failed to read directory:', err);
+    throw err;
+  }
+});
+
+ipcMain.handle('fs:readFile', async (_event, filePath: string) => {
+  try {
+    const content = await fs.readFile(filePath);
+    return content;
+  } catch (err) {
+    console.error('Failed to read file:', err);
+    throw err;
+  }
+});
+
+ipcMain.handle('path:extname', (_event, filePath: string) => {
+  return path.extname(filePath).toLowerCase();
+});
+
+ipcMain.handle('path:basename', (_event, filePath: string) => {
+  return path.basename(filePath);
+});
+
+ipcMain.handle('path:join', (_event, ...paths: string[]) => {
+  return path.join(...paths);
+});
+
+ipcMain.handle('path:relative', (_event, from: string, to: string) => {
+  return path.relative(from, to);
+});
+
+ipcMain.handle(
+  'fs:resolveGamePath',
+  (_event, gameDir: string, relativePath: string) => {
+    return path.resolve(gameDir, relativePath);
+  }
+);
 
 const init = async () => {
   const createWindow = async () => {
@@ -39,9 +94,7 @@ const init = async () => {
   await createWindow();
 
   ipcMain.handle('dialog', async (_event, method: 'showOpenDialog', params) => {
-    console.log('we run', method);
     const result = await dialog[method](params);
-    console.log('we done');
 
     return result;
   });

@@ -1,49 +1,92 @@
-import type {dialog} from 'electron';
 import {vec2} from 'gl-matrix';
 import {useEffect, useRef, useState} from 'react';
 import './AppRoot.css';
 import {AngleInput} from './components/AngleInput';
 import {toDegrees} from './utils/Equa';
 import {RenderInfo, SkeleNode} from './utils/SkeleNode';
+import {
+  SEARCH_DIRS,
+  IMAGE_EXTENSIONS,
+  FAB_EXTENSIONS,
+  FileEntry,
+  toSpriteUri,
+  fromSpriteUri,
+  ImageCache,
+} from './shared/types';
+import {GameImage} from './components/GameImage';
 
-declare global {
-  interface Window {
-    native: {
-      showOpenDialog: typeof dialog.showOpenDialog;
-    };
-  }
-}
-
-const preventDefault = (e: {preventDefault(): void}) => {
-  e.preventDefault();
-};
+const INITIAL_SIZE = 100;
+const INITIAL_ROTATION = 270;
+const INITIAL_CAMERA_POSITION = vec2.fromValues(300, 500);
 
 interface UiNode {
   node: SkeleNode;
 }
 
+const scanDirectory = async (
+  baseDir: string,
+  subDir: string
+): Promise<FileEntry[]> => {
+  const fullPath = await window.native.path.join(baseDir, subDir);
+  const entries: FileEntry[] = [];
+
+  try {
+    const files = await window.native.fs.readdir(fullPath);
+
+    for (const file of files) {
+      const relativePath = file.relativePath;
+
+      if (file.isDirectory) {
+        entries.push(
+          ...(await scanDirectory(
+            baseDir,
+            await window.native.path.join(subDir, file.name)
+          ))
+        );
+      } else {
+        const ext = await window.native.path.extname(file.name);
+        if (IMAGE_EXTENSIONS.includes(ext as any)) {
+          entries.push({path: file.path, relativePath, type: 'image'});
+        } else if (FAB_EXTENSIONS.some(fabExt => file.name.endsWith(fabExt))) {
+          entries.push({path: file.path, relativePath, type: 'fab'});
+        }
+      }
+    }
+  } catch (err) {
+    console.error(`Failed to scan directory ${fullPath}:`, err);
+  }
+
+  return entries;
+};
+
+const preventDefault = (e: React.SyntheticEvent) => e.preventDefault();
+
 export const AppRoot = () => {
-  const spriteHolder = useRef<HTMLDivElement | undefined>(undefined);
+  const spriteHolderRef = useRef<HTMLDivElement>(null);
 
   const [gameDirectory, setGameDirectory] = useState(
-    localStorage.getItem('gameDirectory') || './'
+    () => localStorage.getItem('gameDirectory') || './'
   );
 
-  const [skele, setSkele] = useState<SkeleNode>(new SkeleNode());
-
-  const [size, setSize] = useState(100);
-  const [rotation, setRotation] = useState(270);
-
-  const time = 1;
-
+  const [skele, setSkele] = useState(() => new SkeleNode());
+  const [size, setSize] = useState(INITIAL_SIZE);
+  const [rotation, setRotation] = useState(INITIAL_ROTATION);
   const [dragStart, setDragStart] = useState<vec2>();
+  const [cameraPosition, setCameraPosition] = useState(INITIAL_CAMERA_POSITION);
 
-  const [cameraPosition, setCameraPosition] = useState(
-    vec2.fromValues(300, 500)
-  );
+  const [time, setTime] = useState(1);
 
   const [renderedNodes, setRenderedNodes] = useState<SkeleNode[]>([]);
   const [renderedInfo, setRenderedInfo] = useState<RenderInfo[]>([]);
+
+  const [imageCache, setImageCache] = useState<ImageCache>({});
+
+  // Clean up blob URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      Object.values(imageCache).forEach(URL.revokeObjectURL);
+    };
+  }, []);
 
   const updateSkele = (base: SkeleNode) => {
     base.tickMove(cameraPosition[0], cameraPosition[1], size, rotation);
@@ -56,8 +99,9 @@ export const AppRoot = () => {
     console.log('ticked skele', base);
   };
 
-  const [currentFiles, setCurrentFiles] = useState([] as string[]);
+  const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
 
+  const [currentFiles, setCurrentFiles] = useState([] as string[]);
   const pushCurrentFiles = () => {
     const base = skele.clone();
     for (const f of currentFiles) {
@@ -73,22 +117,9 @@ export const AppRoot = () => {
     updateSkele(base);
   };
 
-  const renderUris = async (skele: SkeleNode) => {
-    for (const node of skele.walk()) {
-      if (node.uri?.startsWith('sprite:')) {
-        node.uri = `./data/gfx/sprite/${node.uri
-          .slice(7)
-          .replace('Still', 'Strawberry-001a_Still')}.PNG`;
-      }
-    }
-    return skele;
-  };
-
   // insert some test data
   useEffect(() => {
-    (async () => {
-      updateSkele(await renderUris(SkeleNode.fromData({angle: 0, mag: 1})));
-    })();
+    updateSkele(SkeleNode.fromData({angle: 0, mag: 1}));
   }, []);
 
   const [lastActiveNode, setLastActiveNode] = useState<UiNode | undefined>(
@@ -97,132 +128,249 @@ export const AppRoot = () => {
 
   const [activeNode, setActiveNode] = useState<UiNode | undefined>(undefined);
 
-  const dragOverSprite = (e: React.MouseEvent) => {
-    const node = activeNode;
-    // console.log('sprite over', e);
-    if (!node) {
-      return;
-    }
-
-    e.preventDefault;
-    // const originalNode = node.node;
-  };
-
-  const dropSprite = (e: React.MouseEvent) => {
-    const {pageX, pageY} = e;
-
-    const node = activeNode;
-    const startPos = dragStart;
-
-    if (!startPos || !node) {
+  const handleDropSprite = (e: React.MouseEvent) => {
+    if (!dragStart || !activeNode) {
       setLastActiveNode(undefined);
       setActiveNode(undefined);
       return;
     }
 
-    console.log(
-      'sprite drop',
-      node,
-      vec2.sub(vec2.create(), [pageX, pageY], startPos)
-    );
+    const delta = vec2.sub(vec2.create(), [e.pageX, e.pageY], dragStart);
 
     const newSkele = skele.clone();
+    const newNode = newSkele.findId(activeNode.node.id);
 
-    const newNode = newSkele.findId(node.node.id);
+    if (newNode) {
+      newNode.mag *= 1.5;
+      updateSkele(newSkele);
+      setLastActiveNode({node: newNode});
+    }
 
-    newNode.mag *= 1.5;
-
-    updateSkele(newSkele);
-
-    setLastActiveNode({node: newNode});
-
-    setLastActiveNode(activeNode);
     setActiveNode(undefined);
   };
 
-  const makeBlobUrl = async (file: File) => {
-    const blob = new Blob([await file.arrayBuffer()], {
-      type: file.type,
-    });
-    const imageUrl = URL.createObjectURL(blob);
-    return imageUrl;
+  const handleNodeSelection = (node: RenderInfo, e: React.MouseEvent) => {
+    setActiveNode({node: node.node});
+    setDragStart(vec2.fromValues(e.pageX, e.pageY));
+    e.preventDefault();
+  };
+
+  const findClosestNode = (x: number, y: number): RenderInfo | undefined => {
+    if (!spriteHolderRef.current) return undefined;
+
+    return renderedInfo.reduce((closest, node) => {
+      const nodePos = vec2.add(vec2.create(), node.center, [
+        spriteHolderRef.current?.offsetLeft || 0,
+        spriteHolderRef.current?.offsetTop || 0,
+      ]);
+
+      const dist = vec2.dist(nodePos, [x, y]);
+      const nodeSize = Math.sqrt(vec2.dot(node.transform, node.transform));
+
+      if (dist < (closest?.distance ?? Infinity) && dist < nodeSize) {
+        return {node, distance: dist};
+      }
+      return closest;
+    }, undefined as {node: RenderInfo; distance: number} | undefined)?.node;
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    let closestNode: RenderInfo | undefined = undefined;
-    let closestDistance = Infinity;
-    const {pageX, pageY} = e;
-
-    for (const node of renderedInfo) {
-      const dist = vec2.dist(
-        vec2.add(vec2.create(), node.center, [
-          spriteHolder.current?.offsetLeft || 0,
-          spriteHolder.current?.offsetTop || 0,
-        ]),
-        [pageX, pageY]
-      );
-      if (
-        dist < closestDistance &&
-        dist < Math.sqrt(vec2.dot(node.transform, node.transform))
-      ) {
-        closestNode = node;
-        closestDistance = dist;
-      }
-    }
-
+    const closestNode = findClosestNode(e.pageX, e.pageY);
     if (closestNode) {
-      const node = closestNode;
-      console.log(node);
-      setActiveNode(node);
-      setDragStart(vec2.fromValues(pageX, pageY));
-      e.preventDefault();
+      handleNodeSelection(closestNode, e);
     }
   };
+
+  const loadDirectoryFiles = async (directory: string) => {
+    const entries: FileEntry[] = [];
+
+    for (const searchDir of SEARCH_DIRS) {
+      entries.push(...(await scanDirectory(directory, searchDir)));
+    }
+
+    setAvailableFiles(entries);
+    console.log('Loaded files:', entries);
+  };
+
+  const handleDirectorySelect = async () => {
+    try {
+      const response = await window.native.showOpenDialog({
+        properties: ['openDirectory', 'treatPackageAsDirectory'],
+        title: 'Select Game Directory',
+        buttonLabel: 'Open',
+      });
+
+      if (!response.canceled && response.filePaths.length > 0) {
+        const newDir = response.filePaths[0];
+        setGameDirectory(newDir);
+        localStorage.setItem('gameDirectory', newDir);
+        await loadDirectoryFiles(newDir);
+      }
+    } catch (err) {
+      console.error('Failed to select directory:', err);
+    }
+  };
+
+  const makeBlobUrl = async (filePath: string) => {
+    try {
+      const buffer = await window.native.fs.readFile(filePath);
+      const blob = new Blob([buffer]);
+      return URL.createObjectURL(blob);
+    } catch (err) {
+      console.error('Failed to create blob URL:', err);
+      return null;
+    }
+  };
+
+  const dragOverSprite = (e: React.MouseEvent) => {
+    if (!activeNode || !dragStart) {
+      return;
+    }
+
+    e.preventDefault();
+
+    const delta = vec2.sub(vec2.create(), [e.pageX, e.pageY], dragStart);
+
+    const newSkele = skele.clone();
+    const newNode = newSkele.findId(activeNode.node.id);
+
+    if (newNode) {
+      // Update node position based on drag delta
+      newNode.state.mid.transform[0] += delta[0] * 0.1;
+      newNode.state.mid.transform[1] += delta[1] * 0.1;
+
+      // Update the drag start for continuous movement
+      setDragStart([e.pageX, e.pageY]);
+
+      // Apply changes
+      updateSkele(newSkele);
+    }
+  };
+
+  const handleFileSelect = async () => {
+    const response = await window.native.showOpenDialog({
+      properties: ['openFile', 'multiSelections', 'treatPackageAsDirectory'],
+      title: 'Add image layers',
+      buttonLabel: 'Add',
+      filters: [
+        {
+          name: 'Supported Files',
+          extensions: ['fab.json', 'jpg', 'jpeg', 'png', 'webp'],
+        },
+        {name: 'Prefab Files', extensions: ['fab.json']},
+        {name: 'Image Files', extensions: ['jpg', 'jpeg', 'png', 'webp']},
+      ],
+    });
+
+    if (!response || response.canceled) return;
+
+    const newFiles = await Promise.all(
+      response.filePaths.map(
+        async filePath =>
+          ({
+            path: filePath,
+            relativePath: await window.native.path.basename(filePath),
+            type:
+              (await window.native.path.extname(filePath)) === '.json'
+                ? 'fab'
+                : 'image',
+          } as FileEntry)
+      )
+    );
+
+    setAvailableFiles(prev => [...prev, ...newFiles]);
+  };
+
+  useEffect(() => {
+    if (gameDirectory) {
+      loadDirectoryFiles(gameDirectory);
+    }
+  }, [gameDirectory]);
 
   return (
     <div
       className="container"
       onContextMenu={preventDefault}
       onSelect={preventDefault}
-      onMouseUp={dropSprite}
+      onMouseUp={handleDropSprite}
       onMouseMove={dragOverSprite}
     >
-      <div className="page-title">
-        <h1 style={{flexGrow: 1, textAlign: 'left'}}>vector-pose</h1>
-        <p>
-          <button
-            onClick={async () => {
-              const response = await window.native.showOpenDialog({
-                properties: ['openDirectory', 'treatPackageAsDirectory'],
-                title: 'Open a fab file, or add image layers',
-                buttonLabel: 'Open',
-              });
-              console.log('got back');
-              console.log(response);
-              if (!response || response.canceled) return;
+      <div className="top-header">
+        <h1 style={{margin: 0}}>vector-pose</h1>
+      </div>
 
-              for (const file of response.filePaths) {
-                console.log(file);
-                // const blobUrl = await makeBlobUrl(file);
-                // imageUris.push(blobUrl);
-                if (file) {
-                  setGameDirectory(file);
-                  localStorage.setItem('gameDirectory', file);
-                  return;
-                }
-              }
-            }}
-          >
-            Choose Directory (currently: {gameDirectory})
-          </button>
-        </p>
+      <div className="page-title">tabs</div>
+
+      <div className="file-explorer-pane">
+        <h2 className="title">Files</h2>
+
+        <h3>Image Files</h3>
+        <ul className="file-list">
+          {availableFiles
+            .filter(file => file.type === 'image')
+            .map(file => (
+              <li
+                key={file.path}
+                className={`file-list-item ${
+                  activeNode?.node.uri === file.path ? 'selected' : ''
+                }`}
+                onClick={() => {
+                  const spriteUri = toSpriteUri(file.path);
+                  console.log('trying to load', file.path, spriteUri);
+                  if (!spriteUri) return;
+
+                  const newSkele = skele.clone();
+                  newSkele.add(
+                    SkeleNode.fromData({
+                      angle: 0,
+                      mag: 1,
+                      uri: spriteUri,
+                    })
+                  );
+                  console.log(newSkele);
+                  updateSkele(newSkele);
+                }}
+              >
+                <span className="file-type-image">{file.relativePath}</span>
+              </li>
+            ))}
+        </ul>
+
+        <h3>Prefab Files</h3>
+        <ul className="file-list">
+          {availableFiles
+            .filter(file => file.type === 'fab')
+            .map(file => (
+              <li
+                key={file.path}
+                className={`file-list-item ${
+                  activeNode?.node.uri === file.path ? 'selected' : ''
+                }`}
+                onClick={() => {
+                  // TODO: Load fab file
+                  console.log('Loading fab:', file.path);
+                }}
+              >
+                <span className="file-type-fab">{file.relativePath}</span>
+              </li>
+            ))}
+        </ul>
+
+        <div className="row">
+          <button onClick={handleFileSelect}>Add Files</button>
+        </div>
+
+        <button onClick={handleDirectorySelect}>
+          Change Directory (currently: {gameDirectory})
+        </button>
       </div>
 
       <div className="editor-pane">
         <div className="editor-window" onMouseDown={handleMouseDown}>
-          <div className="sprite-holder" ref={spriteHolder}>
+          <div className="sprite-holder" ref={spriteHolderRef}>
             {renderedInfo.map(node => (
               <div
+                key={node.node.id}
                 className={node.node === activeNode?.node ? 'active' : ''}
                 style={{
                   left: `${node.center[0]}px`,
@@ -234,7 +382,17 @@ export const AppRoot = () => {
                   }deg)`,
                 }}
               >
-                <img src={node.uri} />
+                {node.uri && (
+                  <GameImage
+                    uri={fromSpriteUri(node.uri)}
+                    gameDirectory={gameDirectory}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                    }}
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -300,48 +458,6 @@ export const AppRoot = () => {
           ))}
         </ol>
         <div className="row">
-          <button
-            onClick={async () => {
-              const response = await window.native.showOpenDialog({
-                properties: [
-                  'openFile',
-                  'multiSelections',
-                  'treatPackageAsDirectory',
-                  'promptToCreate',
-                ],
-                title: 'Open a fab file, or add image layers',
-                buttonLabel: 'Open',
-                filters: [
-                  {
-                    name: 'Supported Files',
-                    extensions: ['fab.json', 'jpg', 'jpeg', 'png', 'webp'],
-                  },
-                  {name: 'Prefab Files', extensions: ['fab.json']},
-                  {
-                    name: 'Image Files',
-                    extensions: ['jpg', 'jpeg', 'png', 'webp'],
-                  },
-                  {name: 'All Files', extensions: ['*']},
-                ],
-              });
-              console.log('got back');
-              console.log(response);
-              if (!response || response.canceled) return;
-
-              const imageUris: string[] = [];
-
-              for (const file of response.filePaths) {
-                console.log(file);
-                // const blobUrl = await makeBlobUrl(file);
-                // imageUris.push(blobUrl);
-              }
-
-              setCurrentFiles(imageUris);
-              pushCurrentFiles();
-            }}
-          >
-            Open File(s)
-          </button>
           <button onClick={pushCurrentFiles}>+</button>
         </div>
       </div>
