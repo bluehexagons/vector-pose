@@ -1,11 +1,10 @@
-import {vec2} from 'gl-matrix';
-import './App.css';
-import {toDegrees, toRadians} from './utils/Equa';
-import {RenderInfo, SkeleNode} from './utils/SkeleNode';
-import {useEffect, useRef, useState} from 'react';
-import {AngleInput} from './components/AngleInput';
-
 import type {dialog} from 'electron';
+import {vec2} from 'gl-matrix';
+import {useEffect, useRef, useState} from 'react';
+import './AppRoot.css';
+import {AngleInput} from './components/AngleInput';
+import {toDegrees} from './utils/Equa';
+import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 
 declare global {
   interface Window {
