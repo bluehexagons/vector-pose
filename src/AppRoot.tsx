@@ -12,8 +12,10 @@ import {
   toSpriteUri,
   fromSpriteUri,
   ImageCache,
+  createFileTree,
 } from './shared/types';
 import {GameImage} from './components/GameImage';
+import {FileTreeView} from './components/FileTreeView';
 
 const INITIAL_SIZE = 100;
 const INITIAL_ROTATION = 270;
@@ -299,61 +301,34 @@ export const AppRoot = () => {
         <h1 style={{margin: 0}}>vector-pose</h1>
       </div>
 
-      <div className="page-title">tabs</div>
+      <div className="page-title">tabs, what?</div>
 
       <div className="file-explorer-pane">
         <h2 className="title">Files</h2>
 
-        <h3>Image Files</h3>
         <ul className="file-list">
-          {availableFiles
-            .filter(file => file.type === 'image')
-            .map(file => (
-              <li
-                key={file.path}
-                className={`file-list-item ${
-                  activeNode?.node.uri === file.path ? 'selected' : ''
-                }`}
-                onClick={() => {
-                  const spriteUri = toSpriteUri(file.path);
-                  console.log('trying to load', file.path, spriteUri);
-                  if (!spriteUri) return;
+          <FileTreeView
+            nodes={createFileTree(availableFiles)}
+            onFileClick={file => {
+              if (file.type === 'image') {
+                const spriteUri = toSpriteUri(file.path);
+                if (!spriteUri) return;
 
-                  const newSkele = skele.clone();
-                  newSkele.add(
-                    SkeleNode.fromData({
-                      angle: 0,
-                      mag: 1,
-                      uri: spriteUri,
-                    })
-                  );
-                  console.log(newSkele);
-                  updateSkele(newSkele);
-                }}
-              >
-                <span className="file-type-image">{file.relativePath}</span>
-              </li>
-            ))}
-        </ul>
-
-        <h3>Prefab Files</h3>
-        <ul className="file-list">
-          {availableFiles
-            .filter(file => file.type === 'fab')
-            .map(file => (
-              <li
-                key={file.path}
-                className={`file-list-item ${
-                  activeNode?.node.uri === file.path ? 'selected' : ''
-                }`}
-                onClick={() => {
-                  // TODO: Load fab file
-                  console.log('Loading fab:', file.path);
-                }}
-              >
-                <span className="file-type-fab">{file.relativePath}</span>
-              </li>
-            ))}
+                const newSkele = skele.clone();
+                newSkele.add(
+                  SkeleNode.fromData({
+                    angle: 0,
+                    mag: 1,
+                    uri: spriteUri,
+                  })
+                );
+                updateSkele(newSkele);
+              } else if (file.type === 'fab') {
+                console.log('Loading fab:', file.path);
+              }
+            }}
+            activeFile={activeNode?.node.uri}
+          />
         </ul>
 
         <div className="row">

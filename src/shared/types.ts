@@ -34,6 +34,58 @@ export interface ImageCache {
   [key: string]: string; // Maps sprite URI to blob URL
 }
 
+export interface FileTreeNode {
+  name: string;
+  path: string;
+  type: 'directory' | 'fab' | 'image';
+  children: FileTreeNode[];
+}
+
+export function createFileTree(files: FileEntry[]): FileTreeNode[] {
+  const root: {[key: string]: FileTreeNode} = {};
+
+  for (const file of files) {
+    const parts = file.relativePath.split(/[/\\]/);
+    let current = root;
+
+    // Create directory nodes
+    for (let i = 0; i < parts.length - 1; i++) {
+      const part = parts[i];
+      if (!current[part]) {
+        current[part] = {
+          name: part,
+          path: parts.slice(0, i + 1).join('/'),
+          type: 'directory',
+          children: [],
+        };
+      }
+      current = current[part].children as any;
+    }
+
+    // Add file node
+    const fileName = parts[parts.length - 1];
+    current[fileName] = {
+      name: fileName,
+      path: file.path,
+      type: file.type,
+      children: [],
+    };
+  }
+
+  // Convert nested objects to arrays recursively
+  function objectToArray(obj: object): FileTreeNode[] {
+    return Object.values(obj).map(node => ({
+      ...node,
+      children:
+        node.children && typeof node.children === 'object'
+          ? objectToArray(node.children)
+          : [],
+    }));
+  }
+
+  return objectToArray(root);
+}
+
 declare global {
   interface Window {
     native: {
