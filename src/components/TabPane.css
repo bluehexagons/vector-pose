@@ -1,0 +1,19 @@
+.tab-pane {
+  grid-column: left-start / right-end;
+  grid-row: header-start / header-end;
+  display: flex;
+  gap: 10px;
+  justify-items: center;
+  align-items: center;
+  height: var(--header-height);
+  overflow: hidden;
+}
+
+.tab-pane ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}

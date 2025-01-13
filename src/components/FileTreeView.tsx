@@ -1,5 +1,6 @@
 import React from 'react';
 import {FileTreeNode} from '../shared/types';
+import './FileTreeView.css';
 
 interface FileTreeViewProps {
   nodes: FileTreeNode[];

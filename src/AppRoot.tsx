@@ -1,29 +1,28 @@
 import {vec2} from 'gl-matrix';
 import {useEffect, useRef, useState} from 'react';
 import './AppRoot.css';
-import {AngleInput} from './components/AngleInput';
-import {toDegrees} from './utils/Equa';
-import {RenderInfo, SkeleNode} from './utils/SkeleNode';
+import {EditorPane} from './components/EditorPane';
+import {FileTreeView} from './components/FileTreeView';
+import {HeaderPane} from './components/HeaderPane';
+import {LayersPane} from './components/LayersPane';
+import {TabPane} from './components/TabPane';
+import {FileExplorerPane} from './components/FileExplorerPane';
+import {Resizer} from './components/Resizer';
 import {
-  SEARCH_DIRS,
-  IMAGE_EXTENSIONS,
+  createFileTree,
   FAB_EXTENSIONS,
   FileEntry,
-  toSpriteUri,
-  fromSpriteUri,
+  IMAGE_EXTENSIONS,
   ImageCache,
-  createFileTree,
+  SEARCH_DIRS,
+  toSpriteUri,
+  UiNode,
 } from './shared/types';
-import {GameImage} from './components/GameImage';
-import {FileTreeView} from './components/FileTreeView';
+import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 
 const INITIAL_SIZE = 100;
 const INITIAL_ROTATION = 270;
 const INITIAL_CAMERA_POSITION = vec2.fromValues(300, 500);
-
-interface UiNode {
-  node: SkeleNode;
-}
 
 const scanDirectory = async (
   baseDir: string,
@@ -213,17 +212,6 @@ export const AppRoot = () => {
     }
   };
 
-  const makeBlobUrl = async (filePath: string) => {
-    try {
-      const buffer = await window.native.fs.readFile(filePath);
-      const blob = new Blob([buffer]);
-      return URL.createObjectURL(blob);
-    } catch (err) {
-      console.error('Failed to create blob URL:', err);
-      return null;
-    }
-  };
-
   const dragOverSprite = (e: React.MouseEvent) => {
     if (!activeNode || !dragStart) {
       return;
@@ -289,6 +277,9 @@ export const AppRoot = () => {
     }
   }, [gameDirectory]);
 
+  const [leftWidth, setLeftWidth] = useState(300);
+  const [rightWidth, setRightWidth] = useState(300);
+
   return (
     <div
       className="container"
@@ -297,143 +288,58 @@ export const AppRoot = () => {
       onMouseUp={handleDropSprite}
       onMouseMove={dragOverSprite}
     >
-      <div className="top-header">
-        <h1 style={{margin: 0}}>vector-pose</h1>
-      </div>
+      <HeaderPane />
+      <TabPane />
 
-      <div className="page-title">tabs, what?</div>
-
-      <div className="file-explorer-pane">
-        <h2 className="title">Files</h2>
-
-        <ul className="file-list">
-          <FileTreeView
-            nodes={createFileTree(availableFiles)}
+      <div className="panes-container">
+        <div className="pane left-pane" style={{width: leftWidth}}>
+          <FileExplorerPane
+            availableFiles={availableFiles}
+            activeFile={activeNode?.node.uri}
+            gameDirectory={gameDirectory}
             onFileClick={file => {
               if (file.type === 'image') {
                 const spriteUri = toSpriteUri(file.path);
                 if (!spriteUri) return;
-
                 const newSkele = skele.clone();
                 newSkele.add(
-                  SkeleNode.fromData({
-                    angle: 0,
-                    mag: 1,
-                    uri: spriteUri,
-                  })
+                  SkeleNode.fromData({angle: 0, mag: 1, uri: spriteUri})
                 );
                 updateSkele(newSkele);
-              } else if (file.type === 'fab') {
-                console.log('Loading fab:', file.path);
               }
             }}
-            activeFile={activeNode?.node.uri}
+            onFileSelect={handleFileSelect}
+            onDirectorySelect={handleDirectorySelect}
           />
-        </ul>
-
-        <div className="row">
-          <button onClick={handleFileSelect}>Add Files</button>
         </div>
 
-        <button onClick={handleDirectorySelect}>
-          Change Directory (currently: {gameDirectory})
-        </button>
-      </div>
+        <Resizer
+          onResize={delta => setLeftWidth(w => Math.max(100, w + delta))}
+        />
 
-      <div className="editor-pane">
-        <div className="editor-window" onMouseDown={handleMouseDown}>
-          <div className="sprite-holder" ref={spriteHolderRef}>
-            {renderedInfo.map(node => (
-              <div
-                key={node.node.id}
-                className={node.node === activeNode?.node ? 'active' : ''}
-                style={{
-                  left: `${node.center[0]}px`,
-                  top: `${node.center[1]}px`,
-                  width: `${node.transform[0] * 2}px`,
-                  height: `${node.transform[1] * 2}px`,
-                  transform: `translate(-50%, -50%) rotate(${
-                    node.direction + 90
-                  }deg)`,
-                }}
-              >
-                {node.uri && (
-                  <GameImage
-                    uri={fromSpriteUri(node.uri)}
-                    gameDirectory={gameDirectory}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                    }}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="node-graph">
-            {renderedNodes.map((node, index) => (
-              <div
-                className={node === activeNode?.node ? 'active' : ''}
-                style={{
-                  left: `${node.state.mid.transform[0]}px`,
-                  top: `${node.state.mid.transform[1]}px`,
-                }}
-              >
-                {node.id ? node.id : `node #${index + 1}`}
-              </div>
-            ))}
-          </div>
+        <div className="pane middle-pane" style={{flex: 1}}>
+          <EditorPane
+            renderedInfo={renderedInfo}
+            renderedNodes={renderedNodes}
+            activeNode={activeNode}
+            gameDirectory={gameDirectory}
+            onMouseDown={handleMouseDown}
+            spriteHolderRef={spriteHolderRef}
+          />
         </div>
-      </div>
 
-      <div className="layers-pane">
-        <h2 className="title">nodes</h2>
-        <ol className="node-tree">
-          {renderedNodes.map((node, index) => (
-            <div className={node === activeNode?.node ? 'active' : ''}>
-              <div>
-                node #{index + 1}
-                {node.id ? ` (${node.id})` : ''}
-              </div>
-              <div>
-                angle=
-                <AngleInput
-                  value={node.rotation}
-                  onChange={v => {
-                    console.log('angle', toDegrees(v));
-                    node.rotation = v;
-                    node.updateTransform();
-                    updateSkele(skele.clone());
-                  }}
-                />
-                &nbsp; mag=
-                <input
-                  value={node.mag}
-                  onChange={evt => {
-                    console.log('mag', evt.target.value);
-                    node.mag = parseFloat(evt.target.value) || 0;
-                    node.updateTransform();
-                    updateSkele(skele.clone());
-                  }}
-                />
-              </div>
-              <div>
-                uri=
-                <input
-                  value={node.uri || ''}
-                  onChange={evt => {
-                    console.log('uri', evt.target.value);
-                    node.uri = evt.target.value || null;
-                    updateSkele(skele.clone());
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-        </ol>
-        <div className="row">
-          <button onClick={pushCurrentFiles}>+</button>
+        <Resizer
+          onResize={delta => setRightWidth(w => Math.max(100, w - delta))}
+        />
+
+        <div className="pane right-pane" style={{width: rightWidth}}>
+          <LayersPane
+            renderedNodes={renderedNodes}
+            activeNode={activeNode}
+            onNodeUpdate={updateSkele}
+            skele={skele}
+            onPushCurrentFiles={pushCurrentFiles}
+          />
         </div>
       </div>
 

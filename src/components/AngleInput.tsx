@@ -1,29 +1,53 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
+import './AngleInput.css';
 
 interface AngleInputProps {
   value: number;
   onChange: (value: number) => void;
 }
 
+const isValidAngle = (angle: number) => !isNaN(angle);
+
 export const AngleInput: React.FC<AngleInputProps> = ({value, onChange}) => {
-  const [rawValue, setRawValue] = useState(value.toString());
+  const [displayValue, setDisplayValue] = useState(value.toString());
+  const lastValueRef = useRef(value);
 
   useEffect(() => {
-    const parsed = parseFloat(rawValue);
-    if (!parsed || Math.abs(value - parsed) > 0.002) {
-      setRawValue(value.toString());
+    // Only update display if external value changed significantly
+    if (Math.abs(value - lastValueRef.current) > 0.02) {
+      setDisplayValue(value.toFixed(3));
+      lastValueRef.current = value;
     }
-  }, [value, rawValue]);
+  }, [value]);
 
   const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = evt.target.value;
-    setRawValue(newValue);
+    setDisplayValue(newValue);
+
+    // Allow incomplete numbers like "-", "." etc during typing
+    if (
+      newValue === '-' ||
+      newValue === '.' ||
+      newValue === '-.' ||
+      newValue === ''
+    ) {
+      return;
+    }
 
     const parsed = parseFloat(newValue);
-    if (Number.isFinite(parsed)) {
+    if (isValidAngle(parsed)) {
+      lastValueRef.current = parsed;
       onChange(parsed);
     }
   };
 
-  return <input value={rawValue} onChange={handleChange} />;
+  return (
+    <input
+      type="text"
+      inputMode="decimal"
+      value={displayValue}
+      onChange={handleChange}
+      className="angle-input"
+    />
+  );
 };

@@ -1,0 +1,60 @@
+.layers-pane {
+  grid-column-start: right-start;
+  grid-column-end: right-end;
+  grid-row-start: content-start;
+  grid-row-end: content-end;
+  overflow-y: auto;
+}
+
+.pane-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.node-item {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 4px 0;
+  background: hsl(180, 0.9%, 15%);
+}
+
+.node-header {
+  background: hsl(180, 0.9%, 21.8%);
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.node-content {
+  padding: 8px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin: 4px 0;
+  gap: 8px;
+}
+
+.input-group label {
+  min-width: 80px;
+  color: #666;
+}
+
+.node-item.active {
+  border-color: #0066cc;
+}
+
+.number-input,
+.text-input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px;
+}
+
+.add-node {
+  padding: 4px 8px;
+  border-radius: 4px;
+}

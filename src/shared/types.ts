@@ -1,4 +1,9 @@
 import type {dialog} from 'electron';
+import type {SkeleNode} from 'src/utils/SkeleNode';
+
+export interface UiNode {
+  node: SkeleNode;
+}
 
 export interface FileSystemEntry {
   name: string;
@@ -17,17 +22,33 @@ export const SEARCH_DIRS = ['./data/fabs', './src/renderer/gfx'] as const;
 export const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp'] as const;
 export const FAB_EXTENSIONS = ['.fab.json'] as const;
 
+export const GFX_PREFIX = 'gfx:';
 export const SPRITE_PREFIX = 'sprite:';
 
 export function toSpriteUri(fullPath: string): string | null {
-  const match = fullPath.match(/[/\\]gfx[/\\]([^/\\]+)\.[^.]+$/i);
-  return match ? `${SPRITE_PREFIX}${match[1]}` : null;
+  let match = fullPath.match(
+    /[/\\]gfx[/\\]sprite[/\\](([^/\\]*[/\\])*[^/\\]+)\.[^.]+$/i
+  );
+  console.log('match', match);
+  if (match?.[1]) return `${SPRITE_PREFIX}${match[1]}`;
+
+  match = fullPath.match(/[/\\]gfx[/\\](([^/\\]*[/\\])*[^/\\]+)\.[^.]+$/i);
+  console.log('match2', match);
+  if (match?.[1]) return `${GFX_PREFIX}${match[1]}`;
+
+  return null;
 }
 
 export function fromSpriteUri(uri: string): string {
-  if (!uri.startsWith(SPRITE_PREFIX)) return uri;
-  const spriteName = uri.slice(SPRITE_PREFIX.length);
-  return `./src/renderer/gfx/${spriteName}.png`;
+  if (uri.startsWith(SPRITE_PREFIX)) {
+    const spriteName = uri.slice(SPRITE_PREFIX.length);
+    return `./src/renderer/gfx/sprite/${spriteName}.png`;
+  }
+  if (uri.startsWith(GFX_PREFIX)) {
+    const spriteName = uri.slice(GFX_PREFIX.length);
+    return `./src/renderer/gfx/${spriteName}.png`;
+  }
+  return uri;
 }
 
 export interface ImageCache {
@@ -84,6 +105,15 @@ export function createFileTree(files: FileEntry[]): FileTreeNode[] {
   }
 
   return objectToArray(root);
+}
+
+export function fileEntryToTreeNode(file: FileEntry): FileTreeNode {
+  return {
+    name: file.relativePath.split(/[/\\]/).pop() || '',
+    path: file.path,
+    type: file.type,
+    children: [],
+  };
 }
 
 declare global {

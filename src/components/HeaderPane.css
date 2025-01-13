@@ -1,0 +1,14 @@
+.header-pane {
+  grid-column: left-start / right-end;
+  grid-row: top-header-start / top-header-end;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: var(--header-height);
+  overflow: hidden;
+}
+
+.header-pane h1 {
+  margin: 0;
+}

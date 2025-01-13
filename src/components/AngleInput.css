@@ -1,0 +1,10 @@
+.angle-input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px;
+}
+
+.angle-input.invalid {
+  color: #999;
+  font-style: italic;
+}

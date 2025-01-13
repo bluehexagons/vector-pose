@@ -1,0 +1,51 @@
+.file-explorer-pane {
+  grid-column: left-start / left-end;
+  grid-row: content-start / content-end;
+  border: 0.5px solid white;
+  border-radius: 9px;
+  overflow: auto;
+  padding: 8px;
+}
+
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.file-list-item {
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.1s ease;
+}
+
+.file-list-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.file-list-item.selected {
+  background: rgba(57, 108, 216, 0.2);
+}
+
+.file-type-fab::before {
+  content: '📄';
+  font-size: 14px;
+}
+
+.file-type-image::before {
+  content: '🖼️';
+  font-size: 14px;
+}
+
+.directory-header {
+  font-size: 0.9em;
+  margin: 8px 0 4px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  user-select: none;
+}

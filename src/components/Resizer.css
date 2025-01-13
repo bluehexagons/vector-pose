@@ -1,0 +1,21 @@
+.resizer {
+  width: var(--gap);
+  cursor: col-resize;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.resizer-handle {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.2s;
+}
+
+.resizer:hover .resizer-handle {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.resizer:active .resizer-handle {
+  background: rgba(255, 255, 255, 0.5);
+}
