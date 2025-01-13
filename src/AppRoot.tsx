@@ -2,14 +2,12 @@ import {vec2} from 'gl-matrix';
 import {useEffect, useRef, useState} from 'react';
 import './AppRoot.css';
 import {EditorPane} from './components/EditorPane';
-import {FileTreeView} from './components/FileTreeView';
+import {FileExplorerPane} from './components/FileExplorerPane';
 import {HeaderPane} from './components/HeaderPane';
 import {LayersPane} from './components/LayersPane';
-import {TabPane} from './components/TabPane';
-import {FileExplorerPane} from './components/FileExplorerPane';
 import {Resizer} from './components/Resizer';
+import {TabPane} from './components/TabPane';
 import {
-  createFileTree,
   FAB_EXTENSIONS,
   FileEntry,
   IMAGE_EXTENSIONS,
@@ -102,18 +100,14 @@ export const AppRoot = () => {
 
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
 
-  const [currentFiles, setCurrentFiles] = useState([] as string[]);
-  const pushCurrentFiles = () => {
+  const appendNewNode = () => {
     const base = skele.clone();
-    for (const f of currentFiles) {
-      base.add(
-        SkeleNode.fromData({
-          angle: 0,
-          mag: 1,
-          uri: f,
-        })
-      );
-    }
+    base.add(
+      SkeleNode.fromData({
+        angle: 0,
+        mag: 1,
+      })
+    );
 
     updateSkele(base);
   };
@@ -338,7 +332,7 @@ export const AppRoot = () => {
             activeNode={activeNode}
             onNodeUpdate={updateSkele}
             skele={skele}
-            onPushCurrentFiles={pushCurrentFiles}
+            onAddNode={appendNewNode}
           />
         </div>
       </div>

@@ -9,7 +9,7 @@ interface LayersPaneProps {
   activeNode?: {node: SkeleNode};
   onNodeUpdate: (skele: SkeleNode) => void;
   skele: SkeleNode;
-  onPushCurrentFiles: () => void;
+  onAddNode: () => void;
 }
 
 const NodeItem: React.FC<{
@@ -86,17 +86,13 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
   activeNode,
   onNodeUpdate,
   skele,
-  onPushCurrentFiles,
+  onAddNode,
 }) => (
   <div className="layers-pane">
     <div className="nodes-container">
       <div className="pane-header">
         <h2>Nodes</h2>
-        <button
-          className="add-node"
-          onClick={onPushCurrentFiles}
-          title="Add Node"
-        >
+        <button className="add-node" onClick={onAddNode} title="Add Node">
           +
         </button>
       </div>
