@@ -64,36 +64,39 @@ const NodeItem: React.FC<{
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
     handleDragLeave(e);
 
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
     const sourceNode = skele.findIdOfRoot(data.nodeId);
 
-    if (sourceNode === node) return;
-
-    sourceNode.remove();
+    if (!sourceNode || sourceNode === node || sourceNode.parent === node) {
+      return;
+    }
 
     const dropTarget = e.target as HTMLElement;
     const isHeader = dropTarget.closest('.node-header');
     const isContent = dropTarget.closest('.node-content');
 
-    console.log('drop thing');
+    try {
+      if (isContent) {
+        // Drop as child at beginning
+        sourceNode.remove();
+        node.children.unshift(sourceNode);
+        node.add(sourceNode);
+      } else {
+        // Drop as sibling
+        sourceNode.remove();
+        if (node.parent) {
+          const idx = node.parent.children.indexOf(node);
+          sourceNode.parent = node.parent;
+          node.parent.children.splice(isHeader ? idx : idx + 1, 0, sourceNode);
+        }
+      }
 
-    // Add to new parent
-    if (isContent) {
-      // Drop as child
-      node.add(sourceNode); // Add to children
-      node.children.unshift(node.children.pop());
-    } else {
-      // Drop as sibling
-      node.parent.add(sourceNode);
-      node.parent.children.pop();
-      const idx = node.parent.children.indexOf(node);
-      node.parent.children.splice(isHeader ? idx : idx + 1, 0, sourceNode);
+      onNodeUpdate(skele.clone());
+    } catch (err) {
+      console.error('Drop operation failed:', err);
     }
-
-    onNodeUpdate(skele.clone());
   };
 
   return (
@@ -197,12 +200,15 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
     const sourceNode = skele.findIdOfRoot(data.nodeId);
 
-    console.log('root drop');
+    if (!sourceNode || sourceNode === skele) return;
 
-    sourceNode.remove();
-
-    skele.add(sourceNode);
-    onNodeUpdate(skele.clone());
+    try {
+      sourceNode.remove();
+      skele.add(sourceNode);
+      onNodeUpdate(skele.clone());
+    } catch (err) {
+      console.error('Root drop operation failed:', err);
+    }
   };
 
   console.log('current state', skele);

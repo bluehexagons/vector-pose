@@ -1,5 +1,4 @@
 import {fromSpriteUri} from '../shared/types';
-import {toRadians} from '../utils/Equa';
 import {RenderInfo} from '../utils/SkeleNode';
 import './EditorPane.css';
 import {GameImage} from './GameImage';
