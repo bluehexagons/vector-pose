@@ -4,11 +4,16 @@ import './AngleInput.css';
 interface AngleInputProps {
   value: number;
   onChange: (value: number) => void;
+  draggable: boolean;
 }
 
 const isValidAngle = (angle: number) => !isNaN(angle);
 
-export const AngleInput: React.FC<AngleInputProps> = ({value, onChange}) => {
+export const AngleInput: React.FC<AngleInputProps> = ({
+  value,
+  onChange,
+  ...inputProps
+}) => {
   const [displayValue, setDisplayValue] = useState(value.toString());
   const lastValueRef = useRef(value);
 
@@ -48,6 +53,7 @@ export const AngleInput: React.FC<AngleInputProps> = ({value, onChange}) => {
       value={displayValue}
       onChange={handleChange}
       className="angle-input"
+      {...inputProps}
     />
   );
 };

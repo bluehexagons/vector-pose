@@ -1,4 +1,4 @@
-import {vec3} from 'gl-matrix';
+import type {vec3} from 'gl-matrix';
 
 export interface ImageProps {
   /** File name (by default, uses the string) */

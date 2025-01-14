@@ -30,6 +30,7 @@ const sortRenderInfo = (a: RenderInfo, b: RenderInfo) => a.sort - b.sort;
 export class SkeleNode {
   id: string | null = null;
   parent: SkeleNode | null = null;
+  root: SkeleNode = this;
   children: SkeleNode[] = [];
   uri: string | null = null;
   props: ImagePropsRef | null = null;
@@ -60,7 +61,27 @@ export class SkeleNode {
 
   add(node: SkeleNode) {
     node.parent = this;
+    node.root = this.root;
     this.children.push(node);
+
+    if (!node.id) {
+      node.id = node.generateId();
+    }
+  }
+
+  remove() {
+    if (this.parent) {
+      this.parent.children.splice(this.parent.children.indexOf(this), 1);
+      this.parent = null;
+    }
+
+    this.root = this;
+    this.clearNodeCache();
+  }
+
+  clearNodeCache() {
+    this.nodeLookupCache.clear();
+    this.parent?.clearNodeCache();
   }
 
   stateAt(pct: number) {
@@ -100,6 +121,19 @@ export class SkeleNode {
     }
 
     return skele;
+  }
+
+  static randomLetters() {
+    return Math.random().toString(36).slice(2, 9);
+  }
+
+  generateId() {
+    const root = this.root;
+    let id: string;
+    do {
+      id = SkeleNode.randomLetters();
+    } while (root.findId(id));
+    return id;
   }
 
   updateTransform() {
@@ -149,6 +183,10 @@ export class SkeleNode {
   }
 
   nodeLookupCache = new Map<string, SkeleNode>();
+
+  findIdOfRoot(nodeId: string): SkeleNode {
+    return this.root.findId(nodeId);
+  }
 
   findId(nodeId: string): SkeleNode {
     if (this.nodeLookupCache.has(nodeId)) {
