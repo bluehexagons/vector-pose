@@ -69,7 +69,15 @@ const NodeItem: React.FC<{
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
     const sourceNode = skele.findIdOfRoot(data.nodeId);
 
-    if (!sourceNode || sourceNode === node || sourceNode.parent === node) {
+    console.log('Drop operation:', {
+      sourceNodeId: sourceNode?.id,
+      targetNodeId: node.id,
+      sourceParentId: sourceNode?.parent?.id,
+      targetParentId: node.parent?.id,
+    });
+
+    if (!sourceNode || sourceNode === node || node.id === sourceNode.id) {
+      console.log('Invalid drop operation');
       return;
     }
 
@@ -78,22 +86,34 @@ const NodeItem: React.FC<{
     const isContent = dropTarget.closest('.node-content');
 
     try {
+      // Create new clone to avoid reference issues
+      const newSkele = skele.clone();
+      const newSourceNode = newSkele.findIdOfRoot(data.nodeId);
+      const newTargetNode = newSkele.findIdOfRoot(node.id);
+
+      if (!newSourceNode || !newTargetNode) {
+        console.error('Failed to find nodes in cloned tree');
+        return;
+      }
+
       if (isContent) {
-        // Drop as child at beginning
-        sourceNode.remove();
-        node.children.unshift(sourceNode);
-        node.add(sourceNode);
+        newSourceNode.remove();
+        newTargetNode.add(newSourceNode);
       } else {
-        // Drop as sibling
-        sourceNode.remove();
-        if (node.parent) {
-          const idx = node.parent.children.indexOf(node);
-          sourceNode.parent = node.parent;
-          node.parent.children.splice(isHeader ? idx : idx + 1, 0, sourceNode);
+        newSourceNode.remove();
+        if (newTargetNode.parent) {
+          const idx = newTargetNode.parent.children.indexOf(newTargetNode);
+          newSourceNode.parent = newTargetNode.parent;
+          newTargetNode.parent.children.splice(
+            isHeader ? idx : idx + 1,
+            0,
+            newSourceNode
+          );
         }
       }
 
-      onNodeUpdate(skele.clone());
+      console.log('Tree state after operation:', newSkele);
+      onNodeUpdate(newSkele);
     } catch (err) {
       console.error('Drop operation failed:', err);
     }
@@ -211,8 +231,8 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
     }
   };
 
-  console.log('current state', skele);
-  console.log('current state', renderedNodes);
+  console.log('current state (skele)', skele);
+  console.log('current state (rendered)', renderedNodes);
 
   return (
     <div className="layers-pane">

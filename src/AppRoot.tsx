@@ -94,6 +94,8 @@ export const AppRoot = () => {
     setRenderedInfo(base.render(1, props => props));
     setRenderedNodes(Array.from(base.walk()).slice(1));
 
+    console.log('help me.', Array.from(base.walk()).slice(1));
+
     setSkele(base);
     console.log('ticked skele', base);
   };
@@ -231,6 +233,16 @@ export const AppRoot = () => {
     }
   };
 
+  const handleFileClick = (file: FileEntry) => {
+    if (file.type === 'image') {
+      const spriteUri = toSpriteUri(file.path);
+      if (!spriteUri) return;
+      const newSkele = skele.clone();
+      newSkele.add(SkeleNode.fromData({angle: 0, mag: 1, uri: spriteUri}));
+      updateSkele(newSkele);
+    }
+  };
+
   const handleFileSelect = async () => {
     const response = await window.native.showOpenDialog({
       properties: ['openFile', 'multiSelections', 'treatPackageAsDirectory'],
@@ -291,17 +303,7 @@ export const AppRoot = () => {
             availableFiles={availableFiles}
             activeFile={activeNode?.node.uri}
             gameDirectory={gameDirectory}
-            onFileClick={file => {
-              if (file.type === 'image') {
-                const spriteUri = toSpriteUri(file.path);
-                if (!spriteUri) return;
-                const newSkele = skele.clone();
-                newSkele.add(
-                  SkeleNode.fromData({angle: 0, mag: 1, uri: spriteUri})
-                );
-                updateSkele(newSkele);
-              }
-            }}
+            onFileClick={handleFileClick}
             onFileSelect={handleFileSelect}
             onDirectorySelect={handleDirectorySelect}
           />
@@ -328,7 +330,7 @@ export const AppRoot = () => {
 
         <div className="pane right-pane" style={{width: rightWidth}}>
           <LayersPane
-            renderedNodes={renderedNodes}
+            renderedNodes={skele.children}
             activeNode={activeNode}
             onNodeUpdate={updateSkele}
             skele={skele}

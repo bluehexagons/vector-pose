@@ -64,32 +64,40 @@ export class SkeleNode {
       throw new Error('Cannot add node to itself');
     }
 
-    if (!node.id) {
-      node.id = node.generateId();
-    }
+    // Debug logging
+    console.log('Adding node:', {
+      nodeId: node.id,
+      parentId: this.id,
+      currentParentId: node.parent?.id,
+    });
 
     // Remove from old parent first
     if (node.parent) {
-      node.remove();
+      node.parent.children = node.parent.children.filter(n => n !== node);
     }
 
     node.parent = this;
     node.root = this.root;
 
-    // Avoid duplicates
-    if (!this.children.includes(node)) {
-      this.children.push(node);
+    if (!node.id) {
+      node.id = node.generateId();
     }
 
+    // Avoid duplicates by ID
+    this.children = this.children.filter(child => child.id !== node.id);
+    this.children.push(node);
     this.clearNodeCache();
   }
 
   remove() {
+    // Debug logging
+    console.log('Removing node:', {
+      nodeId: this.id,
+      parentId: this.parent?.id,
+    });
+
     if (this.parent) {
-      const idx = this.parent.children.indexOf(this);
-      if (idx !== -1) {
-        this.parent.children.splice(idx, 1);
-      }
+      this.parent.children = this.parent.children.filter(n => n !== this);
       this.parent = null;
     }
     this.root = this;
@@ -259,10 +267,16 @@ export class SkeleNode {
 
   // deeply clones the node recursively
   clone(parent = this.parent): SkeleNode {
+    // Debug logging
+    console.log('Cloning node:', {
+      originalId: this.id,
+      parentId: parent?.id,
+    });
+
     const node = new SkeleNode();
     node.parent = parent;
     node.root = parent?.root ?? node;
-    node.id = this.id; // Generate new ID to avoid conflicts
+    node.id = this.id; // Keep same ID to maintain references
     node.uri = this.uri;
     node.mag = this.mag;
     node.rotation = this.rotation;
@@ -270,9 +284,10 @@ export class SkeleNode {
     node.sort = this.sort;
     vec2.copy(node.transform, this.transform);
 
-    // Clone children
+    // Clone children with new parent reference
     for (const child of this.children) {
-      node.add(child.clone(node));
+      const clonedChild = child.clone(node);
+      node.children.push(clonedChild); // Directly push instead of using add()
     }
 
     return node;
