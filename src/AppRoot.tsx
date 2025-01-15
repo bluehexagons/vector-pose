@@ -68,36 +68,24 @@ export const AppRoot = () => {
   );
 
   const [skele, setSkele] = useState(() => new SkeleNode());
-  const [size, setSize] = useState(INITIAL_SIZE);
-  const [rotation, setRotation] = useState(INITIAL_ROTATION);
-  const [dragStart, setDragStart] = useState<vec2>();
-  const [cameraPosition, setCameraPosition] = useState(INITIAL_CAMERA_POSITION);
-
-  const [time, setTime] = useState(1);
-
   const [renderedNodes, setRenderedNodes] = useState<SkeleNode[]>([]);
   const [renderedInfo, setRenderedInfo] = useState<RenderInfo[]>([]);
 
-  const [imageCache, setImageCache] = useState<ImageCache>({});
+  const [dragStart, setDragStart] = useState<vec2>();
 
-  // Clean up blob URLs when component unmounts
-  useEffect(() => {
-    return () => {
-      Object.values(imageCache).forEach(URL.revokeObjectURL);
-    };
-  }, []);
+  const [size, setSize] = useState(INITIAL_SIZE);
+  const [rotation, setRotation] = useState(INITIAL_ROTATION);
+  const [cameraPosition, setCameraPosition] = useState(INITIAL_CAMERA_POSITION);
+  const [time, setTime] = useState(1);
 
   const updateSkele = (base: SkeleNode) => {
     base.tickMove(cameraPosition[0], cameraPosition[1], size, rotation);
 
     base.updateState(time);
+    console.log('update?', base);
     setRenderedInfo(base.render(1, props => props));
     setRenderedNodes(Array.from(base.walk()).slice(1));
-
-    console.log('help me.', Array.from(base.walk()).slice(1));
-
     setSkele(base);
-    console.log('ticked skele', base);
   };
 
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);

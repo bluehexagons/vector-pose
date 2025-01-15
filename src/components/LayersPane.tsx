@@ -67,52 +67,45 @@ const NodeItem: React.FC<{
     handleDragLeave(e);
 
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
-    const sourceNode = skele.findIdOfRoot(data.nodeId);
-
-    console.log('Drop operation:', {
-      sourceNodeId: sourceNode?.id,
-      targetNodeId: node.id,
-      sourceParentId: sourceNode?.parent?.id,
-      targetParentId: node.parent?.id,
-    });
+    const sourceNode = skele.findIdFromRoot(data.nodeId);
 
     if (!sourceNode || sourceNode === node || node.id === sourceNode.id) {
-      console.log('Invalid drop operation');
       return;
     }
 
-    const dropTarget = e.target as HTMLElement;
-    const isHeader = dropTarget.closest('.node-header');
-    const isContent = dropTarget.closest('.node-content');
-
     try {
-      // Create new clone to avoid reference issues
       const newSkele = skele.clone();
-      const newSourceNode = newSkele.findIdOfRoot(data.nodeId);
-      const newTargetNode = newSkele.findIdOfRoot(node.id);
+      const newSourceNode = newSkele.findIdFromRoot(data.nodeId);
+      const newTargetNode = newSkele.findIdFromRoot(node.id);
 
-      if (!newSourceNode || !newTargetNode) {
-        console.error('Failed to find nodes in cloned tree');
-        return;
-      }
+      if (!newSourceNode || !newTargetNode) return;
+      const dropTarget = e.target as HTMLElement;
 
-      if (isContent) {
-        newSourceNode.remove();
+      newSourceNode.remove();
+
+      if (dropTarget.closest('.node-content')) {
+        // Add as child at beginning
         newTargetNode.add(newSourceNode);
+        // re-order after adding
+        newTargetNode.children.unshift(newTargetNode.children.pop());
       } else {
-        newSourceNode.remove();
+        // Add as sibling
         if (newTargetNode.parent) {
           const idx = newTargetNode.parent.children.indexOf(newTargetNode);
-          newSourceNode.parent = newTargetNode.parent;
-          newTargetNode.parent.children.splice(
-            isHeader ? idx : idx + 1,
-            0,
-            newSourceNode
-          );
+          newTargetNode.parent.add(newSourceNode);
+          // Reorder after adding
+          const newIdx = newTargetNode.parent.children.indexOf(newSourceNode);
+          if (newIdx !== -1) {
+            newTargetNode.parent.children.splice(newIdx, 1);
+            newTargetNode.parent.children.splice(
+              dropTarget.closest('.node-header') ? idx : idx + 1,
+              0,
+              newSourceNode
+            );
+          }
         }
       }
 
-      console.log('Tree state after operation:', newSkele);
       onNodeUpdate(newSkele);
     } catch (err) {
       console.error('Drop operation failed:', err);
@@ -218,7 +211,7 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
     e.currentTarget.classList.remove('drag-over');
 
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
-    const sourceNode = skele.findIdOfRoot(data.nodeId);
+    const sourceNode = skele.findIdFromRoot(data.nodeId);
 
     if (!sourceNode || sourceNode === skele) return;
 

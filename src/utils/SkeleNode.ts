@@ -64,17 +64,7 @@ export class SkeleNode {
       throw new Error('Cannot add node to itself');
     }
 
-    // Debug logging
-    console.log('Adding node:', {
-      nodeId: node.id,
-      parentId: this.id,
-      currentParentId: node.parent?.id,
-    });
-
-    // Remove from old parent first
-    if (node.parent) {
-      node.parent.children = node.parent.children.filter(n => n !== node);
-    }
+    node.remove();
 
     node.parent = this;
     node.root = this.root;
@@ -83,24 +73,32 @@ export class SkeleNode {
       node.id = node.generateId();
     }
 
-    // Avoid duplicates by ID
-    this.children = this.children.filter(child => child.id !== node.id);
     this.children.push(node);
+
+    // Update all children's root references
+    for (const child of node.walk()) {
+      child.root = this.root;
+    }
+
     this.clearNodeCache();
   }
 
   remove() {
-    // Debug logging
-    console.log('Removing node:', {
-      nodeId: this.id,
-      parentId: this.parent?.id,
-    });
+    if (!this.parent) return;
 
-    if (this.parent) {
-      this.parent.children = this.parent.children.filter(n => n !== this);
-      this.parent = null;
+    const idx = this.parent.children.indexOf(this);
+    if (idx !== -1) {
+      this.parent.children.splice(idx, 1);
     }
+
+    // Update root references for this node and all its children
     this.root = this;
+    for (const child of this.walk()) {
+      child.root = this;
+    }
+
+    this.parent.clearNodeCache();
+    this.parent = null;
     this.clearNodeCache();
   }
 
@@ -152,11 +150,10 @@ export class SkeleNode {
   }
 
   generateId() {
-    const root = this.root;
     let id: string;
     do {
       id = SkeleNode.randomLetters();
-    } while (root.findId(id));
+    } while (this.findIdFromRoot(id));
     return id;
   }
 
@@ -208,7 +205,7 @@ export class SkeleNode {
 
   nodeLookupCache = new Map<string, SkeleNode>();
 
-  findIdOfRoot(nodeId: string): SkeleNode {
+  findIdFromRoot(nodeId: string): SkeleNode {
     return this.root.findId(nodeId);
   }
 
@@ -267,16 +264,10 @@ export class SkeleNode {
 
   // deeply clones the node recursively
   clone(parent = this.parent): SkeleNode {
-    // Debug logging
-    console.log('Cloning node:', {
-      originalId: this.id,
-      parentId: parent?.id,
-    });
-
     const node = new SkeleNode();
-    node.parent = parent;
-    node.root = parent?.root ?? node;
-    node.id = this.id; // Keep same ID to maintain references
+
+    // Copy basic properties
+    node.id = this.id;
     node.uri = this.uri;
     node.mag = this.mag;
     node.rotation = this.rotation;
@@ -284,11 +275,17 @@ export class SkeleNode {
     node.sort = this.sort;
     vec2.copy(node.transform, this.transform);
 
-    // Clone children with new parent reference
+    // Set up parent relationship
+    node.parent = parent;
+    node.root = parent?.root ?? node;
+
+    // Clone each child with this node as parent
     for (const child of this.children) {
       const clonedChild = child.clone(node);
-      node.children.push(clonedChild); // Directly push instead of using add()
+      node.children.push(clonedChild);
     }
+
+    parent?.clearNodeCache();
 
     return node;
   }
