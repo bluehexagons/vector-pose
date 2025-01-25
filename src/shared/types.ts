@@ -62,47 +62,69 @@ export interface FileTreeNode {
   children: FileTreeNode[];
 }
 
+interface TreeNodeMap {
+  [key: string]: Pick<FileTreeNode, 'name' | 'path' | 'type'> & {
+    children: TreeNodeMap;
+  };
+}
+
 export function createFileTree(files: FileEntry[]): FileTreeNode[] {
-  const root: {[key: string]: FileTreeNode} = {};
+  const root: TreeNodeMap = {};
 
   for (const file of files) {
-    const parts = file.relativePath.split(/[/\\]/);
+    // Split path and remove empty segments
+    const parts = file.relativePath.split(/[/\\]/).filter(Boolean);
     let current = root;
+    let currentPath = '';
 
-    // Create directory nodes
+    // Create directory nodes for each part of the path
     for (let i = 0; i < parts.length - 1; i++) {
       const part = parts[i];
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+
       if (!current[part]) {
         current[part] = {
           name: part,
-          path: parts.slice(0, i + 1).join('/'),
+          path: currentPath,
           type: 'directory',
-          children: [],
+          children: {},
         };
       }
-      current = current[part].children as any;
+      current = current[part].children;
     }
 
-    // Add file node
+    // Add file node at the final level
     const fileName = parts[parts.length - 1];
-    current[fileName] = {
-      name: fileName,
-      path: file.path,
-      type: file.type,
-      children: [],
-    };
+    if (fileName) {
+      current[fileName] = {
+        name: fileName,
+        path: file.path,
+        type: file.type,
+        children: {},
+      };
+    }
+  }
+
+  // Helper to sort nodes: directories first, then alphabetically
+  function sortNodes(nodes: FileTreeNode[]): FileTreeNode[] {
+    return nodes.sort((a, b) => {
+      if (a.type === 'directory' && b.type !== 'directory') return -1;
+      if (a.type !== 'directory' && b.type === 'directory') return 1;
+      return a.name.localeCompare(b.name);
+    });
   }
 
   // Convert nested objects to arrays recursively
-  function objectToArray(obj: object): FileTreeNode[] {
-    return Object.values(obj).map(node => ({
-      ...node,
-      children:
-        node.children && typeof node.children === 'object'
-          ? objectToArray(node.children)
-          : [],
-    }));
+  function objectToArray(obj: TreeNodeMap): FileTreeNode[] {
+    return sortNodes(
+      Object.values(obj).map(node => ({
+        ...node,
+        children: objectToArray(node.children),
+      }))
+    );
   }
+  console.log('root', root);
+  console.log(objectToArray(root));
 
   return objectToArray(root);
 }

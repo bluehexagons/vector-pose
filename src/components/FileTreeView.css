@@ -16,6 +16,27 @@
   background: rgba(57, 108, 216, 0.2);
 }
 
+.file-tree-list {
+  user-select: none;
+}
+
+.tree-item {
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.1s ease;
+}
+
+.tree-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tree-item.selected {
+  background: rgba(57, 108, 216, 0.2);
+}
+
 .file-type-fab::before {
   content: '📄';
   font-size: 14px;
