@@ -60,49 +60,48 @@ export const NodeItem: React.FC<{
 
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
     const sourceNode = skele.findIdFromRoot(data.nodeId);
+    const targetNode = node;
 
-    if (!sourceNode || node.includes(sourceNode)) {
-      console.log(
-        sourceNode ? 'dropped on itself' : 'node not found',
-        data.nodeId
-      );
-      console.log(skele, sourceNode);
+    // Add validation for circular references
+    if (
+      !sourceNode ||
+      !targetNode ||
+      sourceNode === targetNode ||
+      targetNode.includes(sourceNode)
+    ) {
+      console.warn('Invalid drop operation');
       return;
     }
 
     const clone = skele.clone();
+    const newSourceNode = clone.findIdFromRoot(data.nodeId);
+    const newTargetNode = clone.findIdFromRoot(node.id);
+
+    if (!newSourceNode || !newTargetNode) return;
 
     try {
-      const newSourceNode = clone.findIdFromRoot(data.nodeId);
-      const newTargetNode = clone.findIdFromRoot(node.id);
-
-      console.log('dropping', newSourceNode.id, 'onto', newTargetNode.id);
-
-      if (!newSourceNode || !newTargetNode) return;
       const dropTarget = e.target as HTMLElement;
-
       newSourceNode.remove();
 
       if (dropTarget.closest('.node-content')) {
-        // Add as child at beginning
         newTargetNode.add(newSourceNode);
-        // re-order after adding
-        newTargetNode.children.unshift(newTargetNode.children.pop());
+        newTargetNode.children.unshift(newTargetNode.children.pop()!);
       } else {
-        // Add as sibling
-        if (newTargetNode.parent) {
-          const idx = newTargetNode.parent.children.indexOf(newTargetNode);
-          newTargetNode.parent.add(newSourceNode);
-          // Reorder after adding
-          const newIdx = newTargetNode.parent.children.indexOf(newSourceNode);
-          if (newIdx !== -1) {
-            newTargetNode.parent.children.splice(newIdx, 1);
-            newTargetNode.parent.children.splice(
-              dropTarget.closest('.node-header') ? idx : idx + 1,
-              0,
-              newSourceNode
-            );
-          }
+        const parent = newTargetNode.parent;
+        if (!parent) return;
+
+        const idx = parent.children.indexOf(newTargetNode);
+        parent.add(newSourceNode);
+
+        // Move to correct position
+        const newIdx = parent.children.indexOf(newSourceNode);
+        if (newIdx !== -1) {
+          parent.children.splice(newIdx, 1);
+          parent.children.splice(
+            dropTarget.closest('.node-header') ? idx : idx + 1,
+            0,
+            newSourceNode
+          );
         }
       }
 

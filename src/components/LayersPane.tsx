@@ -32,9 +32,10 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
     e.currentTarget.classList.remove('drag-over');
 
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
-    const original = skele.findIdFromRoot(data.nodeId);
+    if (!data.nodeId) return;
 
-    if (!original || original.includes(skele)) return;
+    const original = skele.findIdFromRoot(data.nodeId);
+    if (!original || original === skele) return;
 
     const clone = skele.clone();
     const sourceNode = clone.findIdFromRoot(data.nodeId);
@@ -47,9 +48,6 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
       console.error('Root drop operation failed:', err);
     }
   };
-
-  console.log('current state (skele)', skele);
-  console.log('current state (rendered)', renderedNodes);
 
   return (
     <div className="layers-pane">
