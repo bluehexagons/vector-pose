@@ -64,6 +64,10 @@ export class SkeleNode {
       throw new Error('Cannot add node to itself');
     }
 
+    if (node.includes(this)) {
+      throw new Error('Cannot add parent node to child node');
+    }
+
     node.remove();
 
     node.parent = this;
@@ -104,6 +108,16 @@ export class SkeleNode {
 
   clearNodeCache() {
     this.root.nodeLookupCache.clear();
+  }
+
+  includes(node: SkeleNode) {
+    if (this === node) return true;
+
+    for (const child of this.walk()) {
+      if (child === node) {
+        return true;
+      }
+    }
   }
 
   stateAt(pct: number) {
@@ -213,6 +227,7 @@ export class SkeleNode {
     if (this.nodeLookupCache.has(nodeId)) {
       return this.nodeLookupCache.get(nodeId)!;
     }
+
     for (const node of this.walk()) {
       if (node.id !== nodeId) {
         continue;
@@ -221,6 +236,7 @@ export class SkeleNode {
       return node;
     }
 
+    this.nodeLookupCache.set(nodeId, null);
     return null as never;
   }
 
@@ -263,7 +279,7 @@ export class SkeleNode {
   }
 
   // deeply clones the node recursively
-  clone(parent = this.parent): SkeleNode {
+  clone(parent: SkeleNode = null): SkeleNode {
     const node = new SkeleNode();
 
     // Copy basic properties
@@ -284,8 +300,6 @@ export class SkeleNode {
       const clonedChild = child.clone(node);
       node.children.push(clonedChild);
     }
-
-    parent?.clearNodeCache();
 
     return node;
   }
