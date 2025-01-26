@@ -1,5 +1,5 @@
 import type {dialog} from 'electron';
-import type {SkeleNode} from 'src/utils/SkeleNode';
+import type {SkeleNode, RenderInfo} from 'src/utils/SkeleNode';
 
 export interface UiNode {
   node: SkeleNode;
@@ -151,6 +151,16 @@ export function fileEntryToTreeNode(file: FileEntry): FileTreeNode {
     type: file.type,
     children: [],
   };
+}
+
+export interface TabData {
+  id: string;
+  name: string;
+  filePath?: string;
+  skele: SkeleNode;
+  isModified?: boolean;
+  renderedInfo: RenderInfo[];
+  renderedNodes: SkeleNode[];
 }
 
 declare global {

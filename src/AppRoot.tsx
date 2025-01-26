@@ -15,6 +15,7 @@ import {
   SEARCH_DIRS,
   toSpriteUri,
   UiNode,
+  TabData,
 } from './shared/types';
 import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 
@@ -71,10 +72,6 @@ export const AppRoot = () => {
     () => localStorage.getItem('gameDirectory') || './'
   );
 
-  const [skele, setSkele] = useState(() => new SkeleNode());
-  const [renderedNodes, setRenderedNodes] = useState<SkeleNode[]>([]);
-  const [renderedInfo, setRenderedInfo] = useState<RenderInfo[]>([]);
-
   const [dragStart, setDragStart] = useState<vec2>();
 
   const [size, setSize] = useState(INITIAL_SIZE);
@@ -82,14 +79,63 @@ export const AppRoot = () => {
   const [cameraPosition, setCameraPosition] = useState(INITIAL_CAMERA_POSITION);
   const [time, setTime] = useState(1);
 
+  const [tabs, setTabs] = useState<TabData[]>(() => [
+    {
+      id: crypto.randomUUID(),
+      name: 'Untitled',
+      skele: new SkeleNode(),
+      renderedInfo: [],
+      renderedNodes: [],
+    },
+  ]);
+  const [activeTabId, setActiveTabId] = useState<string>(tabs[0].id);
+
+  const activeTab = tabs.find(tab => tab.id === activeTabId);
+  const skele = activeTab?.skele ?? new SkeleNode();
+
   const updateSkele = (base: SkeleNode) => {
     base.tickMove(cameraPosition[0], cameraPosition[1], size, rotation);
-
     base.updateState(time);
-    console.log('update?', base);
-    setRenderedInfo(base.render(1, props => props));
-    setRenderedNodes(Array.from(base.walk()).slice(1));
-    setSkele(base);
+
+    const newRenderedInfo = base.render(1, props => props);
+    const newRenderedNodes = Array.from(base.walk()).slice(1);
+
+    setTabs(current =>
+      current.map(tab =>
+        tab.id === activeTabId
+          ? {
+              ...tab,
+              skele: base,
+              isModified: true,
+              renderedInfo: newRenderedInfo,
+              renderedNodes: newRenderedNodes,
+            }
+          : tab
+      )
+    );
+  };
+
+  const handleNewTab = () => {
+    const newTab: TabData = {
+      id: crypto.randomUUID(),
+      name: 'Untitled',
+      skele: new SkeleNode(),
+      renderedInfo: [],
+      renderedNodes: [],
+    };
+    setTabs(current => [...current, newTab]);
+    setActiveTabId(newTab.id);
+  };
+
+  const handleCloseTab = (tabId: string) => {
+    setTabs(current => current.filter(tab => tab.id !== tabId));
+    if (activeTabId === tabId) {
+      setActiveTabId(tabs[0]?.id);
+    }
+  };
+
+  const handleSelectTab = (tabId: string) => {
+    setActiveTabId(tabId);
   };
 
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
@@ -149,7 +195,7 @@ export const AppRoot = () => {
   const findClosestNode = (x: number, y: number): RenderInfo | undefined => {
     if (!spriteHolderRef.current) return undefined;
 
-    return renderedInfo.reduce((closest, node) => {
+    return activeTab.renderedInfo.reduce((closest, node) => {
       const nodePos = vec2.add(vec2.create(), node.center, [
         spriteHolderRef.current?.offsetLeft || 0,
         spriteHolderRef.current?.offsetTop || 0,
@@ -243,8 +289,24 @@ export const AppRoot = () => {
 
         if (fabData.skele) {
           const newSkele = SkeleNode.fromData(fabData.skele);
-          updateSkele(newSkele);
-          console.log('Loaded fab file:', fabData.name);
+          newSkele.tickMove(
+            cameraPosition[0],
+            cameraPosition[1],
+            size,
+            rotation
+          );
+          newSkele.updateState(time);
+
+          const newTab: TabData = {
+            id: crypto.randomUUID(),
+            name: file.relativePath,
+            filePath: file.path,
+            skele: newSkele,
+            renderedInfo: newSkele.render(1, props => props),
+            renderedNodes: Array.from(newSkele.walk()).slice(1),
+          };
+          setTabs(current => [...current, newTab]);
+          setActiveTabId(newTab.id);
         } else {
           console.error('No skele data found in fab file');
         }
@@ -306,7 +368,13 @@ export const AppRoot = () => {
       onMouseMove={dragOverSprite}
     >
       <HeaderPane />
-      <TabPane />
+      <TabPane
+        tabs={tabs}
+        activeTabId={activeTabId}
+        onNewTab={handleNewTab}
+        onCloseTab={handleCloseTab}
+        onSelectTab={handleSelectTab}
+      />
 
       <div className="panes-container">
         <div className="pane left-pane" style={{width: leftWidth}}>
@@ -326,8 +394,8 @@ export const AppRoot = () => {
 
         <div className="pane middle-pane" style={{flex: 1}}>
           <EditorPane
-            renderedInfo={renderedInfo}
-            renderedNodes={renderedNodes}
+            renderedInfo={activeTab?.renderedInfo ?? []}
+            renderedNodes={activeTab?.renderedNodes ?? []}
             activeNode={activeNode}
             gameDirectory={gameDirectory}
             onMouseDown={handleMouseDown}
@@ -341,10 +409,10 @@ export const AppRoot = () => {
 
         <div className="pane right-pane" style={{width: rightWidth}}>
           <LayersPane
-            renderedNodes={skele.children}
+            renderedNodes={activeTab?.skele.children ?? []}
             activeNode={activeNode}
             onNodeUpdate={updateSkele}
-            skele={skele}
+            skele={activeTab?.skele ?? new SkeleNode()}
             onAddNode={appendNewNode}
           />
         </div>
