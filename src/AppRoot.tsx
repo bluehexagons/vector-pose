@@ -277,8 +277,14 @@ export const AppRoot = () => {
     const newSkele = skele.clone();
     const newNode = newSkele.findId(activeNode.node.id);
 
-    if (newNode?.parent) {
-      newNode.updateFromWorldPosition(worldPos[0], worldPos[1]);
+    if (newNode) {
+      // If this is a sprite node (has URI), update its parent to move it
+      // Otherwise, update the node itself
+      if (newNode.uri) {
+        newNode.updateFromChildTarget(worldPos[0], worldPos[1]);
+      } else {
+        newNode.updateFromWorldPosition(worldPos[0], worldPos[1]);
+      }
       setDragStart(worldPos);
       updateSkele(newSkele);
     }
