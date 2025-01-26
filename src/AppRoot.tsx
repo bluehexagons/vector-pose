@@ -23,6 +23,9 @@ const INITIAL_SIZE = 100;
 const INITIAL_ROTATION = 270;
 const INITIAL_CAMERA_POSITION = vec2.fromValues(300, 500);
 
+const createDefaultSkele = () =>
+  SkeleNode.fromData({angle: 0, mag: 1, children: [{angle: 0, mag: 0}]});
+
 const scanDirectory = async (
   baseDir: string,
   subDir: string
@@ -83,7 +86,7 @@ export const AppRoot = () => {
     {
       id: crypto.randomUUID(),
       name: 'Untitled',
-      skele: new SkeleNode(),
+      skele: createDefaultSkele(),
       renderedInfo: [],
       renderedNodes: [],
     },
@@ -91,7 +94,7 @@ export const AppRoot = () => {
   const [activeTabId, setActiveTabId] = useState<string>(tabs[0].id);
 
   const activeTab = tabs.find(tab => tab.id === activeTabId);
-  const skele = activeTab?.skele ?? new SkeleNode();
+  const skele = activeTab?.skele;
 
   const updateSkele = (base: SkeleNode) => {
     base.tickMove(cameraPosition[0], cameraPosition[1], size, rotation);
@@ -119,7 +122,7 @@ export const AppRoot = () => {
     const newTab: TabData = {
       id: crypto.randomUUID(),
       name: 'Untitled',
-      skele: new SkeleNode(),
+      skele: createDefaultSkele(),
       renderedInfo: [],
       renderedNodes: [],
     };
@@ -154,9 +157,7 @@ export const AppRoot = () => {
 
   // pre-populate a good default palette
   useEffect(() => {
-    updateSkele(
-      SkeleNode.fromData({angle: 0, mag: 1, children: [{angle: 0, mag: 0}]})
-    );
+    updateSkele(createDefaultSkele());
   }, []);
 
   const [lastActiveNode, setLastActiveNode] = useState<UiNode | undefined>(
