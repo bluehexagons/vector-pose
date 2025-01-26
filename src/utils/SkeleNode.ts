@@ -325,6 +325,24 @@ export class SkeleNode {
     return this.toData();
   }
 
+  updateFromWorldPosition(worldX: number, worldY: number) {
+    if (!this.parent) return;
+
+    // Get parent's world position
+    const parentState = this.parent.stateAt(1);
+    const parentX = parentState.transform[0];
+    const parentY = parentState.transform[1];
+
+    // Calculate relative position
+    const relX = worldX - parentX;
+    const relY = worldY - parentY;
+
+    // Update angle and magnitude
+    this.rotation = Math.atan2(relY, relX);
+    this.mag = Math.sqrt(relX * relX + relY * relY);
+    this.updateTransform();
+  }
+
   static test() {
     const testData: SkeleData = {
       angle: 45,

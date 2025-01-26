@@ -18,6 +18,7 @@ import {
   TabData,
 } from './shared/types';
 import {RenderInfo, SkeleNode} from './utils/SkeleNode';
+import {BASE_SCALE, Viewport} from './components/EditorCanvas';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 270;
@@ -195,22 +196,25 @@ export const AppRoot = () => {
     setActiveNode(undefined);
   };
 
-  const handleNodeSelection = (node: RenderInfo, e: React.MouseEvent) => {
+  const handleNodeSelection = (
+    node: RenderInfo,
+    e: React.MouseEvent,
+    worldPos: vec2
+  ) => {
     setActiveNode({node: node.node});
-    setDragStart(vec2.fromValues(e.pageX, e.pageY));
+    setDragStart(worldPos);
     e.preventDefault();
   };
 
-  const findClosestNode = (x: number, y: number): RenderInfo | undefined => {
-    if (!spriteHolderRef.current) return undefined;
+  const findClosestNode = (
+    worldX: number,
+    worldY: number,
+    scale: number
+  ): RenderInfo | undefined => {
+    if (!activeTab?.renderedInfo) return undefined;
 
     return activeTab.renderedInfo.reduce((closest, node) => {
-      const nodePos = vec2.add(vec2.create(), node.center, [
-        spriteHolderRef.current?.offsetLeft || 0,
-        spriteHolderRef.current?.offsetTop || 0,
-      ]);
-
-      const dist = vec2.dist(nodePos, [x, y]);
+      const dist = vec2.dist(node.center, [worldX, worldY]);
       const nodeSize = Math.sqrt(vec2.dot(node.transform, node.transform));
 
       if (dist < (closest?.distance ?? Infinity) && dist < nodeSize) {
@@ -220,10 +224,17 @@ export const AppRoot = () => {
     }, undefined as {node: RenderInfo; distance: number} | undefined)?.node;
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    const closestNode = findClosestNode(e.pageX, e.pageY);
+  const handleMouseDown = (e: React.MouseEvent, viewport: Viewport) => {
+    if (e.button !== 0) return;
+
+    const worldPos = viewport.pageToWorld(e.pageX, e.pageY);
+    const closestNode = findClosestNode(
+      worldPos[0],
+      worldPos[1],
+      viewport.scale
+    );
     if (closestNode) {
-      handleNodeSelection(closestNode, e);
+      handleNodeSelection(closestNode, e, worldPos);
     }
   };
 
@@ -257,28 +268,18 @@ export const AppRoot = () => {
     }
   };
 
-  const dragOverSprite = (e: React.MouseEvent) => {
-    if (!activeNode || !dragStart) {
-      return;
-    }
+  const dragOverSprite = (e: React.MouseEvent, viewport: Viewport) => {
+    if (!activeNode || !dragStart) return;
 
     e.preventDefault();
 
-    const delta = vec2.sub(vec2.create(), [e.pageX, e.pageY], dragStart);
-
+    const worldPos = viewport.pageToWorld(e.pageX, e.pageY);
     const newSkele = skele.clone();
     const newNode = newSkele.findId(activeNode.node.id);
 
-    if (newNode) {
-      // Scale the movement to match our unit system
-      const scaleFactor = 0.001; // Adjust this to control drag sensitivity
-      newNode.state.mid.transform[0] += delta[0] * scaleFactor;
-      newNode.state.mid.transform[1] += delta[1] * scaleFactor;
-
-      // Update the drag start for continuous movement
-      setDragStart([e.pageX, e.pageY]);
-
-      // Apply changes
+    if (newNode?.parent) {
+      newNode.updateFromWorldPosition(worldPos[0], worldPos[1]);
+      setDragStart(worldPos);
       updateSkele(newSkele);
     }
   };
@@ -470,7 +471,6 @@ export const AppRoot = () => {
       onContextMenu={preventDefault}
       onSelect={preventDefault}
       onMouseUp={handleDropSprite}
-      onMouseMove={dragOverSprite}
     >
       <HeaderPane
         activeTab={activeTab}
@@ -511,6 +511,7 @@ export const AppRoot = () => {
             activeNode={activeNode}
             gameDirectory={gameDirectory}
             onMouseDown={handleMouseDown}
+            onMouseMove={dragOverSprite}
             spriteHolderRef={spriteHolderRef}
           />
         </div>

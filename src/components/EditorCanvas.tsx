@@ -4,9 +4,16 @@ import {vec2} from 'gl-matrix';
 // Base scale factor: at scale 1.0, a 1x1 unit square will be this many pixels
 export const BASE_SCALE = 200;
 
+export interface Viewport {
+  scale: number;
+  offset: vec2;
+  pageToWorld: (pageX: number, pageY: number) => vec2;
+  worldToPage: (worldX: number, worldY: number) => vec2;
+}
+
 interface EditorCanvasProps {
-  children: (transform: {scale: number; offset: vec2}) => React.ReactNode;
-  onViewportChange?: (scale: number, offset: vec2) => void;
+  children: (viewport: Viewport) => React.ReactNode;
+  onViewportChange?: (viewport: Viewport) => void;
 }
 
 export const EditorCanvas: React.FC<EditorCanvasProps> = ({
@@ -34,6 +41,45 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     window.addEventListener('resize', centerViewport);
     return () => window.removeEventListener('resize', centerViewport);
   }, []);
+
+  const pageToWorld = useCallback(
+    (pageX: number, pageY: number) => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return vec2.create();
+
+      // Convert page coordinates to container-relative
+      const x = pageX - rect.left;
+      const y = pageY - rect.top;
+
+      // Remove offset and scale to get world coordinates
+      return vec2.fromValues(
+        (x - offset[0]) / (BASE_SCALE * scale),
+        (y - offset[1]) / (BASE_SCALE * scale)
+      );
+    },
+    [scale, offset]
+  );
+
+  const worldToPage = useCallback(
+    (worldX: number, worldY: number) => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return vec2.create();
+
+      // Apply scale and offset
+      const x = worldX * BASE_SCALE * scale + offset[0] + rect.left;
+      const y = worldY * BASE_SCALE * scale + offset[1] + rect.top;
+
+      return vec2.fromValues(x, y);
+    },
+    [scale, offset]
+  );
+
+  const viewport: Viewport = {
+    scale: BASE_SCALE * scale,
+    offset,
+    pageToWorld,
+    worldToPage,
+  };
 
   const handleWheel = useCallback(
     (e: WheelEvent) => {
@@ -63,9 +109,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
       setScale(newScale);
       setOffset(newOffset);
-      onViewportChange?.(newScale, newOffset);
+      onViewportChange?.(viewport);
     },
-    [scale, offset]
+    [scale, offset, viewport]
   );
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -89,9 +135,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       const newOffset = vec2.add(vec2.create(), offset, delta);
       setOffset(newOffset);
       setLastPos(vec2.fromValues(e.clientX, e.clientY));
-      onViewportChange?.(scale, newOffset);
+      onViewportChange?.(viewport);
     },
-    [isDragging, lastPos, offset]
+    [isDragging, lastPos, offset, viewport]
   );
 
   const handleMouseUp = useCallback(() => {
@@ -131,7 +177,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           transformOrigin: '0 0',
         }}
       >
-        {children({scale: BASE_SCALE * scale, offset})}
+        {children(viewport)}
       </div>
     </div>
   );
