@@ -476,7 +476,6 @@ export const AppRoot = () => {
       className="container"
       onContextMenu={preventDefault}
       onSelect={preventDefault}
-      onMouseUp={handleDropSprite}
     >
       <HeaderPane
         activeTab={activeTab}
@@ -518,6 +517,7 @@ export const AppRoot = () => {
             gameDirectory={gameDirectory}
             onMouseDown={handleMouseDown}
             onMouseMove={dragOverSprite}
+            onMouseUp={handleDropSprite}
             spriteHolderRef={spriteHolderRef}
           />
         </div>

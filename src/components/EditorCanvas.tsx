@@ -14,11 +14,17 @@ export interface Viewport {
 interface EditorCanvasProps {
   children: (viewport: Viewport) => React.ReactNode;
   onViewportChange?: (viewport: Viewport) => void;
+  onCanvasMouseDown?: (e: React.MouseEvent, viewport: Viewport) => void;
+  onCanvasMouseMove?: (e: React.MouseEvent, viewport: Viewport) => void;
+  onCanvasMouseUp?: (e: React.MouseEvent, viewport: Viewport) => void;
 }
 
 export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   children,
   onViewportChange,
+  onCanvasMouseDown,
+  onCanvasMouseMove,
+  onCanvasMouseUp,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Start zoomed out a bit more
@@ -114,36 +120,50 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     [scale, offset, viewport]
   );
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (e.button === 1) {
-      // Middle mouse button
-      setIsDragging(true);
-      setLastPos(vec2.fromValues(e.clientX, e.clientY));
-      e.preventDefault();
-    }
-  }, []);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.button === 1) {
+        setIsDragging(true);
+        setLastPos(vec2.fromValues(e.clientX, e.clientY));
+        e.preventDefault();
+      } else {
+        // Pass other mouse events to parent with viewport info
+        onCanvasMouseDown?.(e, viewport);
+      }
+    },
+    [viewport]
+  );
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
-      if (!isDragging || !lastPos) return;
+      if (isDragging && lastPos) {
+        const delta = vec2.fromValues(
+          e.clientX - lastPos[0],
+          e.clientY - lastPos[1]
+        );
 
-      const delta = vec2.fromValues(
-        e.clientX - lastPos[0],
-        e.clientY - lastPos[1]
-      );
-
-      const newOffset = vec2.add(vec2.create(), offset, delta);
-      setOffset(newOffset);
-      setLastPos(vec2.fromValues(e.clientX, e.clientY));
-      onViewportChange?.(viewport);
+        const newOffset = vec2.add(vec2.create(), offset, delta);
+        setOffset(newOffset);
+        setLastPos(vec2.fromValues(e.clientX, e.clientY));
+        onViewportChange?.(viewport);
+      } else {
+        onCanvasMouseMove?.(e, viewport);
+      }
     },
     [isDragging, lastPos, offset, viewport]
   );
 
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-    setLastPos(undefined);
-  }, []);
+  const handleMouseUp = useCallback(
+    (e: React.MouseEvent) => {
+      if (isDragging) {
+        setIsDragging(false);
+        setLastPos(undefined);
+      } else {
+        onCanvasMouseUp?.(e, viewport);
+      }
+    },
+    [isDragging, viewport]
+  );
 
   useEffect(() => {
     const container = containerRef.current;

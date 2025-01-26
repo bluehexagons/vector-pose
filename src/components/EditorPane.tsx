@@ -13,6 +13,7 @@ interface EditorPaneProps {
   onMouseDown: (e: React.MouseEvent, viewport: Viewport) => void;
   spriteHolderRef: React.RefObject<HTMLDivElement>;
   onMouseMove?: (e: React.MouseEvent, viewport: Viewport) => void;
+  onMouseUp?: (e: React.MouseEvent, viewport: Viewport) => void;
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = ({
@@ -23,6 +24,7 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   onMouseDown,
   spriteHolderRef,
   onMouseMove,
+  onMouseUp,
 }) => {
   const screenToWorld = (
     screenX: number,
@@ -39,13 +41,13 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
 
   return (
     <div className="editor-pane">
-      <EditorCanvas>
+      <EditorCanvas
+        onCanvasMouseDown={onMouseDown}
+        onCanvasMouseMove={onMouseMove}
+        onCanvasMouseUp={onMouseUp}
+      >
         {viewport => (
-          <div
-            className="editor-content"
-            onMouseDown={e => onMouseDown(e, viewport)}
-            onMouseMove={e => onMouseMove?.(e, viewport)}
-          >
+          <div className="editor-content">
             <div className="sprite-holder" ref={spriteHolderRef}>
               {renderedInfo.map(node => (
                 <div
