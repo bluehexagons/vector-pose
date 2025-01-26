@@ -30,10 +30,6 @@ export const FileTreeView: React.FC<FileTreeViewProps> = ({
     return a.name.localeCompare(b.name);
   });
 
-  const toggleDir = (path: string) => {
-    setExpandedDirs(prev => ({...prev, [path]: !prev[path]}));
-  };
-
   return (
     <div className="file-tree-list">
       {sortedNodes.map(node => (
@@ -43,14 +39,19 @@ export const FileTreeView: React.FC<FileTreeViewProps> = ({
               <div
                 className="tree-item directory"
                 style={{paddingLeft: `${level * 20}px`}}
-                onClick={() => toggleDir(node.path)}
+                onClick={() =>
+                  setExpandedDirs(prev => ({
+                    ...prev,
+                    [node.path]: !prev[node.path],
+                  }))
+                }
               >
                 <span className="folder-icon">
                   {expandedDirs[node.path] ? '📂' : '📁'}
                 </span>
                 {node.name}
               </div>
-              {expandedDirs[node.path] && (
+              {expandedDirs[node.path] && node.children.length > 0 && (
                 <FileTreeView
                   nodes={node.children}
                   onFileClick={onFileClick}

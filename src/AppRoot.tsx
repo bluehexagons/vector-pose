@@ -33,13 +33,17 @@ const scanDirectory = async (
     const files = await window.native.fs.readdir(fullPath);
 
     for (const file of files) {
-      const relativePath = file.relativePath;
+      // Build the full relative path including subdirectories
+      const relativePath = await window.native.path.join(
+        subDir,
+        file.relativePath
+      );
 
       if (file.isDirectory) {
         entries.push(
           ...(await scanDirectory(
             baseDir,
-            await window.native.path.join(subDir, file.name)
+            relativePath // Pass the full relative path for subdirectories
           ))
         );
       } else {

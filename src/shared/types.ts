@@ -62,26 +62,26 @@ export interface FileTreeNode {
   children: FileTreeNode[];
 }
 
+type TreeNodeNode = Pick<FileTreeNode, 'name' | 'path' | 'type'> & {
+  children: TreeNodeMap;
+};
+
 interface TreeNodeMap {
-  [key: string]: Pick<FileTreeNode, 'name' | 'path' | 'type'> & {
-    children: TreeNodeMap;
-  };
+  [key: string]: TreeNodeNode;
 }
 
 export function createFileTree(files: FileEntry[]): FileTreeNode[] {
   const root: TreeNodeMap = {};
 
+  // First, create the full tree
   for (const file of files) {
-    // Split path and remove empty segments
     const parts = file.relativePath.split(/[/\\]/).filter(Boolean);
     let current = root;
     let currentPath = '';
 
-    // Create directory nodes for each part of the path
     for (let i = 0; i < parts.length - 1; i++) {
       const part = parts[i];
       currentPath = currentPath ? `${currentPath}/${part}` : part;
-
       if (!current[part]) {
         current[part] = {
           name: part,
@@ -93,7 +93,6 @@ export function createFileTree(files: FileEntry[]): FileTreeNode[] {
       current = current[part].children;
     }
 
-    // Add file node at the final level
     const fileName = parts[parts.length - 1];
     if (fileName) {
       current[fileName] = {
@@ -105,28 +104,44 @@ export function createFileTree(files: FileEntry[]): FileTreeNode[] {
     }
   }
 
-  // Helper to sort nodes: directories first, then alphabetically
-  function sortNodes(nodes: FileTreeNode[]): FileTreeNode[] {
-    return nodes.sort((a, b) => {
+  // Helper to collapse single-child directories
+  function collapseDirectory(
+    node: TreeNodeNode,
+    nodePath: string[] = []
+  ): FileTreeNode {
+    if (node.type !== 'directory') {
+      return {...node, children: []};
+    }
+
+    const childEntries = Object.entries(node.children);
+    const children = childEntries.map(([name, child]) =>
+      collapseDirectory(child, [...nodePath, name])
+    );
+
+    // If directory has exactly one child and it's a directory, combine them
+    if (children.length === 1 && children[0].type === 'directory') {
+      return {
+        name: `${node.name}/${children[0].name}`,
+        path: children[0].path,
+        type: 'directory',
+        children: children[0].children,
+      };
+    }
+
+    return {
+      ...node,
+      children,
+    };
+  }
+
+  // Convert and sort
+  return Object.values(root)
+    .map(node => collapseDirectory(node))
+    .sort((a, b) => {
       if (a.type === 'directory' && b.type !== 'directory') return -1;
       if (a.type !== 'directory' && b.type === 'directory') return 1;
       return a.name.localeCompare(b.name);
     });
-  }
-
-  // Convert nested objects to arrays recursively
-  function objectToArray(obj: TreeNodeMap): FileTreeNode[] {
-    return sortNodes(
-      Object.values(obj).map(node => ({
-        ...node,
-        children: objectToArray(node.children),
-      }))
-    );
-  }
-  console.log('root', root);
-  console.log(objectToArray(root));
-
-  return objectToArray(root);
 }
 
 export function fileEntryToTreeNode(file: FileEntry): FileTreeNode {
