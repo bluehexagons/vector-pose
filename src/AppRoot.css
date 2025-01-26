@@ -219,3 +219,51 @@ h4 {
 .middle-pane {
   min-width: 200px;
 }
+
+.node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+}
+
+.node-actions {
+  position: relative;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  color: #f6f6f6;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.action-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.action-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #2f2f2f;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  z-index: 1000;
+  min-width: 120px;
+}
+
+.action-dropdown button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: #f6f6f6;
+  cursor: pointer;
+}
+
+.action-dropdown button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

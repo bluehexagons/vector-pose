@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {toDegrees, toRadians} from '../utils/Equa';
 import {SkeleNode} from '../utils/SkeleNode';
 import {AngleInput} from './AngleInput';
@@ -11,6 +11,8 @@ export const NodeItem: React.FC<{
   onNodeUpdate: (skele: SkeleNode) => void;
   skele: SkeleNode;
 }> = ({node, index, depth = 0, isActive, onNodeUpdate, skele}) => {
+  const [showActions, setShowActions] = useState(false);
+
   const handleDragStart = (e: React.DragEvent) => {
     console.log(e);
     if (e.currentTarget.tagName === 'INPUT') return;
@@ -111,6 +113,16 @@ export const NodeItem: React.FC<{
     }
   };
 
+  const handleDelete = () => {
+    const clone = skele.clone();
+    const nodeToDelete = clone.findIdFromRoot(node.id);
+    if (nodeToDelete) {
+      nodeToDelete.remove();
+      onNodeUpdate(clone);
+    }
+    setShowActions(false);
+  };
+
   return (
     <div
       className="node-wrapper"
@@ -126,6 +138,19 @@ export const NodeItem: React.FC<{
           <span className="node-title">
             {node.id ? node.id : `node #${index + 1}`}
           </span>
+          <div className="node-actions">
+            <button
+              className="action-button"
+              onClick={() => setShowActions(!showActions)}
+            >
+              ⋮
+            </button>
+            {showActions && (
+              <div className="action-dropdown">
+                <button onClick={handleDelete}>Delete</button>
+              </div>
+            )}
+          </div>
         </div>
         <div
           className="node-content"

@@ -106,7 +106,7 @@ export const AppRoot = () => {
     updateSkele(base);
   };
 
-  // insert some test data
+  // pre-populate a good default palette
   useEffect(() => {
     updateSkele(
       SkeleNode.fromData({angle: 0, mag: 1, children: [{angle: 0, mag: 0}]})
@@ -227,13 +227,30 @@ export const AppRoot = () => {
     }
   };
 
-  const handleFileClick = (file: FileEntry) => {
+  const handleFileClick = async (file: FileEntry) => {
     if (file.type === 'image') {
       const spriteUri = toSpriteUri(file.path);
       if (!spriteUri) return;
       const newSkele = skele.clone();
       newSkele.add(SkeleNode.fromData({angle: 0, mag: 1, uri: spriteUri}));
       updateSkele(newSkele);
+    } else if (file.type === 'fab') {
+      try {
+        const buffer = await window.native.fs.readFile(file.path, 'utf-8');
+        const str = buffer as unknown as string;
+        console.log(str, str.toString());
+        const fabData = JSON.parse(str);
+
+        if (fabData.skele) {
+          const newSkele = SkeleNode.fromData(fabData.skele);
+          updateSkele(newSkele);
+          console.log('Loaded fab file:', fabData.name);
+        } else {
+          console.error('No skele data found in fab file');
+        }
+      } catch (err) {
+        console.error('Failed to load fab file:', err);
+      }
     }
   };
 

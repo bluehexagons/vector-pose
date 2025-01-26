@@ -159,7 +159,7 @@ declare global {
       showOpenDialog: typeof dialog.showOpenDialog;
       fs: {
         readdir: (path: string) => Promise<FileSystemEntry[]>;
-        readFile: (path: string) => Promise<Buffer>;
+        readFile: (path: string, encoding?: BufferEncoding) => Promise<Buffer>;
         resolveGamePath: (
           relativePath: string,
           gameDir: string

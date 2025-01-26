@@ -29,15 +29,18 @@ ipcMain.handle('fs:readdir', async (_event, dirPath: string) => {
   }
 });
 
-ipcMain.handle('fs:readFile', async (_event, filePath: string) => {
-  try {
-    const content = await fs.readFile(filePath);
-    return content;
-  } catch (err) {
-    console.error('Failed to read file:', err);
-    throw err;
+ipcMain.handle(
+  'fs:readFile',
+  async (_event, filePath: string, encoding?: BufferEncoding) => {
+    try {
+      const content = await fs.readFile(filePath, encoding);
+      return content;
+    } catch (err) {
+      console.error('Failed to read file:', err);
+      throw err;
+    }
   }
-});
+);
 
 ipcMain.handle('path:extname', (_event, filePath: string) => {
   return path.extname(filePath).toLowerCase();

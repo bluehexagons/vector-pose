@@ -13,8 +13,8 @@ const exposedContext = {
     readdir: (path: string): Promise<FileSystemEntry[]> =>
       ipcRenderer.invoke('fs:readdir', path),
 
-    readFile: (path: string): Promise<Buffer> =>
-      ipcRenderer.invoke('fs:readFile', path),
+    readFile: (path: string, encoding?: string): Promise<Buffer> =>
+      ipcRenderer.invoke('fs:readFile', path, encoding),
 
     resolveGamePath: (gameDir: string, relativePath: string): Promise<Buffer> =>
       ipcRenderer.invoke('fs:resolveGamePath', gameDir, relativePath),
