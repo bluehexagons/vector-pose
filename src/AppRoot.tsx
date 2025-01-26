@@ -282,10 +282,18 @@ export const AppRoot = () => {
       newSkele.add(SkeleNode.fromData({angle: 0, mag: 1, uri: spriteUri}));
       updateSkele(newSkele);
     } else if (file.type === 'fab') {
+      // Check if file is already open in a tab
+      const existingTab = tabs.find(tab => tab.filePath === file.path);
+      if (existingTab) {
+        setActiveTabId(existingTab.id);
+        return;
+      }
+
       try {
-        const buffer = await window.native.fs.readFile(file.path, 'utf-8');
-        const str = buffer as unknown as string;
-        console.log(str, str.toString());
+        const str = (await window.native.fs.readFile(
+          file.path,
+          'utf-8'
+        )) as unknown as string;
         const fabData = JSON.parse(str);
 
         if (fabData.skele) {
