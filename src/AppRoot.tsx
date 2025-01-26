@@ -100,8 +100,9 @@ export const AppRoot = () => {
   const [viewRotation, setViewRotation] = useState(INITIAL_ROTATION);
 
   const handleRotateView = (degrees: number) => {
-    // Normalize to 0-360
-    setViewRotation((degrees + 360) % 360);
+    // Allow any angle, just normalize display to 0-360
+    const normalized = ((degrees % 360) + 360) % 360;
+    setViewRotation(normalized);
   };
 
   useEffect(() => {

@@ -34,9 +34,16 @@ export const HeaderPane = ({
       <ul className="header-menu">
         <li className="header-menu-item">
           <div className="view-controls">
-            <button onClick={() => onRotateView(viewRotation - 90)}>⟲</button>
-            <span className="rotation-display">{viewRotation}°</span>
-            <button onClick={() => onRotateView(viewRotation + 90)}>⟳</button>
+            <button onClick={() => onRotateView(viewRotation - 45)}>⟲</button>
+            <input
+              type="number"
+              className="rotation-input"
+              value={viewRotation}
+              onChange={e => onRotateView(Number(e.target.value) || 0)}
+              step={15}
+            />
+            <span>°</span>
+            <button onClick={() => onRotateView(viewRotation + 45)}>⟳</button>
           </div>
         </li>
         <li className="header-menu-item">

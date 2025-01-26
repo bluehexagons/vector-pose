@@ -78,3 +78,33 @@
   text-align: center;
   opacity: 0.7;
 }
+
+.rotation-input {
+  width: 4em;
+  padding: 6px 4px;
+  text-align: right;
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-color);
+  font-size: 12px;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+}
+
+.rotation-input:hover,
+.rotation-input:focus {
+  border-color: var(--border-color);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.view-controls span {
+  opacity: 0.7;
+  font-size: 12px;
+}
+
+.view-controls button {
+  padding: 2px 6px;
+}
