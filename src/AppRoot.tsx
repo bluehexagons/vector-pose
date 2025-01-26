@@ -99,7 +99,7 @@ export const AppRoot = () => {
     base.add(
       SkeleNode.fromData({
         angle: 0,
-        mag: 1,
+        mag: 0,
       })
     );
 
@@ -108,7 +108,9 @@ export const AppRoot = () => {
 
   // insert some test data
   useEffect(() => {
-    updateSkele(SkeleNode.fromData({angle: 0, mag: 1}));
+    updateSkele(
+      SkeleNode.fromData({angle: 0, mag: 1, children: [{angle: 0, mag: 0}]})
+    );
   }, []);
 
   const [lastActiveNode, setLastActiveNode] = useState<UiNode | undefined>(
