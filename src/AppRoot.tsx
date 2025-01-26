@@ -104,6 +104,12 @@ export const AppRoot = () => {
     setViewRotation((degrees + 360) % 360);
   };
 
+  useEffect(() => {
+    if (skele) {
+      updateSkele(skele.clone());
+    }
+  }, [viewRotation]);
+
   const updateSkele = (base: SkeleNode) => {
     base.tickMove(objectPosition[0], objectPosition[1], size, viewRotation);
     base.updateState(time);
