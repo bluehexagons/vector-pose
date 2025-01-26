@@ -232,7 +232,7 @@ export const AppRoot = () => {
 
   const handleDirectorySelect = async () => {
     try {
-      const response = await window.native.showOpenDialog({
+      const response = await window.native.dialog.showOpenDialog({
         properties: ['openDirectory', 'treatPackageAsDirectory'],
         title: 'Select Game Directory',
         buttonLabel: 'Open',
@@ -326,7 +326,7 @@ export const AppRoot = () => {
   };
 
   const handleFileSelect = async () => {
-    const response = await window.native.showOpenDialog({
+    const response = await window.native.dialog.showOpenDialog({
       properties: ['openFile', 'multiSelections', 'treatPackageAsDirectory'],
       title: 'Add image layers',
       buttonLabel: 'Add',
@@ -400,16 +400,16 @@ export const AppRoot = () => {
     if (!activeTab) return;
 
     try {
-      const response = await window.native.showOpenDialog({
+      const response = await window.native.dialog.showSaveDialog({
         title: 'Save As',
         buttonLabel: 'Save',
         filters: [{name: 'Prefab Files', extensions: ['fab.json']}],
-        properties: ['createDirectory'],
+        properties: ['showOverwriteConfirmation', 'createDirectory'],
       });
 
-      if (response.canceled || !response.filePaths[0]) return;
+      if (response.canceled || !response.filePath) return;
 
-      const filePath = response.filePaths[0];
+      const filePath = response.filePath;
       const relativePath = await window.native.path.relative(
         gameDirectory,
         filePath

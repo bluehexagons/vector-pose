@@ -166,7 +166,10 @@ export interface TabData {
 declare global {
   interface Window {
     native: {
-      showOpenDialog: typeof dialog.showOpenDialog;
+      dialog: {
+        showOpenDialog: typeof dialog.showOpenDialog;
+        showSaveDialog: typeof dialog.showSaveDialog;
+      };
       fs: {
         readdir: (path: string) => Promise<FileSystemEntry[]>;
         readFile: (path: string, encoding?: BufferEncoding) => Promise<Buffer>;

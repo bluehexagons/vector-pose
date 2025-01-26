@@ -109,7 +109,7 @@ export const NodeItem: React.FC<{
 
       onNodeUpdate(clone);
     } catch (err) {
-      console.error('Drop operation failed:', err);
+      console.warn('Drop operation failed:', err);
     }
   };
 

@@ -6,8 +6,12 @@ import type {dialog} from 'electron';
 import type {FileSystemEntry} from './shared/types';
 
 const exposedContext = {
-  showOpenDialog: (config: Parameters<typeof dialog.showOpenDialog>[0]) =>
-    ipcRenderer.invoke('dialog', 'showOpenDialog', config),
+  dialog: {
+    showOpenDialog: (config: Parameters<typeof dialog.showOpenDialog>[0]) =>
+      ipcRenderer.invoke('dialog:showOpen', config),
+    showSaveDialog: (config: Parameters<typeof dialog.showSaveDialog>[0]) =>
+      ipcRenderer.invoke('dialog:showSave', config),
+  },
 
   fs: {
     readdir: (path: string): Promise<FileSystemEntry[]> =>

@@ -8,10 +8,12 @@ if (squirrelStarted) {
   app.quit();
 }
 
-// Add IPC handlers before the init function
-ipcMain.handle('dialog', async (_event, method: 'showOpenDialog', params) => {
-  const result = await dialog[method](params);
-  return result;
+ipcMain.handle('dialog:showOpen', async (_event, params) => {
+  return await dialog.showOpenDialog(params);
+});
+
+ipcMain.handle('dialog:showSave', async (_event, params) => {
+  return await dialog.showSaveDialog(params);
 });
 
 ipcMain.handle('fs:readdir', async (_event, dirPath: string) => {

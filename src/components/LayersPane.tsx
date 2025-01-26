@@ -45,7 +45,7 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
       clone.add(sourceNode);
       onNodeUpdate(clone);
     } catch (err) {
-      console.error('Root drop operation failed:', err);
+      console.warn('Root drop operation failed:', err);
     }
   };
 
