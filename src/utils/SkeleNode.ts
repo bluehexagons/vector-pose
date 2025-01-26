@@ -263,6 +263,7 @@ export class SkeleNode {
         uri: node.uri,
         props: propObjectDeduper(node.props),
         center: node.parent!.stateAt(time).transform,
+        // Size is now in raw units (no longer multiplied by 2)
         transform: vec2.fromValues(size, size),
         direction: toDegrees(state.rotation),
         sort: node.sort,

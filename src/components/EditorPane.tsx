@@ -1,5 +1,7 @@
+import {vec2} from 'gl-matrix';
 import {fromSpriteUri} from '../shared/types';
-import {RenderInfo} from '../utils/SkeleNode';
+import {RenderInfo, SkeleNode} from '../utils/SkeleNode';
+import {EditorCanvas} from './EditorCanvas';
 import './EditorPane.css';
 import {GameImage} from './GameImage';
 
@@ -22,51 +24,63 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
 }) => {
   return (
     <div className="editor-pane">
-      <div className="editor-window" onMouseDown={onMouseDown}>
-        <div className="sprite-holder" ref={spriteHolderRef}>
-          {renderedInfo.map(node => (
+      <EditorCanvas>
+        {({scale, offset}) => (
+          <div className="editor-content">
             <div
-              key={node.node.id}
-              className={node.node === activeNode?.node ? 'active' : ''}
-              style={{
-                left: `${node.center[0]}px`,
-                top: `${node.center[1]}px`,
-                width: `${node.transform[0] * 2}px`,
-                height: `${node.transform[1] * 2}px`,
-                transform: `translate(-50%, -50%) rotate(${
-                  node.direction + 90
-                }deg)`,
-              }}
+              className="sprite-holder"
+              ref={spriteHolderRef}
+              onMouseDown={onMouseDown}
             >
-              {node.uri && (
-                <GameImage
-                  uri={fromSpriteUri(node.uri)}
-                  gameDirectory={gameDirectory}
+              {renderedInfo.map(node => (
+                <div
+                  key={node.node.id}
+                  className={node.node === activeNode?.node ? 'active' : ''}
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
+                    position: 'absolute',
+                    left: `${node.center[0]}px`,
+                    top: `${node.center[1]}px`,
+                    // Size is now in raw units
+                    width: `${node.transform[0]}px`,
+                    height: `${node.transform[1]}px`,
+                    transform: `translate(-50%, -50%) rotate(${
+                      node.direction + 90
+                    }deg)`,
                   }}
-                />
-              )}
+                >
+                  {node.uri && (
+                    <GameImage
+                      uri={fromSpriteUri(node.uri)}
+                      gameDirectory={gameDirectory}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="node-graph">
-          {renderedNodes.map((node, index) => (
-            <div
-              key={node.id || index}
-              className={node === activeNode?.node ? 'active' : ''}
-              style={{
-                left: `${node.state.mid.transform[0]}px`,
-                top: `${node.state.mid.transform[1]}px`,
-              }}
-            >
-              {node.id ? node.id : `node #${index + 1}`}
+            <div className="node-graph">
+              {renderedNodes.map((node, index) => (
+                <div
+                  key={node.id || index}
+                  className={node === activeNode?.node ? 'active' : ''}
+                  style={{
+                    position: 'absolute',
+                    left: `${node.state.mid.transform[0]}px`,
+                    top: `${node.state.mid.transform[1]}px`,
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                >
+                  {node.id ? node.id : `node #${index + 1}`}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        )}
+      </EditorCanvas>
     </div>
   );
 };

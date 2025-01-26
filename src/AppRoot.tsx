@@ -19,9 +19,9 @@ import {
 } from './shared/types';
 import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 
-const INITIAL_SIZE = 100;
-const INITIAL_ROTATION = 270;
-const INITIAL_CAMERA_POSITION = vec2.fromValues(300, 500);
+const INITIAL_SIZE = 1;
+const INITIAL_ROTATION = 0;
+const INITIAL_OBJECT_POSITION = vec2.fromValues(0, 0);
 
 const createDefaultSkele = () =>
   SkeleNode.fromData({angle: 0, mag: 1, children: [{angle: 0, mag: 0}]});
@@ -86,9 +86,9 @@ export const AppRoot = () => {
 
   const [dragStart, setDragStart] = useState<vec2>();
 
-  const [size, setSize] = useState(INITIAL_SIZE);
-  const [rotation, setRotation] = useState(INITIAL_ROTATION);
-  const [cameraPosition, setCameraPosition] = useState(INITIAL_CAMERA_POSITION);
+  const size = INITIAL_SIZE;
+  const rotation = INITIAL_ROTATION;
+  const objectPosition = INITIAL_OBJECT_POSITION;
   const [time, setTime] = useState(1);
 
   const [tabs, setTabs] = useState<TabData[]>(() => [createEmptyTab()]);
@@ -98,7 +98,7 @@ export const AppRoot = () => {
   const skele = activeTab?.skele;
 
   const updateSkele = (base: SkeleNode) => {
-    base.tickMove(cameraPosition[0], cameraPosition[1], size, rotation);
+    base.tickMove(objectPosition[0], objectPosition[1], size, rotation);
     base.updateState(time);
 
     const newRenderedInfo = base.render(1, props => props);
@@ -174,7 +174,6 @@ export const AppRoot = () => {
     const newNode = newSkele.findId(activeNode.node.id);
 
     if (newNode) {
-      newNode.mag *= 1.5;
       updateSkele(newSkele);
       setLastActiveNode({node: newNode});
     }
@@ -257,9 +256,10 @@ export const AppRoot = () => {
     const newNode = newSkele.findId(activeNode.node.id);
 
     if (newNode) {
-      // Update node position based on drag delta
-      newNode.state.mid.transform[0] += delta[0] * 0.1;
-      newNode.state.mid.transform[1] += delta[1] * 0.1;
+      // Scale the movement to match our unit system
+      const scaleFactor = 0.001; // Adjust this to control drag sensitivity
+      newNode.state.mid.transform[0] += delta[0] * scaleFactor;
+      newNode.state.mid.transform[1] += delta[1] * scaleFactor;
 
       // Update the drag start for continuous movement
       setDragStart([e.pageX, e.pageY]);
@@ -274,7 +274,8 @@ export const AppRoot = () => {
       const spriteUri = toSpriteUri(file.path);
       if (!spriteUri) return;
       const newSkele = skele.clone();
-      newSkele.add(SkeleNode.fromData({angle: 0, mag: 1, uri: spriteUri}));
+      // Add new sprites at a reasonable size
+      newSkele.add(SkeleNode.fromData({angle: 0, mag: 0.25, uri: spriteUri}));
       updateSkele(newSkele);
     } else if (file.type === 'fab') {
       // Check if file is already open in a tab
@@ -294,8 +295,8 @@ export const AppRoot = () => {
         if (fabData.skele) {
           const newSkele = SkeleNode.fromData(fabData.skele);
           newSkele.tickMove(
-            cameraPosition[0],
-            cameraPosition[1],
+            objectPosition[0],
+            objectPosition[1],
             size,
             rotation
           );

@@ -12,10 +12,12 @@
 }
 
 .sprite-holder {
-  position: relative;
+  position: absolute;
+  pointer-events: none;
 }
 
 .sprite-holder > * {
+  pointer-events: auto;
   position: absolute;
   transform: translate(-50%, -50%);
 }
@@ -27,11 +29,35 @@
 }
 
 .node-graph {
-  position: relative;
+  position: absolute;
+  pointer-events: none;
   opacity: 0.25;
 }
 
 .node-graph > * {
+  pointer-events: auto;
   position: absolute;
   transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.editor-content {
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+/* Add grid background for visual reference */
+.editor-canvas {
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  /* Grid size of 0.1 units */
+  background-size: 40px 40px;
 }
