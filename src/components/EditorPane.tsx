@@ -38,14 +38,15 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
                   className={node.node === activeNode?.node ? 'active' : ''}
                   style={{
                     position: 'absolute',
-                    left: `${node.center[0]}px`,
-                    top: `${node.center[1]}px`,
-                    // Size is now in raw units
-                    width: `${node.transform[0]}px`,
-                    height: `${node.transform[1]}px`,
+                    // Apply scale to positions and sizes
+                    left: `${node.center[0] * scale}px`,
+                    top: `${node.center[1] * scale}px`,
+                    width: `${node.transform[0] * scale}px`,
+                    height: `${node.transform[1] * scale}px`,
                     transform: `translate(-50%, -50%) rotate(${
                       node.direction + 90
                     }deg)`,
+                    outline: '1px solid rgba(255,255,255,0.1)',
                   }}
                 >
                   {node.uri && (
@@ -66,11 +67,14 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
               {renderedNodes.map((node, index) => (
                 <div
                   key={node.id || index}
-                  className={node === activeNode?.node ? 'active' : ''}
+                  className={`node-label ${
+                    node === activeNode?.node ? 'active' : ''
+                  }`}
                   style={{
                     position: 'absolute',
-                    left: `${node.state.mid.transform[0]}px`,
-                    top: `${node.state.mid.transform[1]}px`,
+                    // Apply scale to positions
+                    left: `${node.state.mid.transform[0] * scale}px`,
+                    top: `${node.state.mid.transform[1] * scale}px`,
                     transform: 'translate(-50%, -50%)',
                   }}
                 >

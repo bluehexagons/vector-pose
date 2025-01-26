@@ -58,6 +58,16 @@
       transparent 1px
     ),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  /* Grid size of 0.1 units */
-  background-size: 40px 40px;
+  /* Grid size of 0.1 units * BASE_SCALE */
+  background-size: 20px 20px;
+}
+
+.node-label {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: white;
+  pointer-events: all;
+  white-space: nowrap;
 }

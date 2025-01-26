@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {vec2} from 'gl-matrix';
 
 // Base scale factor: at scale 1.0, a 1x1 unit square will be this many pixels
-export const BASE_SCALE = 400;
+export const BASE_SCALE = 200;
 
 interface EditorCanvasProps {
   children: (transform: {scale: number; offset: vec2}) => React.ReactNode;
@@ -14,8 +14,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   onViewportChange,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  // Start at a scale that shows a good initial view
-  const [scale, setScale] = useState(1);
+  // Start zoomed out a bit more
+  const [scale, setScale] = useState(0.5);
   const [offset, setOffset] = useState<vec2>(vec2.fromValues(0, 0));
   const [isDragging, setIsDragging] = useState(false);
   const [lastPos, setLastPos] = useState<vec2>();
@@ -126,13 +126,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       <div
         style={{
           position: 'absolute',
-          transform: `translate(${offset[0]}px, ${offset[1]}px) scale(${
-            scale * BASE_SCALE
-          })`,
+          // Remove scale from transform, we're applying it to children now
+          transform: `translate(${offset[0]}px, ${offset[1]}px)`,
           transformOrigin: '0 0',
         }}
       >
-        {children({scale: scale * BASE_SCALE, offset})}
+        {children({scale: BASE_SCALE * scale, offset})}
       </div>
     </div>
   );

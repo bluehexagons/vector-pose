@@ -20,7 +20,7 @@ import {
 import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 
 const INITIAL_SIZE = 1;
-const INITIAL_ROTATION = 0;
+const INITIAL_ROTATION = 270;
 const INITIAL_OBJECT_POSITION = vec2.fromValues(0, 0);
 
 const createDefaultSkele = () =>
@@ -97,8 +97,15 @@ export const AppRoot = () => {
   const activeTab = tabs.find(tab => tab.id === activeTabId);
   const skele = activeTab?.skele;
 
+  const [viewRotation, setViewRotation] = useState(INITIAL_ROTATION);
+
+  const handleRotateView = (degrees: number) => {
+    // Normalize to 0-360
+    setViewRotation((degrees + 360) % 360);
+  };
+
   const updateSkele = (base: SkeleNode) => {
-    base.tickMove(objectPosition[0], objectPosition[1], size, rotation);
+    base.tickMove(objectPosition[0], objectPosition[1], size, viewRotation);
     base.updateState(time);
 
     const newRenderedInfo = base.render(1, props => props);
@@ -463,6 +470,8 @@ export const AppRoot = () => {
         onSave={handleSave}
         onSaveAs={handleSaveAs}
         onNameChange={handleNameChange}
+        onRotateView={handleRotateView}
+        viewRotation={viewRotation}
       />
       <TabPane
         tabs={tabs}
