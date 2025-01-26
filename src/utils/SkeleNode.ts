@@ -304,6 +304,26 @@ export class SkeleNode {
     return node;
   }
 
+  toData(): SkeleData {
+    return {
+      angle: toDegrees(this.rotation),
+      mag: this.mag,
+      id: this.id || undefined,
+      uri: this.uri || undefined,
+      props: this.props || undefined,
+      sort: this.sort || undefined,
+      children:
+        this.children.length > 0
+          ? this.children.map(child => child.toData())
+          : undefined,
+    };
+  }
+
+  // Add custom JSON serialization
+  toJSON() {
+    return this.toData();
+  }
+
   static test() {
     const testData: SkeleData = {
       angle: 45,

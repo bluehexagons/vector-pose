@@ -174,6 +174,11 @@ declare global {
           relativePath: string,
           gameDir: string
         ) => Promise<string>;
+        writeFile: (
+          path: string,
+          data: string,
+          encoding?: BufferEncoding
+        ) => Promise<boolean>;
       };
       path: {
         extname: (path: string) => Promise<string>;

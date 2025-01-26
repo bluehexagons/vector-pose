@@ -42,6 +42,24 @@ ipcMain.handle(
   }
 );
 
+ipcMain.handle(
+  'fs:writeFile',
+  async (
+    _event,
+    filePath: string,
+    data: string,
+    encoding: BufferEncoding = 'utf-8'
+  ) => {
+    try {
+      await fs.writeFile(filePath, data, encoding);
+      return true;
+    } catch (err) {
+      console.error('Failed to write file:', err);
+      throw err;
+    }
+  }
+);
+
 ipcMain.handle('path:extname', (_event, filePath: string) => {
   return path.extname(filePath).toLowerCase();
 });

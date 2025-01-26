@@ -368,6 +368,75 @@ export const AppRoot = () => {
   const [leftWidth, setLeftWidth] = useState(300);
   const [rightWidth, setRightWidth] = useState(300);
 
+  const handleSave = async () => {
+    if (!activeTab) return;
+
+    try {
+      if (!activeTab.filePath) {
+        return handleSaveAs();
+      }
+
+      const fabData = {
+        name: activeTab.name,
+        skele: activeTab.skele.toData(), // Use toData() explicitly
+      };
+
+      await window.native.fs.writeFile(
+        activeTab.filePath,
+        JSON.stringify(fabData, null, 2)
+      );
+
+      setTabs(current =>
+        current.map(tab =>
+          tab.id === activeTabId ? {...tab, isModified: false} : tab
+        )
+      );
+    } catch (err) {
+      console.error('Failed to save file:', err);
+    }
+  };
+
+  const handleSaveAs = async () => {
+    if (!activeTab) return;
+
+    try {
+      const response = await window.native.showOpenDialog({
+        title: 'Save As',
+        buttonLabel: 'Save',
+        filters: [{name: 'Prefab Files', extensions: ['fab.json']}],
+        properties: ['createDirectory'],
+      });
+
+      if (response.canceled || !response.filePaths[0]) return;
+
+      const filePath = response.filePaths[0];
+      const relativePath = await window.native.path.relative(
+        gameDirectory,
+        filePath
+      );
+
+      setTabs(current =>
+        current.map(tab =>
+          tab.id === activeTabId
+            ? {...tab, filePath, name: relativePath, isModified: false}
+            : tab
+        )
+      );
+
+      const fabData = {
+        name: relativePath,
+        skele: activeTab.skele.toData(), // Use toData() explicitly
+      };
+
+      await window.native.fs.writeFile(
+        filePath,
+        JSON.stringify(fabData, null, 2)
+      );
+    } catch (err) {
+      console.error('Failed to save file:', err);
+    }
+  };
+
   return (
     <div
       className="container"
@@ -376,7 +445,11 @@ export const AppRoot = () => {
       onMouseUp={handleDropSprite}
       onMouseMove={dragOverSprite}
     >
-      <HeaderPane />
+      <HeaderPane
+        activeTab={activeTab}
+        onSave={handleSave}
+        onSaveAs={handleSaveAs}
+      />
       <TabPane
         tabs={tabs}
         activeTabId={activeTabId}

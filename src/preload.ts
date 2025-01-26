@@ -18,6 +18,13 @@ const exposedContext = {
 
     resolveGamePath: (gameDir: string, relativePath: string): Promise<Buffer> =>
       ipcRenderer.invoke('fs:resolveGamePath', gameDir, relativePath),
+
+    writeFile: (
+      path: string,
+      data: string,
+      encoding?: BufferEncoding
+    ): Promise<boolean> =>
+      ipcRenderer.invoke('fs:writeFile', path, data, encoding),
   },
 
   path: {
