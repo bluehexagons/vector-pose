@@ -156,6 +156,7 @@ export function fileEntryToTreeNode(file: FileEntry): FileTreeNode {
 export interface TabData {
   id: string;
   name: string;
+  description: string;
   filePath?: string;
   skele: SkeleNode;
   isModified?: boolean;
@@ -168,7 +169,13 @@ declare global {
     native: {
       dialog: {
         showOpenDialog: typeof dialog.showOpenDialog;
-        showSaveDialog: typeof dialog.showSaveDialog;
+        showSaveDialog: typeof dialog.showSaveDialog & {
+          (
+            options: Parameters<typeof dialog.showSaveDialog>[0] & {
+              defaultPath?: string;
+            }
+          ): ReturnType<typeof dialog.showSaveDialog>;
+        };
       };
       fs: {
         readdir: (path: string) => Promise<FileSystemEntry[]>;
@@ -185,7 +192,7 @@ declare global {
       };
       path: {
         extname: (path: string) => Promise<string>;
-        basename: (path: string) => Promise<string>;
+        basename: (path: string, ext?: string) => Promise<string>;
         join: (...paths: string[]) => Promise<string>;
         relative: (from: string, to: string) => Promise<string>;
       };

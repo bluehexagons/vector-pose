@@ -66,8 +66,8 @@ ipcMain.handle('path:extname', (_event, filePath: string) => {
   return path.extname(filePath).toLowerCase();
 });
 
-ipcMain.handle('path:basename', (_event, filePath: string) => {
-  return path.basename(filePath);
+ipcMain.handle('path:basename', (_event, filePath: string, ext?: string) => {
+  return path.basename(filePath, ext);
 });
 
 ipcMain.handle('path:join', (_event, ...paths: string[]) => {

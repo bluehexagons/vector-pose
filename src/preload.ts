@@ -35,8 +35,8 @@ const exposedContext = {
     extname: (path: string): Promise<string> =>
       ipcRenderer.invoke('path:extname', path),
 
-    basename: (path: string): Promise<string> =>
-      ipcRenderer.invoke('path:basename', path),
+    basename: (path: string, ext?: string): Promise<string> =>
+      ipcRenderer.invoke('path:basename', path, ext),
 
     join: (...paths: string[]): Promise<string> =>
       ipcRenderer.invoke('path:join', ...paths),

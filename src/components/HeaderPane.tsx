@@ -5,17 +5,27 @@ export const HeaderPane = ({
   activeTab,
   onSave,
   onSaveAs,
+  onNameChange,
 }: {
   activeTab?: TabData;
   onSave: () => Promise<void>;
   onSaveAs: () => Promise<void>;
+  onNameChange: (name: string) => void;
 }) => {
   return (
     <div className="header-pane">
-      <h1 className="header-title">
-        {activeTab?.name ?? 'vector-pose'}
-        {activeTab?.isModified && '*'}
-      </h1>
+      <div className="header-left">
+        <h1 className="header-title">vector-pose</h1>
+        {activeTab && (
+          <input
+            type="text"
+            className="tab-name-input"
+            value={activeTab.name}
+            onChange={e => onNameChange(e.target.value)}
+          />
+        )}
+        {activeTab?.isModified && <span className="modified-indicator">*</span>}
+      </div>
       <ul className="header-menu">
         <li className="header-menu-item">
           <button onClick={onSave} disabled={!activeTab}>

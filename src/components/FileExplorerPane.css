@@ -49,3 +49,12 @@
   border-radius: 4px;
   user-select: none;
 }
+
+.game-directory {
+  margin-top: 32px;
+}
+
+.change-directory {
+  margin: 8px 0;
+  width: 100%;
+}

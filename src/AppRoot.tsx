@@ -66,6 +66,15 @@ const scanDirectory = async (
   return entries;
 };
 
+const createEmptyTab = () => ({
+  id: crypto.randomUUID(),
+  name: 'Untitled',
+  description: '',
+  skele: createDefaultSkele(),
+  renderedInfo: [] as RenderInfo[],
+  renderedNodes: [] as SkeleNode[],
+});
+
 const preventDefault = (e: React.SyntheticEvent) => e.preventDefault();
 
 export const AppRoot = () => {
@@ -82,15 +91,7 @@ export const AppRoot = () => {
   const [cameraPosition, setCameraPosition] = useState(INITIAL_CAMERA_POSITION);
   const [time, setTime] = useState(1);
 
-  const [tabs, setTabs] = useState<TabData[]>(() => [
-    {
-      id: crypto.randomUUID(),
-      name: 'Untitled',
-      skele: createDefaultSkele(),
-      renderedInfo: [],
-      renderedNodes: [],
-    },
-  ]);
+  const [tabs, setTabs] = useState<TabData[]>(() => [createEmptyTab()]);
   const [activeTabId, setActiveTabId] = useState<string>(tabs[0].id);
 
   const activeTab = tabs.find(tab => tab.id === activeTabId);
@@ -119,13 +120,7 @@ export const AppRoot = () => {
   };
 
   const handleNewTab = () => {
-    const newTab: TabData = {
-      id: crypto.randomUUID(),
-      name: 'Untitled',
-      skele: createDefaultSkele(),
-      renderedInfo: [],
-      renderedNodes: [],
-    };
+    const newTab: TabData = createEmptyTab();
     setTabs(current => [...current, newTab]);
     setActiveTabId(newTab.id);
   };
@@ -308,7 +303,8 @@ export const AppRoot = () => {
 
           const newTab: TabData = {
             id: crypto.randomUUID(),
-            name: file.relativePath,
+            name: fabData.name ?? file.relativePath,
+            description: fabData.name ?? file.relativePath,
             filePath: file.path,
             skele: newSkele,
             renderedInfo: newSkele.render(1, props => props),
@@ -381,6 +377,10 @@ export const AppRoot = () => {
         skele: activeTab.skele.toData(), // Use toData() explicitly
       };
 
+      // overwrite camera-modified values to their originals
+      fabData.skele.angle = 0;
+      fabData.skele.mag = 1;
+
       await window.native.fs.writeFile(
         activeTab.filePath,
         JSON.stringify(fabData, null, 2)
@@ -400,9 +400,13 @@ export const AppRoot = () => {
     if (!activeTab) return;
 
     try {
+      // Convert tab name to filename format
+      const defaultName = activeTab.name.toLowerCase().replace(/\s+/g, '_');
+
       const response = await window.native.dialog.showSaveDialog({
         title: 'Save As',
         buttonLabel: 'Save',
+        defaultPath: defaultName + '.fab.json',
         filters: [{name: 'Prefab Files', extensions: ['fab.json']}],
         properties: ['showOverwriteConfirmation', 'createDirectory'],
       });
@@ -410,23 +414,23 @@ export const AppRoot = () => {
       if (response.canceled || !response.filePath) return;
 
       const filePath = response.filePath;
-      const relativePath = await window.native.path.relative(
-        gameDirectory,
-        filePath
-      );
+      const fileName = await window.native.path.basename(filePath, '.fab.json');
 
       setTabs(current =>
         current.map(tab =>
-          tab.id === activeTabId
-            ? {...tab, filePath, name: relativePath, isModified: false}
-            : tab
+          tab.id === activeTabId ? {...tab, filePath, isModified: false} : tab
         )
       );
 
       const fabData = {
-        name: relativePath,
-        skele: activeTab.skele.toData(), // Use toData() explicitly
+        name: activeTab.name,
+        description: activeTab.description,
+        skele: activeTab.skele.toData(),
       };
+
+      // overwrite camera-modified values to their originals
+      fabData.skele.angle = 0;
+      fabData.skele.mag = 1;
 
       await window.native.fs.writeFile(
         filePath,
@@ -435,6 +439,14 @@ export const AppRoot = () => {
     } catch (err) {
       console.error('Failed to save file:', err);
     }
+  };
+
+  const handleNameChange = (name: string) => {
+    setTabs(current =>
+      current.map(tab =>
+        tab.id === activeTabId ? {...tab, name, isModified: true} : tab
+      )
+    );
   };
 
   return (
@@ -449,6 +461,7 @@ export const AppRoot = () => {
         activeTab={activeTab}
         onSave={handleSave}
         onSaveAs={handleSaveAs}
+        onNameChange={handleNameChange}
       />
       <TabPane
         tabs={tabs}
