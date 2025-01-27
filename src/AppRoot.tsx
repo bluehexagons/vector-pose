@@ -134,6 +134,7 @@ export const AppRoot = () => {
         ? node.state.transform
         : node.parent.state.transform;
       const dist = vec2.dist(center, [worldX, worldY]);
+
       const nodeSize = !node.uri
         ? targetSize
         : Math.sqrt(vec2.dot(node.transform, node.transform)) +
@@ -141,9 +142,16 @@ export const AppRoot = () => {
 
       console.log('nodeSize', nodeSize);
 
-      if (dist < Math.min(nodeSize, closest?.distance ?? Infinity)) {
+      const distBound = Math.min(nodeSize, closest?.distance ?? Infinity);
+
+      if (Math.abs(dist - distBound) < 0.01 && node.uri) {
+        return closest;
+      }
+
+      if (dist <= distBound) {
         return {node, distance: dist};
       }
+
       return closest;
     }, undefined as {node: SkeleNode; distance: number} | undefined)?.node;
   };
@@ -204,18 +212,6 @@ export const AppRoot = () => {
 
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
 
-  const appendNewNode = () => {
-    const base = skele.clone();
-    base.add(
-      SkeleNode.fromData({
-        angle: 0,
-        mag: 0,
-      })
-    );
-
-    updateSkele(base);
-  };
-
   // pre-populate a good default palette
   useEffect(() => {
     updateSkele(createDefaultSkele());
@@ -226,6 +222,21 @@ export const AppRoot = () => {
   );
 
   const [activeNode, setActiveNode] = useState<UiNode | undefined>(undefined);
+
+  const appendNewNode = () => {
+    const base = skele.clone();
+    const newNode = lastActiveNode ? base.findId(lastActiveNode.node.id) : base;
+    if (newNode) {
+      newNode.add(
+        SkeleNode.fromData({
+          angle: 0,
+          mag: 0,
+        })
+      );
+    }
+
+    updateSkele(base);
+  };
 
   const handleEditorMouseUp = (e: React.MouseEvent) => {
     if (!dragStart || !activeNode) {
