@@ -40,7 +40,7 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
       </ul>
 
       {/* <div className="row">
-        <button onClick={onFileSelect}>Add Files</button>
+        <button onClick={onFileSelect}>Open File</button>
       </div> */}
 
       <div className="game-directory">

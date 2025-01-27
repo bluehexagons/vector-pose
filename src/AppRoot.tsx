@@ -1,6 +1,7 @@
 import {vec2} from 'gl-matrix';
 import {useEffect, useRef, useState} from 'react';
 import './AppRoot.css';
+import {Viewport} from './components/EditorCanvas';
 import {EditorPane} from './components/EditorPane';
 import {FileExplorerPane} from './components/FileExplorerPane';
 import {HeaderPane} from './components/HeaderPane';
@@ -11,16 +12,14 @@ import {
   FAB_EXTENSIONS,
   FileEntry,
   IMAGE_EXTENSIONS,
-  ImageCache,
   SEARCH_DIRS,
+  TabData,
   toSpriteUri,
   UiNode,
-  TabData,
 } from './shared/types';
-import {RenderInfo, SkeleNode} from './utils/SkeleNode';
-import {BASE_SCALE, Viewport} from './components/EditorCanvas';
 import {toDegrees, toRadians} from './utils/Equa';
 import type {ImagePropsRef} from './utils/Renderer';
+import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 0;

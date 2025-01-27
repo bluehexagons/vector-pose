@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {vec2} from 'gl-matrix';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {rotateVec2, toRadians} from '../utils/Equa';
 
 // Base scale factor: at scale 1.0, a 1x1 unit square will be this many pixels

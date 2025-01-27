@@ -1,6 +1,6 @@
+import {lerp} from '@bluehexagons/easing';
 import {vec2} from 'gl-matrix';
 import {lerpAngleRad, toDegrees, toRadians} from './Equa';
-import {lerp} from '@bluehexagons/easing';
 import type {ImagePropsRef} from './Renderer';
 
 export interface SkeleData {

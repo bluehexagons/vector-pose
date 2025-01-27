@@ -22,9 +22,9 @@ export const TabPane: React.FC<TabPaneProps> = ({
       <ul>
         {tabs.map(tab => (
           <li
-            key={tab.id}
-            className={`tab ${tab.id === activeTabId ? 'active' : ''}`}
-            onClick={() => onSelectTab(tab.id)}
+            key={tab.skele.id}
+            className={`tab ${tab.skele.id === activeTabId ? 'active' : ''}`}
+            onClick={() => onSelectTab(tab.skele.id)}
           >
             <span className="tab-name">
               {tab.name}
@@ -34,7 +34,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
               className="tab-close"
               onClick={e => {
                 e.stopPropagation();
-                onCloseTab(tab.id);
+                onCloseTab(tab.skele.id);
               }}
             >
               ×

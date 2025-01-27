@@ -1,4 +1,3 @@
-import {vec2} from 'gl-matrix';
 import {fromSpriteUri} from '../shared/types';
 import {RenderInfo, SkeleNode} from '../utils/SkeleNode';
 import {EditorCanvas, Viewport} from './EditorCanvas';
@@ -30,19 +29,6 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   onMouseUp,
   rotation,
 }) => {
-  const screenToWorld = (
-    screenX: number,
-    screenY: number,
-    scale: number,
-    offset: vec2
-  ): vec2 => {
-    // Convert screen coordinates to world coordinates
-    return vec2.fromValues(
-      (screenX - offset[0]) / scale,
-      (screenY - offset[1]) / scale
-    );
-  };
-
   return (
     <div className="editor-pane">
       <EditorCanvas

@@ -1,7 +1,7 @@
 import {app, BrowserWindow, dialog, ipcMain} from 'electron';
-import path from 'path';
-import fs from 'fs/promises';
 import squirrelStarted from 'electron-squirrel-startup';
+import fs from 'fs/promises';
+import path from 'path';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (squirrelStarted) {
