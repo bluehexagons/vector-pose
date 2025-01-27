@@ -17,7 +17,7 @@ export interface SkeleData {
 }
 
 export interface RenderInfo {
-  uri: string;
+  uri: string | null;
   center: vec2;
   transform: vec2;
   direction: number;
@@ -241,7 +241,6 @@ export class SkeleNode {
       return node;
     }
 
-    this.nodeLookupCache.set(nodeId, null);
     return null as never;
   }
 
@@ -283,7 +282,7 @@ export class SkeleNode {
   }
 
   // deeply clones the node recursively
-  clone(parent: SkeleNode = null): SkeleNode {
+  clone(parent: SkeleNode | null = null): SkeleNode {
     const node = new SkeleNode();
 
     // Copy basic properties
