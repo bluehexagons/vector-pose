@@ -29,7 +29,7 @@ export interface RenderInfo {
 const sortRenderInfo = (a: RenderInfo, b: RenderInfo) => a.sort - b.sort;
 
 export class SkeleNode {
-  id: string | null = null;
+  id: string = SkeleNode.randomLetters(); // Always initialize with an ID
   parent: SkeleNode | null = null;
   root: SkeleNode = this;
   children: SkeleNode[] = [];
@@ -145,11 +145,12 @@ export class SkeleNode {
     const mag = data.mag ?? 1;
 
     const skele = new SkeleNode();
+    // Use provided ID or keep the auto-generated one
+    if (data.id) skele.id = data.id;
 
     skele.uri = data.uri ?? null;
     skele.rotation = rads;
     skele.mag = mag;
-    skele.id = data.id ?? null;
     skele.props = data.props ?? null;
     skele.sort = data.sort ?? 0;
     skele.hidden = data.hidden ?? false;

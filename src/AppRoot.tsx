@@ -57,6 +57,7 @@ const scanDirectory = async (
         );
       } else {
         const ext = await window.native.path.extname(file.name);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (IMAGE_EXTENSIONS.includes(ext as any)) {
           entries.push({path: file.path, relativePath, type: 'image'});
         } else if (FAB_EXTENSIONS.some(fabExt => file.name.endsWith(fabExt))) {
@@ -71,13 +72,24 @@ const scanDirectory = async (
   return entries;
 };
 
-const createEmptyTab = () => ({
-  name: 'Untitled',
-  description: '',
-  skele: createDefaultSkele(),
-  renderedInfo: [] as RenderInfo[],
-  renderedNodes: [] as SkeleNode[],
-});
+const createEmptyTab = () => {
+  const skele = SkeleNode.fromData({
+    angle: 0,
+    mag: 1,
+    children: [{angle: 0, mag: 0}],
+    id: SkeleNode.randomLetters(), // Explicitly set a new ID
+  });
+  const renderedInfo = skele.render(1, deduper).slice(1);
+  const renderedNodes = Array.from(skele.walk()).slice(1);
+  return {
+    name: 'Untitled',
+    description: '',
+    skele,
+    renderedInfo,
+    renderedNodes,
+    isModified: false,
+  };
+};
 
 const preventDefault = (e: React.SyntheticEvent) => e.preventDefault();
 
@@ -139,8 +151,6 @@ export const AppRoot = () => {
         : Math.sqrt(vec2.dot(node.transform, node.transform)) +
           targetSize * 0.5;
 
-      console.log('nodeSize', nodeSize);
-
       const distBound = Math.min(nodeSize, closest?.distance ?? Infinity);
 
       if (Math.abs(dist - distBound) < 0.01 && node.uri) {
@@ -155,25 +165,47 @@ export const AppRoot = () => {
     }, undefined as {node: SkeleNode; distance: number} | undefined)?.node;
   };
 
-  const updateTab = (base: SkeleNode) => {
+  const updateTab = (base: SkeleNode, filePath?: string) => {
     const newRenderedInfo = base.render(1, deduper).slice(1);
     const newRenderedNodes = Array.from(base.walk()).slice(1);
     setTabs(current => {
-      const amended = !current.some(tab => tab.skele.id === activeTabId)
-        ? [...current, createEmptyTab()]
-        : current;
-      return amended.map(tab =>
-        tab.skele.id === activeTabId
-          ? {
-              ...tab,
-              skele: base,
-              isModified: true,
-              renderedInfo: newRenderedInfo,
-              renderedNodes: newRenderedNodes,
-            }
-          : tab
+      // Check if this is an existing tab by skele ID or file path
+      const existingTab = current.find(
+        tab => tab.skele.id === base.id || tab.filePath === filePath
       );
+
+      if (existingTab) {
+        // Update existing tab
+        return current.map(tab =>
+          tab === existingTab
+            ? {
+                ...tab,
+                skele: base,
+                filePath,
+                isModified: true,
+                renderedInfo: newRenderedInfo,
+                renderedNodes: newRenderedNodes,
+              }
+            : tab
+        );
+      }
+
+      // Create new tab
+      const newTab: TabData = {
+        name: filePath ? filePath.split('/').pop() : 'Untitled',
+        description: '',
+        skele: base,
+        filePath,
+        renderedInfo: newRenderedInfo,
+        renderedNodes: newRenderedNodes,
+        isModified: false,
+      };
+
+      return [...current, newTab];
     });
+
+    // Always set active tab to the one we just updated
+    setActiveTabId(base.id);
   };
 
   const tickSkele = (base: SkeleNode) => {
@@ -193,20 +225,37 @@ export const AppRoot = () => {
   };
 
   const handleNewTab = () => {
-    const newTab: TabData = createEmptyTab();
+    const newTab = createEmptyTab();
     setTabs(current => [...current, newTab]);
     setActiveTabId(newTab.skele.id);
   };
 
   const handleCloseTab = (tabId: string) => {
-    setTabs(current => current.filter(tab => tab.skele.id !== tabId));
-    if (activeTabId === tabId) {
-      setActiveTabId(tabs[0]?.skele.id);
-    }
+    setTabs(current => {
+      const newTabs = current.filter(tab => tab.skele.id !== tabId);
+      // If we're closing the active tab, switch to the first remaining tab
+      if (activeTabId === tabId && newTabs.length > 0) {
+        setActiveTabId(newTabs[0].skele.id);
+      }
+      // Ensure we always have at least one tab
+      if (newTabs.length === 0) {
+        const newTab = createEmptyTab();
+        setActiveTabId(newTab.skele.id);
+        return [newTab];
+      }
+      return newTabs;
+    });
   };
 
   const handleSelectTab = (tabId: string) => {
-    setActiveTabId(tabId);
+    const tab = tabs.find(t => t.skele.id === tabId);
+    if (tab) {
+      setActiveTabId(tabId);
+      // Ensure the selected tab's skele is initialized
+      if (!tab.skele.initialized) {
+        updateSkele(tab.skele.clone());
+      }
+    }
   };
 
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
@@ -237,13 +286,11 @@ export const AppRoot = () => {
     updateSkele(base);
   };
 
-  const handleEditorMouseUp = (e: React.MouseEvent) => {
+  const handleEditorMouseUp = () => {
     if (!dragStart || !activeNode) {
       setActiveNode(undefined);
       return;
     }
-
-    const delta = vec2.sub(vec2.create(), [e.pageX, e.pageY], dragStart);
 
     const newSkele = skele.clone();
     const newNode = newSkele.findId(activeNode.node.id);
@@ -331,6 +378,26 @@ export const AppRoot = () => {
     }
   };
 
+  const loadFabFile = async (file: FileEntry) => {
+    try {
+      const str = (await window.native.fs.readFile(
+        file.path,
+        'utf-8'
+      )) as string;
+      const fabData = JSON.parse(str);
+
+      if (fabData.skele) {
+        const newSkele = SkeleNode.fromData(fabData.skele);
+        tickSkele(newSkele);
+        updateTab(newSkele, file.path);
+        return true;
+      }
+    } catch (err) {
+      console.error('Failed to load fab file:', err);
+    }
+    return false;
+  };
+
   const handleFileClick = async (file: FileEntry) => {
     if (file.type === 'image') {
       const spriteUri = toSpriteUri(file.path);
@@ -347,23 +414,7 @@ export const AppRoot = () => {
         return;
       }
 
-      try {
-        const str = (await window.native.fs.readFile(
-          file.path,
-          'utf-8'
-        )) as unknown as string;
-        const fabData = JSON.parse(str);
-
-        if (fabData.skele) {
-          const newSkele = SkeleNode.fromData(fabData.skele);
-          setActiveTabId(newSkele.id);
-          updateTab(newSkele);
-        } else {
-          console.error('No skele data found in fab file');
-        }
-      } catch (err) {
-        console.error('Failed to load fab file:', err);
-      }
+      await loadFabFile(file);
     }
   };
 

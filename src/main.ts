@@ -33,10 +33,16 @@ ipcMain.handle('fs:readdir', async (_event, dirPath: string) => {
 
 ipcMain.handle(
   'fs:readFile',
-  async (_event, filePath: string, encoding?: BufferEncoding) => {
+  async (
+    _event,
+    filePath: string,
+    encoding?: BufferEncoding
+  ): Promise<string | Buffer> => {
     try {
-      const content = await fs.readFile(filePath, encoding);
-      return content;
+      if (encoding) {
+        return await fs.readFile(filePath, {encoding});
+      }
+      return await fs.readFile(filePath);
     } catch (err) {
       console.error('Failed to read file:', err);
       throw err;
@@ -49,12 +55,11 @@ ipcMain.handle(
   async (
     _event,
     filePath: string,
-    data: string,
-    encoding: BufferEncoding = 'utf-8'
-  ) => {
+    data: string | Buffer,
+    encoding?: BufferEncoding
+  ): Promise<void> => {
     try {
       await fs.writeFile(filePath, data, encoding);
-      return true;
     } catch (err) {
       console.error('Failed to write file:', err);
       throw err;

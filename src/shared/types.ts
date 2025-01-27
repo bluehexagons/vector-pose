@@ -168,26 +168,23 @@ declare global {
     native: {
       dialog: {
         showOpenDialog: typeof dialog.showOpenDialog;
-        showSaveDialog: typeof dialog.showSaveDialog & {
-          (
-            options: Parameters<typeof dialog.showSaveDialog>[0] & {
-              defaultPath?: string;
-            }
-          ): ReturnType<typeof dialog.showSaveDialog>;
-        };
+        showSaveDialog: typeof dialog.showSaveDialog;
       };
       fs: {
         readdir: (path: string) => Promise<FileSystemEntry[]>;
-        readFile: (path: string, encoding?: BufferEncoding) => Promise<Buffer>;
+        readFile: {
+          (path: string, encoding: BufferEncoding): Promise<string>;
+          (path: string): Promise<Buffer>;
+        };
         resolveGamePath: (
           relativePath: string,
           gameDir: string
         ) => Promise<string>;
         writeFile: (
           path: string,
-          data: string,
+          data: string | Buffer,
           encoding?: BufferEncoding
-        ) => Promise<boolean>;
+        ) => Promise<void>;
       };
       path: {
         extname: (path: string) => Promise<string>;
