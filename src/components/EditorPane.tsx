@@ -84,8 +84,15 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
                   style={{
                     position: 'absolute',
                     // Apply scale to positions
-                    left: `${node.state.mid.transform[0] * viewport.scale}px`,
-                    top: `${node.state.mid.transform[1] * viewport.scale}px`,
+                    left: `${
+                      (node.uri ? node.parent : node).state.mid.transform[0] *
+                      viewport.scale
+                    }px`,
+                    top: `${
+                      (node.uri ? node.parent : node).state.mid.transform[1] *
+                      viewport.scale
+                    }px`,
+                    marginTop: node.uri ? '2em' : '0',
                     transform: 'translate(-50%, -50%)',
                   }}
                 >

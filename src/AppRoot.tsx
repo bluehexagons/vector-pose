@@ -253,8 +253,7 @@ export const AppRoot = () => {
 
     if (newNode) {
       if (newNode.uri) {
-        return; // disable for testing
-        newNode.updateFromChildTarget(worldPos[0], worldPos[1]);
+        newNode.parent.updateFromWorldPosition(worldPos[0], worldPos[1]);
       } else {
         newNode.updateFromWorldPosition(worldPos[0], worldPos[1]);
       }
