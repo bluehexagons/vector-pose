@@ -293,6 +293,7 @@ export class SkeleNode {
     node.rotation = this.rotation;
     node.props = this.props;
     node.sort = this.sort;
+    node.hidden = this.hidden;
     vec2.copy(node.transform, this.transform);
 
     // Set up parent relationship
@@ -316,6 +317,7 @@ export class SkeleNode {
       uri: this.uri || undefined,
       props: this.props || undefined,
       sort: this.sort || undefined,
+      hidden: this.hidden || undefined,
       children:
         this.children.length > 0
           ? this.children.map(child => child.toData())

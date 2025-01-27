@@ -68,6 +68,7 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
                         width: '100%',
                         height: '100%',
                         objectFit: 'contain',
+                        opacity: node.node.hidden ? 0.5 : 1,
                       }}
                     />
                   )}
