@@ -5,6 +5,15 @@ import type {ImagePropsRef} from '../utils/Renderer';
 
 const deduper = (props: ImagePropsRef) => props;
 
+const renderSkele = (skele: SkeleNode) => ({
+  renderedInfo: skele
+    ? skele.render(1, deduper).filter(i => i.node.id !== skele.id)
+    : [],
+  renderedNodes: skele
+    ? Array.from(skele.walk()).filter(i => i.id !== skele.id)
+    : [],
+});
+
 const createEmptyTab = (defaultSkele?: SkeleNode) => {
   const skele =
     defaultSkele ??
@@ -14,14 +23,12 @@ const createEmptyTab = (defaultSkele?: SkeleNode) => {
       children: [{angle: 0, mag: 0}],
       id: SkeleNode.randomLetters(), // Explicitly set a new ID
     });
-  const renderedInfo = skele.render(1, deduper).slice(1);
-  const renderedNodes = Array.from(skele.walk()).slice(1);
+
   return {
+    ...renderSkele(skele),
     name: 'Untitled',
     description: '',
     skele,
-    renderedInfo,
-    renderedNodes,
     isModified: false,
     rotation: 270, // Add default rotation
   };
@@ -36,16 +43,12 @@ export function useTabs() {
       // First try to find tab by ID
       const existingTab = current.find(tab => tab.skele.id === base.id);
       if (existingTab) {
-        const newRenderedInfo = base.render(1, deduper).slice(1);
-        const newRenderedNodes = Array.from(base.walk()).slice(1);
-
         return current.map(tab =>
           tab === existingTab
             ? {
                 ...tab,
+                ...renderSkele(base),
                 skele: base,
-                renderedInfo: newRenderedInfo,
-                renderedNodes: newRenderedNodes,
                 isModified: true,
               }
             : tab
@@ -60,10 +63,9 @@ export function useTabs() {
             tab === fileTab
               ? {
                   ...tab,
+                  ...renderSkele(base),
                   skele: base,
                   isModified: false,
-                  renderedInfo: base.render(1, deduper).slice(1),
-                  renderedNodes: Array.from(base.walk()).slice(1),
                 }
               : tab
           );
@@ -76,10 +78,9 @@ export function useTabs() {
         {
           name: filePath ? filePath.split('/').pop() : 'Untitled',
           description: '',
+          ...renderSkele(base),
           skele: base,
           filePath,
-          renderedInfo: base.render(1, deduper).slice(1),
-          renderedNodes: Array.from(base.walk()).slice(1),
           isModified: false,
           rotation: 270, // Add default rotation
         },
