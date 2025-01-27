@@ -166,7 +166,6 @@ export const AppRoot = () => {
   };
 
   const updateSkele = (base: SkeleNode) => {
-    const preserveId = !!tabs.find(tab => tab.skele.id === base.id);
     const clone = base.clone(null);
     tickSkele(clone);
     updateTab(clone, activeTab?.filePath);
@@ -248,8 +247,9 @@ export const AppRoot = () => {
 
     const worldPos = viewport.pageToWorld(e.pageX, e.pageY);
     const newSkele = skele.clone();
-    updateSkele(newSkele);
     const newNode = newSkele.findId(activeNode.node.id);
+
+    tickSkele(newSkele);
 
     if (newNode) {
       if (newNode.uri) {
@@ -260,6 +260,8 @@ export const AppRoot = () => {
       }
       setDragStart(worldPos);
     }
+
+    updateSkele(newSkele);
   };
 
   const loadDirectoryFiles = async (directory: string) => {
