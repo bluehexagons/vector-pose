@@ -339,7 +339,7 @@ export class SkeleNode {
 
     // Update angle and magnitude
     this.rotation = Math.atan2(relY, relX);
-    this.mag = Math.sqrt(relX * relX + relY * relY);
+    this.mag = Math.sqrt(relX * relX + relY * relY) * 0.5;
     this.updateTransform();
   }
 
@@ -357,7 +357,7 @@ export class SkeleNode {
 
     // Update parent's angle and magnitude to reach the child position
     this.parent.rotation = Math.atan2(relY, relX);
-    this.parent.mag = Math.sqrt(relX * relX + relY * relY);
+    this.parent.mag = Math.sqrt(relX * relX + relY * relY) * 0.5;
     this.parent.updateTransform();
   }
 

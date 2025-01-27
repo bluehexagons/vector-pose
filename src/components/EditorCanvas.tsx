@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {vec2} from 'gl-matrix';
+import {rotateVec2, rotateVec2Around, toRadians} from '../utils/Equa';
 
 // Base scale factor: at scale 1.0, a 1x1 unit square will be this many pixels
 export const BASE_SCALE = 200;
@@ -7,6 +8,7 @@ export const BASE_SCALE = 200;
 export interface Viewport {
   scale: number;
   offset: vec2;
+  rotation: number; // Add rotation to viewport info
   pageToWorld: (pageX: number, pageY: number) => vec2;
   worldToPage: (worldX: number, worldY: number) => vec2;
 }
@@ -17,6 +19,7 @@ interface EditorCanvasProps {
   onCanvasMouseDown?: (e: React.MouseEvent, viewport: Viewport) => void;
   onCanvasMouseMove?: (e: React.MouseEvent, viewport: Viewport) => void;
   onCanvasMouseUp?: (e: React.MouseEvent, viewport: Viewport) => void;
+  rotation: number;
 }
 
 export const EditorCanvas: React.FC<EditorCanvasProps> = ({
@@ -25,6 +28,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   onCanvasMouseDown,
   onCanvasMouseMove,
   onCanvasMouseUp,
+  rotation = 0, // Add rotation prop
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Start zoomed out a bit more
@@ -57,13 +61,18 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       const x = pageX - rect.left;
       const y = pageY - rect.top;
 
-      // Remove offset and scale to get world coordinates
-      return vec2.fromValues(
-        (x - offset[0]) / (BASE_SCALE * scale),
-        (y - offset[1]) / (BASE_SCALE * scale)
+      // Remove offset and scale to get canvas coordinates
+      const canvasX = (x - offset[0]) / (BASE_SCALE * scale);
+      const canvasY = (y - offset[1]) / (BASE_SCALE * scale);
+
+      // Rotate coordinates back to world space
+      return rotateVec2(
+        vec2.create(),
+        vec2.fromValues(canvasX, canvasY),
+        -toRadians(rotation)
       );
     },
-    [scale, offset]
+    [scale, offset, rotation]
   );
 
   const worldToPage = useCallback(
@@ -71,18 +80,26 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return vec2.create();
 
+      // Rotate world coordinates to canvas space
+      const rotated = rotateVec2(
+        vec2.create(),
+        vec2.fromValues(worldX, worldY),
+        toRadians(rotation)
+      );
+
       // Apply scale and offset
-      const x = worldX * BASE_SCALE * scale + offset[0] + rect.left;
-      const y = worldY * BASE_SCALE * scale + offset[1] + rect.top;
+      const x = rotated[0] * BASE_SCALE * scale + offset[0] + rect.left;
+      const y = rotated[1] * BASE_SCALE * scale + offset[1] + rect.top;
 
       return vec2.fromValues(x, y);
     },
-    [scale, offset]
+    [scale, offset, rotation]
   );
 
   const viewport: Viewport = {
     scale: BASE_SCALE * scale,
     offset,
+    rotation,
     pageToWorld,
     worldToPage,
   };

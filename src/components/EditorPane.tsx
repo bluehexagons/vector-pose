@@ -14,6 +14,7 @@ interface EditorPaneProps {
   spriteHolderRef: React.RefObject<HTMLDivElement>;
   onMouseMove?: (e: React.MouseEvent, viewport: Viewport) => void;
   onMouseUp?: (e: React.MouseEvent, viewport: Viewport) => void;
+  rotation: number;
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = ({
@@ -25,6 +26,7 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   spriteHolderRef,
   onMouseMove,
   onMouseUp,
+  rotation,
 }) => {
   const screenToWorld = (
     screenX: number,
@@ -45,6 +47,7 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
         onCanvasMouseDown={onMouseDown}
         onCanvasMouseMove={onMouseMove}
         onCanvasMouseUp={onMouseUp}
+        rotation={rotation}
       >
         {viewport => (
           <div className="editor-content">

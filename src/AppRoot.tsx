@@ -19,6 +19,7 @@ import {
 } from './shared/types';
 import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 import {BASE_SCALE, Viewport} from './components/EditorCanvas';
+import {toRadians} from './utils/Equa';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 270;
@@ -176,7 +177,7 @@ export const AppRoot = () => {
 
   const [activeNode, setActiveNode] = useState<UiNode | undefined>(undefined);
 
-  const handleDropSprite = (e: React.MouseEvent) => {
+  const handleEditorMouseUp = (e: React.MouseEvent) => {
     if (!dragStart || !activeNode) {
       setLastActiveNode(undefined);
       setActiveNode(undefined);
@@ -224,7 +225,7 @@ export const AppRoot = () => {
     }, undefined as {node: RenderInfo; distance: number} | undefined)?.node;
   };
 
-  const handleMouseDown = (e: React.MouseEvent, viewport: Viewport) => {
+  const handleEditorMouseDown = (e: React.MouseEvent, viewport: Viewport) => {
     if (e.button !== 0) return;
 
     const worldPos = viewport.pageToWorld(e.pageX, e.pageY);
@@ -268,7 +269,7 @@ export const AppRoot = () => {
     }
   };
 
-  const dragOverSprite = (e: React.MouseEvent, viewport: Viewport) => {
+  const handleEditorMouseMove = (e: React.MouseEvent, viewport: Viewport) => {
     if (!activeNode || !dragStart) return;
 
     e.preventDefault();
@@ -278,8 +279,6 @@ export const AppRoot = () => {
     const newNode = newSkele.findId(activeNode.node.id);
 
     if (newNode) {
-      // If this is a sprite node (has URI), update its parent to move it
-      // Otherwise, update the node itself
       if (newNode.uri) {
         newNode.updateFromChildTarget(worldPos[0], worldPos[1]);
       } else {
@@ -436,7 +435,6 @@ export const AppRoot = () => {
       if (response.canceled || !response.filePath) return;
 
       const filePath = response.filePath;
-      const fileName = await window.native.path.basename(filePath, '.fab.json');
 
       setTabs(current =>
         current.map(tab =>
@@ -515,10 +513,11 @@ export const AppRoot = () => {
             renderedNodes={activeTab?.renderedNodes ?? []}
             activeNode={activeNode}
             gameDirectory={gameDirectory}
-            onMouseDown={handleMouseDown}
-            onMouseMove={dragOverSprite}
-            onMouseUp={handleDropSprite}
+            onMouseDown={handleEditorMouseDown}
+            onMouseMove={handleEditorMouseMove}
+            onMouseUp={handleEditorMouseUp}
             spriteHolderRef={spriteHolderRef}
+            rotation={viewRotation}
           />
         </div>
 
