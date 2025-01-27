@@ -51,6 +51,12 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
     }
   };
 
+  console.log(
+    'layers updating...',
+    lastActiveNode?.node.id,
+    renderedNodes.map(n => n.id)
+  );
+
   return (
     <div className="layers-pane">
       <div className="nodes-container">
@@ -71,10 +77,9 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
               key={index}
               node={node}
               index={index}
-              className={`${node.id === activeNode?.node.id ? 'active' : ''} ${
-                node.id === lastActiveNode?.node.id ? 'last-active' : ''
-              }`}
               onNodeUpdate={onNodeUpdate}
+              activeNode={activeNode?.node}
+              lastActiveNode={lastActiveNode?.node}
               skele={skele}
             />
           ))}

@@ -57,13 +57,11 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
               {renderedInfo.map(node => (
                 <div
                   key={node.node.id}
-                  className={`${
-                    node.node.id === activeNode?.node.id ? 'active' : ''
-                  } ${
+                  className={`${node.uri ? 'sprite-node' : 'vector-node'} ${
                     node.node.id === lastActiveNode?.node.id
                       ? 'last-active'
                       : ''
-                  }`}
+                  } ${node.node.id === activeNode?.node.id ? 'active' : ''} `}
                   style={{
                     position: 'absolute',
                     // Apply scale to positions and sizes
@@ -74,7 +72,6 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
                     transform: `translate(-50%, -50%) rotate(${
                       node.direction + 90
                     }deg)`,
-                    outline: '1px solid rgba(255,255,255,0.1)',
                   }}
                 >
                   {node.uri && (
@@ -96,8 +93,8 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
                 <div
                   key={node.id || index}
                   className={`node-label ${
-                    node === activeNode?.node ? 'active' : ''
-                  }`}
+                    node.id === lastActiveNode?.node.id ? 'last-active' : ''
+                  } ${node.id === activeNode?.node.id ? 'active' : ''} `}
                   style={{
                     position: 'absolute',
                     // Apply scale to positions

@@ -69,3 +69,19 @@
   pointer-events: all;
   white-space: nowrap;
 }
+
+.sprite-node {
+  outline: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vector-node {
+}
+
+.vector-node::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -50%;
+  bottom: 50%;
+  border-right: 1px dashed rgba(0, 255, 255, 0.5);
+}

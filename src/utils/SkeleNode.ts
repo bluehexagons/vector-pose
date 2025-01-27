@@ -13,6 +13,7 @@ export interface SkeleData {
   uri?: string;
   props?: ImagePropsRef;
   sort?: number;
+  hidden?: boolean;
 }
 
 export interface RenderInfo {
@@ -39,6 +40,8 @@ export class SkeleNode {
   /** Radians! */
   rotation = 0;
   mag = 1;
+  rendered = false;
+  hidden = false;
 
   /** state holds mutable state data */
   state = {
@@ -149,6 +152,7 @@ export class SkeleNode {
     skele.id = data.id ?? null;
     skele.props = data.props ?? null;
     skele.sort = data.sort ?? 0;
+    skele.hidden = data.hidden ?? false;
 
     vec2.set(skele.transform, mag * Math.cos(rads), mag * Math.sin(rads));
 
@@ -253,8 +257,9 @@ export class SkeleNode {
     propObjectDeduper: (props: ImagePropsRef) => ImagePropsRef
   ): RenderInfo[] {
     const views: RenderInfo[] = [];
+    this.rendered = true;
     for (const node of this.walk()) {
-      if (!node.uri) continue;
+      console.log('we rendering', node);
 
       const state = node.stateAt(time);
       const size = node.mag * state.scale;
@@ -262,8 +267,7 @@ export class SkeleNode {
       views.push({
         uri: node.uri,
         props: propObjectDeduper(node.props),
-        center: node.parent!.stateAt(time).transform,
-        // Size is now in raw units (no longer multiplied by 2)
+        center: node.parent?.stateAt(time).transform ?? vec2.create(),
         transform: vec2.fromValues(size, size),
         direction: toDegrees(state.rotation),
         sort: node.sort,
@@ -397,5 +401,5 @@ export class SkeleNode {
   }
 }
 
-console.log('-- testing skelenode --');
-console.log('result:', SkeleNode.test());
+// console.log('-- testing skelenode --');
+// console.log('result:', SkeleNode.test());

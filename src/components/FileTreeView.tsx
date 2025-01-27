@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {FileTreeNode} from '../shared/types';
 import './FileTreeView.css';
 
@@ -18,11 +18,6 @@ export const FileTreeView: React.FC<FileTreeViewProps> = ({
   const [expandedDirs, setExpandedDirs] = useState<{[key: string]: boolean}>(
     {}
   );
-
-  // Debug logging to verify tree structure
-  useEffect(() => {
-    console.log('FileTreeView nodes:', nodes);
-  }, [nodes]);
 
   const sortedNodes = [...nodes].sort((a, b) => {
     if (a.type === 'directory' && b.type !== 'directory') return -1;

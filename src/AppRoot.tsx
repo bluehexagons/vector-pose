@@ -19,12 +19,15 @@ import {
 } from './shared/types';
 import {RenderInfo, SkeleNode} from './utils/SkeleNode';
 import {BASE_SCALE, Viewport} from './components/EditorCanvas';
-import {toRadians} from './utils/Equa';
+import {toDegrees, toRadians} from './utils/Equa';
+import type {ImagePropsRef} from './utils/Renderer';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 0;
 const INITIAL_OBJECT_POSITION = vec2.fromValues(0, 0);
 const INITIAL_VIEW_ROTATION = 270;
+
+const deduper = (props: ImagePropsRef) => props;
 
 const createDefaultSkele = () =>
   SkeleNode.fromData({angle: 0, mag: 1, children: [{angle: 0, mag: 0}]});
@@ -88,9 +91,6 @@ export const AppRoot = () => {
 
   const [dragStart, setDragStart] = useState<vec2>();
 
-  const size = INITIAL_SIZE;
-  const rotation = INITIAL_ROTATION;
-  const objectPosition = INITIAL_OBJECT_POSITION;
   const [time, setTime] = useState(1);
 
   const [tabs, setTabs] = useState<TabData[]>(() => [createEmptyTab()]);
@@ -99,7 +99,15 @@ export const AppRoot = () => {
   const activeTab = tabs.find(tab => tab.skele.id === activeTabId);
   const skele = activeTab?.skele;
 
-  const [viewRotation, setViewRotation] = useState(INITIAL_VIEW_ROTATION);
+  const [viewRotation, setRawViewRotation] = useState(INITIAL_VIEW_ROTATION);
+
+  const setViewRotation = (degrees: number) => {
+    const clone = skele.clone();
+    clone.rotation = toRadians(degrees);
+    updateSkele(clone);
+
+    setRawViewRotation(degrees);
+  };
 
   const handleRotateView = (degrees: number) => {
     // Allow any angle, just normalize display to 0-360
@@ -108,10 +116,10 @@ export const AppRoot = () => {
   };
 
   useEffect(() => {
-    if (skele) {
+    if (skele && !skele.rendered) {
       updateSkele(skele.clone());
     }
-  }, [viewRotation]);
+  }, [skele]);
 
   const findClosestNode = (
     worldX: number,
@@ -120,6 +128,7 @@ export const AppRoot = () => {
     if (!activeTab?.renderedNodes) return undefined;
 
     return activeTab.renderedNodes.reduce((closest, node) => {
+      if (node.hidden) return closest;
       const center = !node.uri
         ? node.state.transform
         : node.parent.state.transform;
@@ -145,15 +154,14 @@ export const AppRoot = () => {
     }, undefined as {node: SkeleNode; distance: number} | undefined)?.node;
   };
 
-  const updateSkele = (base: SkeleNode) => {
-    base.tickMove(objectPosition[0], objectPosition[1], size, rotation);
-    base.updateState(time);
-
-    const newRenderedInfo = base.render(1, props => props);
+  const updateTab = (base: SkeleNode) => {
+    const newRenderedInfo = base.render(1, deduper).slice(1);
     const newRenderedNodes = Array.from(base.walk()).slice(1);
-
-    setTabs(current =>
-      current.map(tab =>
+    setTabs(current => {
+      const amended = !current.some(tab => tab.skele.id === activeTabId)
+        ? [...current, createEmptyTab()]
+        : current;
+      return amended.map(tab =>
         tab.skele.id === activeTabId
           ? {
               ...tab,
@@ -163,8 +171,24 @@ export const AppRoot = () => {
               renderedNodes: newRenderedNodes,
             }
           : tab
-      )
+      );
+    });
+  };
+
+  const tickSkele = (base: SkeleNode) => {
+    console.log('my rotation will be', base.rotation);
+    base.tickMove(
+      INITIAL_OBJECT_POSITION[0],
+      INITIAL_OBJECT_POSITION[1],
+      INITIAL_SIZE,
+      toDegrees(base.rotation + INITIAL_ROTATION)
     );
+    base.render(time, deduper);
+  };
+
+  const updateSkele = (base: SkeleNode) => {
+    tickSkele(base);
+    updateTab(base);
   };
 
   const handleNewTab = () => {
@@ -324,18 +348,8 @@ export const AppRoot = () => {
 
         if (fabData.skele) {
           const newSkele = SkeleNode.fromData(fabData.skele);
-          updateSkele(newSkele);
-
-          const newTab: TabData = {
-            name: fabData.name ?? file.relativePath,
-            description: fabData.name ?? file.relativePath,
-            filePath: file.path,
-            skele: newSkele,
-            renderedInfo: newSkele.render(1, props => props),
-            renderedNodes: Array.from(newSkele.walk()).slice(1),
-          };
-          setTabs(current => [...current, newTab]);
-          setActiveTabId(newTab.skele.id);
+          setActiveTabId(newSkele.id);
+          updateTab(newSkele);
         } else {
           console.error('No skele data found in fab file');
         }

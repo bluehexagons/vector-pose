@@ -64,14 +64,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       const canvasX = (x - offset[0]) / (BASE_SCALE * scale);
       const canvasY = (y - offset[1]) / (BASE_SCALE * scale);
 
-      // Rotate coordinates back to world space
-      return rotateVec2(
-        vec2.create(),
-        vec2.fromValues(canvasX, canvasY),
-        -toRadians(rotation)
-      );
+      return vec2.fromValues(canvasX, canvasY);
     },
-    [scale, offset, rotation]
+    [scale, offset]
   );
 
   const worldToPage = useCallback(

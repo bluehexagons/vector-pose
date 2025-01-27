@@ -4,13 +4,22 @@ import {SkeleNode} from '../utils/SkeleNode';
 import {AngleInput} from './AngleInput';
 
 export const NodeItem: React.FC<{
-  className?: string;
   node: SkeleNode;
+  activeNode: SkeleNode;
+  lastActiveNode: SkeleNode;
   index: number;
   depth?: number;
   onNodeUpdate: (skele: SkeleNode) => void;
   skele: SkeleNode;
-}> = ({className, node, index, depth = 0, onNodeUpdate, skele}) => {
+}> = ({
+  activeNode,
+  lastActiveNode,
+  node,
+  index,
+  depth = 0,
+  onNodeUpdate,
+  skele,
+}) => {
   const [showActions, setShowActions] = useState(false);
 
   const handleDragStart = (e: React.DragEvent) => {
@@ -133,7 +142,11 @@ export const NodeItem: React.FC<{
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div className={`node-item ${className}`}>
+      <div
+        className={`node-item ${
+          node.id === lastActiveNode?.id ? 'last-active' : ''
+        } ${node.id === activeNode?.id ? 'active' : ''}`}
+      >
         <div className="node-header">
           <span className="node-title">
             {node.id ? node.id : `node #${index + 1}`}
@@ -201,6 +214,8 @@ export const NodeItem: React.FC<{
       </div>
       {node.children.map((child, childIndex) => (
         <NodeItem
+          activeNode={activeNode}
+          lastActiveNode={lastActiveNode}
           key={childIndex}
           node={child}
           index={childIndex}
