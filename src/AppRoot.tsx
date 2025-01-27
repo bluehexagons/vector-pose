@@ -22,8 +22,9 @@ import {BASE_SCALE, Viewport} from './components/EditorCanvas';
 import {toRadians} from './utils/Equa';
 
 const INITIAL_SIZE = 1;
-const INITIAL_ROTATION = 270;
+const INITIAL_ROTATION = 0;
 const INITIAL_OBJECT_POSITION = vec2.fromValues(0, 0);
+const INITIAL_VIEW_ROTATION = 270;
 
 const createDefaultSkele = () =>
   SkeleNode.fromData({angle: 0, mag: 1, children: [{angle: 0, mag: 0}]});
@@ -69,7 +70,6 @@ const scanDirectory = async (
 };
 
 const createEmptyTab = () => ({
-  id: crypto.randomUUID(),
   name: 'Untitled',
   description: '',
   skele: createDefaultSkele(),
@@ -94,12 +94,12 @@ export const AppRoot = () => {
   const [time, setTime] = useState(1);
 
   const [tabs, setTabs] = useState<TabData[]>(() => [createEmptyTab()]);
-  const [activeTabId, setActiveTabId] = useState<string>(tabs[0].id);
+  const [activeTabId, setActiveTabId] = useState<string>(tabs[0].skele.id);
 
-  const activeTab = tabs.find(tab => tab.id === activeTabId);
+  const activeTab = tabs.find(tab => tab.skele.id === activeTabId);
   const skele = activeTab?.skele;
 
-  const [viewRotation, setViewRotation] = useState(INITIAL_ROTATION);
+  const [viewRotation, setViewRotation] = useState(INITIAL_VIEW_ROTATION);
 
   const handleRotateView = (degrees: number) => {
     // Allow any angle, just normalize display to 0-360
@@ -113,8 +113,40 @@ export const AppRoot = () => {
     }
   }, [viewRotation]);
 
+  const findClosestNode = (
+    worldX: number,
+    worldY: number
+  ): SkeleNode | undefined => {
+    if (!activeTab?.renderedNodes) return undefined;
+
+    return activeTab.renderedNodes.reduce((closest, node) => {
+      const center = !node.uri
+        ? node.state.transform
+        : node.parent.state.transform;
+      const dist = vec2.dist(center, [worldX, worldY]);
+      const nodeSize = !node.uri
+        ? 0.1
+        : Math.sqrt(vec2.dot(node.transform, node.transform)) + 0.05;
+
+      console.log(
+        node.id,
+        'size used:',
+        nodeSize,
+        'center:',
+        center,
+        'dist:',
+        dist
+      );
+
+      if (dist < Math.min(nodeSize, closest?.distance ?? Infinity)) {
+        return {node, distance: dist};
+      }
+      return closest;
+    }, undefined as {node: SkeleNode; distance: number} | undefined)?.node;
+  };
+
   const updateSkele = (base: SkeleNode) => {
-    base.tickMove(objectPosition[0], objectPosition[1], size, viewRotation);
+    base.tickMove(objectPosition[0], objectPosition[1], size, rotation);
     base.updateState(time);
 
     const newRenderedInfo = base.render(1, props => props);
@@ -122,7 +154,7 @@ export const AppRoot = () => {
 
     setTabs(current =>
       current.map(tab =>
-        tab.id === activeTabId
+        tab.skele.id === activeTabId
           ? {
               ...tab,
               skele: base,
@@ -138,13 +170,13 @@ export const AppRoot = () => {
   const handleNewTab = () => {
     const newTab: TabData = createEmptyTab();
     setTabs(current => [...current, newTab]);
-    setActiveTabId(newTab.id);
+    setActiveTabId(newTab.skele.id);
   };
 
   const handleCloseTab = (tabId: string) => {
-    setTabs(current => current.filter(tab => tab.id !== tabId));
+    setTabs(current => current.filter(tab => tab.skele.id !== tabId));
     if (activeTabId === tabId) {
-      setActiveTabId(tabs[0]?.id);
+      setActiveTabId(tabs[0]?.skele.id);
     }
   };
 
@@ -179,7 +211,6 @@ export const AppRoot = () => {
 
   const handleEditorMouseUp = (e: React.MouseEvent) => {
     if (!dragStart || !activeNode) {
-      setLastActiveNode(undefined);
       setActiveNode(undefined);
       return;
     }
@@ -198,7 +229,7 @@ export const AppRoot = () => {
   };
 
   const handleNodeSelection = (
-    node: RenderInfo,
+    node: UiNode,
     e: React.MouseEvent,
     worldPos: vec2
   ) => {
@@ -207,35 +238,34 @@ export const AppRoot = () => {
     e.preventDefault();
   };
 
-  const findClosestNode = (
-    worldX: number,
-    worldY: number,
-    scale: number
-  ): RenderInfo | undefined => {
-    if (!activeTab?.renderedInfo) return undefined;
-
-    return activeTab.renderedInfo.reduce((closest, node) => {
-      const dist = vec2.dist(node.center, [worldX, worldY]);
-      const nodeSize = Math.sqrt(vec2.dot(node.transform, node.transform));
-
-      if (dist < (closest?.distance ?? Infinity) && dist < nodeSize) {
-        return {node, distance: dist};
-      }
-      return closest;
-    }, undefined as {node: RenderInfo; distance: number} | undefined)?.node;
-  };
-
   const handleEditorMouseDown = (e: React.MouseEvent, viewport: Viewport) => {
     if (e.button !== 0) return;
 
     const worldPos = viewport.pageToWorld(e.pageX, e.pageY);
-    const closestNode = findClosestNode(
-      worldPos[0],
-      worldPos[1],
-      viewport.scale
-    );
+    const closestNode = findClosestNode(worldPos[0], worldPos[1]);
     if (closestNode) {
-      handleNodeSelection(closestNode, e, worldPos);
+      handleNodeSelection({node: closestNode}, e, worldPos);
+    }
+  };
+
+  const handleEditorMouseMove = (e: React.MouseEvent, viewport: Viewport) => {
+    if (!activeNode || !dragStart) return;
+
+    e.preventDefault();
+
+    const worldPos = viewport.pageToWorld(e.pageX, e.pageY);
+    const newSkele = skele.clone();
+    updateSkele(newSkele);
+    const newNode = newSkele.findId(activeNode.node.id);
+
+    if (newNode) {
+      if (newNode.uri) {
+        return; // disable for testing
+        newNode.updateFromChildTarget(worldPos[0], worldPos[1]);
+      } else {
+        newNode.updateFromWorldPosition(worldPos[0], worldPos[1]);
+      }
+      setDragStart(worldPos);
     }
   };
 
@@ -269,26 +299,6 @@ export const AppRoot = () => {
     }
   };
 
-  const handleEditorMouseMove = (e: React.MouseEvent, viewport: Viewport) => {
-    if (!activeNode || !dragStart) return;
-
-    e.preventDefault();
-
-    const worldPos = viewport.pageToWorld(e.pageX, e.pageY);
-    const newSkele = skele.clone();
-    const newNode = newSkele.findId(activeNode.node.id);
-
-    if (newNode) {
-      if (newNode.uri) {
-        newNode.updateFromChildTarget(worldPos[0], worldPos[1]);
-      } else {
-        newNode.updateFromWorldPosition(worldPos[0], worldPos[1]);
-      }
-      setDragStart(worldPos);
-      updateSkele(newSkele);
-    }
-  };
-
   const handleFileClick = async (file: FileEntry) => {
     if (file.type === 'image') {
       const spriteUri = toSpriteUri(file.path);
@@ -301,7 +311,7 @@ export const AppRoot = () => {
       // Check if file is already open in a tab
       const existingTab = tabs.find(tab => tab.filePath === file.path);
       if (existingTab) {
-        setActiveTabId(existingTab.id);
+        setActiveTabId(existingTab.skele.id);
         return;
       }
 
@@ -314,16 +324,9 @@ export const AppRoot = () => {
 
         if (fabData.skele) {
           const newSkele = SkeleNode.fromData(fabData.skele);
-          newSkele.tickMove(
-            objectPosition[0],
-            objectPosition[1],
-            size,
-            rotation
-          );
-          newSkele.updateState(time);
+          updateSkele(newSkele);
 
           const newTab: TabData = {
-            id: crypto.randomUUID(),
             name: fabData.name ?? file.relativePath,
             description: fabData.name ?? file.relativePath,
             filePath: file.path,
@@ -332,7 +335,7 @@ export const AppRoot = () => {
             renderedNodes: Array.from(newSkele.walk()).slice(1),
           };
           setTabs(current => [...current, newTab]);
-          setActiveTabId(newTab.id);
+          setActiveTabId(newTab.skele.id);
         } else {
           console.error('No skele data found in fab file');
         }
@@ -409,7 +412,7 @@ export const AppRoot = () => {
 
       setTabs(current =>
         current.map(tab =>
-          tab.id === activeTabId ? {...tab, isModified: false} : tab
+          tab.skele.id === activeTabId ? {...tab, isModified: false} : tab
         )
       );
     } catch (err) {
@@ -438,7 +441,9 @@ export const AppRoot = () => {
 
       setTabs(current =>
         current.map(tab =>
-          tab.id === activeTabId ? {...tab, filePath, isModified: false} : tab
+          tab.skele.id === activeTabId
+            ? {...tab, filePath, isModified: false}
+            : tab
         )
       );
 
@@ -464,7 +469,7 @@ export const AppRoot = () => {
   const handleNameChange = (name: string) => {
     setTabs(current =>
       current.map(tab =>
-        tab.id === activeTabId ? {...tab, name, isModified: true} : tab
+        tab.skele.id === activeTabId ? {...tab, name, isModified: true} : tab
       )
     );
   };
@@ -512,6 +517,7 @@ export const AppRoot = () => {
             renderedInfo={activeTab?.renderedInfo ?? []}
             renderedNodes={activeTab?.renderedNodes ?? []}
             activeNode={activeNode}
+            lastActiveNode={lastActiveNode}
             gameDirectory={gameDirectory}
             onMouseDown={handleEditorMouseDown}
             onMouseMove={handleEditorMouseMove}
@@ -529,6 +535,7 @@ export const AppRoot = () => {
           <LayersPane
             renderedNodes={activeTab?.skele.children ?? []}
             activeNode={activeNode}
+            lastActiveNode={lastActiveNode}
             onNodeUpdate={updateSkele}
             skele={activeTab?.skele ?? new SkeleNode()}
             onAddNode={appendNewNode}

@@ -154,7 +154,6 @@ export function fileEntryToTreeNode(file: FileEntry): FileTreeNode {
 }
 
 export interface TabData {
-  id: string;
   name: string;
   description: string;
   filePath?: string;

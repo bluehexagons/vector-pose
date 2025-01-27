@@ -34,12 +34,16 @@ body {
   background: transparent;
 }
 
-.active {
-  filter: drop-shadow(0 0 4px white);
+.last-active {
+  filter: drop-shadow(0 0 4px gray);
 }
 
 .focused {
   filter: drop-shadow(0 0 4px rgba(0.1, 0.5, 1, 0.8));
+}
+
+.active {
+  filter: drop-shadow(0 0 4px white);
 }
 
 .container {

@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {vec2} from 'gl-matrix';
-import {rotateVec2, rotateVec2Around, toRadians} from '../utils/Equa';
+import {rotateVec2, toRadians} from '../utils/Equa';
 
 // Base scale factor: at scale 1.0, a 1x1 unit square will be this many pixels
 export const BASE_SCALE = 200;
@@ -8,7 +8,7 @@ export const BASE_SCALE = 200;
 export interface Viewport {
   scale: number;
   offset: vec2;
-  rotation: number; // Add rotation to viewport info
+  rotation: number;
   pageToWorld: (pageX: number, pageY: number) => vec2;
   worldToPage: (worldX: number, worldY: number) => vec2;
 }
@@ -28,7 +28,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   onCanvasMouseDown,
   onCanvasMouseMove,
   onCanvasMouseUp,
-  rotation = 0, // Add rotation prop
+  rotation = 0,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Start zoomed out a bit more
@@ -37,7 +37,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [lastPos, setLastPos] = useState<vec2>();
 
-  // Add effect to center the viewport on mount and resize
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -113,7 +112,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
       // Keep scale within reasonable bounds
       // These bounds are in terms of BASE_SCALE
-      if (newScale < 0.25 || newScale > 4) return;
+      if (newScale < 0.15 || newScale > 8) return;
 
       // Calculate mouse position relative to container
       const rect = containerRef.current?.getBoundingClientRect();

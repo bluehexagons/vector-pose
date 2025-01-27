@@ -328,17 +328,18 @@ export class SkeleNode {
   updateFromWorldPosition(worldX: number, worldY: number) {
     if (!this.parent) return;
 
-    // Get parent's world position
-    const parentState = this.parent.stateAt(1);
-    const parentX = parentState.transform[0];
-    const parentY = parentState.transform[1];
+    const parent = this.parent.state;
+    const parentX = parent.transform[0];
+    const parentY = parent.transform[1];
+
+    console.log('parent', this, parent, parentX, parentY);
 
     // Calculate relative position
     const relX = worldX - parentX;
     const relY = worldY - parentY;
 
     // Update angle and magnitude
-    this.rotation = Math.atan2(relY, relX);
+    this.rotation = Math.atan2(relY, relX) - parent.rotation;
     this.mag = Math.sqrt(relX * relX + relY * relY) * 0.5;
     this.updateTransform();
   }
@@ -347,7 +348,7 @@ export class SkeleNode {
     if (!this.parent) return;
 
     // Get parent's world position
-    const parentState = this.parent.stateAt(1);
+    const parentState = this.parent;
     const parentX = parentState.transform[0];
     const parentY = parentState.transform[1];
 

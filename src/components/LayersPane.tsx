@@ -6,6 +6,7 @@ import {NodeItem} from './NodeItem';
 interface LayersPaneProps {
   renderedNodes: SkeleNode[];
   activeNode?: {node: SkeleNode};
+  lastActiveNode?: {node: SkeleNode};
   onNodeUpdate: (skele: SkeleNode) => void;
   skele: SkeleNode;
   onAddNode: () => void;
@@ -14,6 +15,7 @@ interface LayersPaneProps {
 export const LayersPane: React.FC<LayersPaneProps> = ({
   renderedNodes,
   activeNode,
+  lastActiveNode,
   onNodeUpdate,
   skele,
   onAddNode,
@@ -69,7 +71,9 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
               key={index}
               node={node}
               index={index}
-              isActive={node === activeNode?.node}
+              className={`${node.id === activeNode?.node.id ? 'active' : ''} ${
+                node.id === lastActiveNode?.node.id ? 'last-active' : ''
+              }`}
               onNodeUpdate={onNodeUpdate}
               skele={skele}
             />

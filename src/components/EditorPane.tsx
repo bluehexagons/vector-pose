@@ -7,8 +7,9 @@ import {GameImage} from './GameImage';
 
 interface EditorPaneProps {
   renderedInfo: RenderInfo[];
-  renderedNodes: any[];
-  activeNode?: any;
+  renderedNodes: SkeleNode[];
+  activeNode?: {node: SkeleNode};
+  lastActiveNode?: {node: SkeleNode};
   gameDirectory: string;
   onMouseDown: (e: React.MouseEvent, viewport: Viewport) => void;
   spriteHolderRef: React.RefObject<HTMLDivElement>;
@@ -21,6 +22,7 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   renderedInfo,
   renderedNodes,
   activeNode,
+  lastActiveNode,
   gameDirectory,
   onMouseDown,
   spriteHolderRef,
@@ -55,7 +57,13 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
               {renderedInfo.map(node => (
                 <div
                   key={node.node.id}
-                  className={node.node === activeNode?.node ? 'active' : ''}
+                  className={`${
+                    node.node.id === activeNode?.node.id ? 'active' : ''
+                  } ${
+                    node.node.id === lastActiveNode?.node.id
+                      ? 'last-active'
+                      : ''
+                  }`}
                   style={{
                     position: 'absolute',
                     // Apply scale to positions and sizes

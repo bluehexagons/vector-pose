@@ -48,7 +48,11 @@
 }
 
 .node-item.active {
-  border-color: #0066cc;
+  border-color: rgb(81, 133, 185);
+}
+
+.node-item.last-active {
+  border-color: rgb(28, 74, 119);
 }
 
 .number-input,
