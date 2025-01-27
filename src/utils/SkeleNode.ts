@@ -40,7 +40,7 @@ export class SkeleNode {
   /** Radians! */
   rotation = 0;
   mag = 1;
-  rendered = false;
+  initialized = false;
   hidden = false;
 
   /** state holds mutable state data */
@@ -257,7 +257,7 @@ export class SkeleNode {
     propObjectDeduper: (props: ImagePropsRef) => ImagePropsRef
   ): RenderInfo[] {
     const views: RenderInfo[] = [];
-    this.rendered = true;
+    this.initialized = true;
     for (const node of this.walk()) {
       console.log('we rendering', node);
 

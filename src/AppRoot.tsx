@@ -116,14 +116,15 @@ export const AppRoot = () => {
   };
 
   useEffect(() => {
-    if (skele && !skele.rendered) {
+    if (skele && !skele.initialized) {
       updateSkele(skele.clone());
     }
   }, [skele]);
 
   const findClosestNode = (
     worldX: number,
-    worldY: number
+    worldY: number,
+    targetSize: number
   ): SkeleNode | undefined => {
     if (!activeTab?.renderedNodes) return undefined;
 
@@ -134,18 +135,11 @@ export const AppRoot = () => {
         : node.parent.state.transform;
       const dist = vec2.dist(center, [worldX, worldY]);
       const nodeSize = !node.uri
-        ? 0.1
-        : Math.sqrt(vec2.dot(node.transform, node.transform)) + 0.05;
+        ? targetSize
+        : Math.sqrt(vec2.dot(node.transform, node.transform)) +
+          targetSize * 0.5;
 
-      console.log(
-        node.id,
-        'size used:',
-        nodeSize,
-        'center:',
-        center,
-        'dist:',
-        dist
-      );
+      console.log('nodeSize', nodeSize);
 
       if (dist < Math.min(nodeSize, closest?.distance ?? Infinity)) {
         return {node, distance: dist};
@@ -266,7 +260,11 @@ export const AppRoot = () => {
     if (e.button !== 0) return;
 
     const worldPos = viewport.pageToWorld(e.pageX, e.pageY);
-    const closestNode = findClosestNode(worldPos[0], worldPos[1]);
+    const closestNode = findClosestNode(
+      worldPos[0],
+      worldPos[1],
+      0.02 * vec2.len(viewport.pageToWorld(0, 1))
+    );
     if (closestNode) {
       handleNodeSelection({node: closestNode}, e, worldPos);
     }
