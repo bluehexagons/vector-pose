@@ -260,8 +260,6 @@ export class SkeleNode {
     const views: RenderInfo[] = [];
     this.initialized = true;
     for (const node of this.walk()) {
-      console.log('we rendering', node);
-
       const state = node.stateAt(time);
       const size = node.mag * state.scale;
 
@@ -289,7 +287,7 @@ export class SkeleNode {
     const node = new SkeleNode();
 
     // Copy basic properties
-    node.id = this.id;
+    node.id = this.id ?? SkeleNode.randomLetters();
     node.uri = this.uri;
     node.mag = this.mag;
     node.rotation = this.rotation;
@@ -336,8 +334,6 @@ export class SkeleNode {
     const parent = this.parent.state;
     const parentX = parent.transform[0];
     const parentY = parent.transform[1];
-
-    console.log('parent', this, parent, parentX, parentY);
 
     // Calculate relative position
     const relX = worldX - parentX;

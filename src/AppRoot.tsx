@@ -20,6 +20,7 @@ import {
 import {toDegrees, toRadians} from './utils/Equa';
 import type {ImagePropsRef} from './utils/Renderer';
 import {RenderInfo, SkeleNode} from './utils/SkeleNode';
+import {useTabs} from './hooks/useTabs';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 0;
@@ -72,28 +73,21 @@ const scanDirectory = async (
   return entries;
 };
 
-const createEmptyTab = () => {
-  const skele = SkeleNode.fromData({
-    angle: 0,
-    mag: 1,
-    children: [{angle: 0, mag: 0}],
-    id: SkeleNode.randomLetters(), // Explicitly set a new ID
-  });
-  const renderedInfo = skele.render(1, deduper).slice(1);
-  const renderedNodes = Array.from(skele.walk()).slice(1);
-  return {
-    name: 'Untitled',
-    description: '',
-    skele,
-    renderedInfo,
-    renderedNodes,
-    isModified: false,
-  };
-};
-
 const preventDefault = (e: React.SyntheticEvent) => e.preventDefault();
 
 export const AppRoot = () => {
+  const {
+    tabs,
+    activeTab,
+    activeTabId,
+    setActiveTabId,
+    updateTab,
+    addNewTab,
+    closeTab,
+    selectTab,
+    setTabs,
+  } = useTabs();
+
   const spriteHolderRef = useRef<HTMLDivElement>(null);
 
   const [gameDirectory, setGameDirectory] = useState(
@@ -104,11 +98,7 @@ export const AppRoot = () => {
 
   const [time, setTime] = useState(1);
 
-  const [tabs, setTabs] = useState<TabData[]>(() => [createEmptyTab()]);
-  const [activeTabId, setActiveTabId] = useState<string>(tabs[0].skele.id);
-
-  const activeTab = tabs.find(tab => tab.skele.id === activeTabId);
-  const skele = activeTab?.skele;
+  const skele = activeTab.skele;
 
   const [viewRotation, setRawViewRotation] = useState(INITIAL_VIEW_ROTATION);
 
@@ -165,51 +155,7 @@ export const AppRoot = () => {
     }, undefined as {node: SkeleNode; distance: number} | undefined)?.node;
   };
 
-  const updateTab = (base: SkeleNode, filePath?: string) => {
-    const newRenderedInfo = base.render(1, deduper).slice(1);
-    const newRenderedNodes = Array.from(base.walk()).slice(1);
-    setTabs(current => {
-      // Check if this is an existing tab by skele ID or file path
-      const existingTab = current.find(
-        tab => tab.skele.id === base.id || tab.filePath === filePath
-      );
-
-      if (existingTab) {
-        // Update existing tab
-        return current.map(tab =>
-          tab === existingTab
-            ? {
-                ...tab,
-                skele: base,
-                filePath,
-                isModified: true,
-                renderedInfo: newRenderedInfo,
-                renderedNodes: newRenderedNodes,
-              }
-            : tab
-        );
-      }
-
-      // Create new tab
-      const newTab: TabData = {
-        name: filePath ? filePath.split('/').pop() : 'Untitled',
-        description: '',
-        skele: base,
-        filePath,
-        renderedInfo: newRenderedInfo,
-        renderedNodes: newRenderedNodes,
-        isModified: false,
-      };
-
-      return [...current, newTab];
-    });
-
-    // Always set active tab to the one we just updated
-    setActiveTabId(base.id);
-  };
-
   const tickSkele = (base: SkeleNode) => {
-    console.log('my rotation will be', base.rotation);
     base.tickMove(
       INITIAL_OBJECT_POSITION[0],
       INITIAL_OBJECT_POSITION[1],
@@ -220,50 +166,18 @@ export const AppRoot = () => {
   };
 
   const updateSkele = (base: SkeleNode) => {
-    tickSkele(base);
-    updateTab(base);
+    const preserveId = !!tabs.find(tab => tab.skele.id === base.id);
+    const clone = base.clone(null);
+    tickSkele(clone);
+    updateTab(clone, activeTab?.filePath);
   };
 
-  const handleNewTab = () => {
-    const newTab = createEmptyTab();
-    setTabs(current => [...current, newTab]);
-    setActiveTabId(newTab.skele.id);
-  };
-
-  const handleCloseTab = (tabId: string) => {
-    setTabs(current => {
-      const newTabs = current.filter(tab => tab.skele.id !== tabId);
-      // If we're closing the active tab, switch to the first remaining tab
-      if (activeTabId === tabId && newTabs.length > 0) {
-        setActiveTabId(newTabs[0].skele.id);
-      }
-      // Ensure we always have at least one tab
-      if (newTabs.length === 0) {
-        const newTab = createEmptyTab();
-        setActiveTabId(newTab.skele.id);
-        return [newTab];
-      }
-      return newTabs;
-    });
-  };
-
-  const handleSelectTab = (tabId: string) => {
-    const tab = tabs.find(t => t.skele.id === tabId);
-    if (tab) {
-      setActiveTabId(tabId);
-      // Ensure the selected tab's skele is initialized
-      if (!tab.skele.initialized) {
-        updateSkele(tab.skele.clone());
-      }
-    }
-  };
+  // Replace handleNewTab, handleCloseTab, handleSelectTab with hook methods
+  const handleNewTab = addNewTab;
+  const handleCloseTab = closeTab;
+  const handleSelectTab = selectTab;
 
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
-
-  // pre-populate a good default palette
-  useEffect(() => {
-    updateSkele(createDefaultSkele());
-  }, []);
 
   const [lastActiveNode, setLastActiveNode] = useState<UiNode | undefined>(
     undefined
@@ -356,7 +270,6 @@ export const AppRoot = () => {
     }
 
     setAvailableFiles(entries);
-    console.log('Loaded files:', entries);
   };
 
   const handleDirectorySelect = async () => {
