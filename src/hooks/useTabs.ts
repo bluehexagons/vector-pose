@@ -5,13 +5,15 @@ import type {ImagePropsRef} from '../utils/Renderer';
 
 const deduper = (props: ImagePropsRef) => props;
 
-const createEmptyTab = () => {
-  const skele = SkeleNode.fromData({
-    angle: 0,
-    mag: 1,
-    children: [{angle: 0, mag: 0}],
-    id: SkeleNode.randomLetters(), // Explicitly set a new ID
-  });
+const createEmptyTab = (defaultSkele?: SkeleNode) => {
+  const skele =
+    defaultSkele ??
+    SkeleNode.fromData({
+      angle: 0,
+      mag: 1,
+      children: [{angle: 0, mag: 0}],
+      id: SkeleNode.randomLetters(), // Explicitly set a new ID
+    });
   const renderedInfo = skele.render(1, deduper).slice(1);
   const renderedNodes = Array.from(skele.walk()).slice(1);
   return {
@@ -21,6 +23,7 @@ const createEmptyTab = () => {
     renderedInfo,
     renderedNodes,
     isModified: false,
+    rotation: 270, // Add default rotation
   };
 };
 
@@ -78,6 +81,7 @@ export function useTabs() {
           renderedInfo: base.render(1, deduper).slice(1),
           renderedNodes: Array.from(base.walk()).slice(1),
           isModified: false,
+          rotation: 270, // Add default rotation
         },
       ];
     });
@@ -85,11 +89,14 @@ export function useTabs() {
     setActiveTabId(base.id);
   }, []);
 
-  const addNewTab = useCallback(() => {
-    const newTab = createEmptyTab();
-    setTabs(current => [...current, newTab]);
-    setActiveTabId(newTab.skele.id);
-  }, [createEmptyTab]);
+  const addNewTab = useCallback(
+    (skele: SkeleNode) => {
+      const newTab = createEmptyTab(skele);
+      setTabs(current => [...current, newTab]);
+      setActiveTabId(newTab.skele.id);
+    },
+    [createEmptyTab]
+  );
 
   const closeTab = useCallback(
     (tabId: string) => {
@@ -113,6 +120,14 @@ export function useTabs() {
     setActiveTabId(tabId);
   }, []);
 
+  const setRotation = useCallback((tabId: string, degrees: number) => {
+    setTabs(current =>
+      current.map(tab =>
+        tab.skele.id === tabId ? {...tab, rotation: degrees} : tab
+      )
+    );
+  }, []);
+
   const activeTab = tabs.find(tab => tab.skele.id === activeTabId);
 
   return {
@@ -125,5 +140,6 @@ export function useTabs() {
     selectTab,
     setActiveTabId,
     setTabs,
+    setRotation, // Add new rotation setter
   };
 }

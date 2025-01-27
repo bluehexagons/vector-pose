@@ -161,6 +161,7 @@ export interface TabData {
   isModified?: boolean;
   renderedInfo: RenderInfo[];
   renderedNodes: SkeleNode[];
+  rotation: number; // Added field
 }
 
 declare global {

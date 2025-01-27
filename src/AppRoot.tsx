@@ -86,6 +86,7 @@ export const AppRoot = () => {
     closeTab,
     selectTab,
     setTabs,
+    setRotation,
   } = useTabs();
 
   const spriteHolderRef = useRef<HTMLDivElement>(null);
@@ -100,20 +101,16 @@ export const AppRoot = () => {
 
   const skele = activeTab.skele;
 
-  const [viewRotation, setRawViewRotation] = useState(INITIAL_VIEW_ROTATION);
-
-  const setViewRotation = (degrees: number) => {
-    const clone = skele.clone();
-    clone.rotation = toRadians(degrees);
-    updateSkele(clone);
-
-    setRawViewRotation(degrees);
-  };
-
   const handleRotateView = (degrees: number) => {
     // Allow any angle, just normalize display to 0-360
     const normalized = ((degrees % 360) + 360) % 360;
-    setViewRotation(normalized);
+
+    setRotation(activeTabId, normalized);
+
+    // Apply rotation to skele
+    const clone = skele.clone();
+    clone.rotation = toRadians(normalized);
+    updateSkele(clone);
   };
 
   useEffect(() => {
@@ -172,7 +169,12 @@ export const AppRoot = () => {
   };
 
   // Replace handleNewTab, handleCloseTab, handleSelectTab with hook methods
-  const handleNewTab = addNewTab;
+  const handleNewTab = () => {
+    const skele = createDefaultSkele();
+    skele.rotation = toRadians(INITIAL_VIEW_ROTATION);
+    tickSkele(skele);
+    addNewTab(skele);
+  };
   const handleCloseTab = closeTab;
   const handleSelectTab = selectTab;
 
@@ -302,6 +304,7 @@ export const AppRoot = () => {
 
       if (fabData.skele) {
         const newSkele = SkeleNode.fromData(fabData.skele);
+        newSkele.rotation = toRadians(INITIAL_VIEW_ROTATION);
         tickSkele(newSkele);
         updateTab(newSkele, file.path);
         return true;
@@ -473,7 +476,7 @@ export const AppRoot = () => {
         onSaveAs={handleSaveAs}
         onNameChange={handleNameChange}
         onRotateView={handleRotateView}
-        viewRotation={viewRotation}
+        viewRotation={activeTab.rotation}
       />
       <TabPane
         tabs={tabs}
@@ -510,7 +513,7 @@ export const AppRoot = () => {
             onMouseMove={handleEditorMouseMove}
             onMouseUp={handleEditorMouseUp}
             spriteHolderRef={spriteHolderRef}
-            rotation={viewRotation}
+            rotation={activeTab.rotation}
           />
         </div>
 
