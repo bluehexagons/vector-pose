@@ -10,6 +10,11 @@ import {Resizer} from './components/Resizer';
 import {TabPane} from './components/TabPane';
 import {useTabs} from './hooks/useTabs';
 import {
+  createImageNode,
+  findExistingTab,
+  loadFabContent,
+} from './services/contentService';
+import {
   loadDirectoryFiles,
   loadFabFile,
   saveFabFile,
@@ -17,7 +22,7 @@ import {
   selectFiles,
   showSaveDialog,
 } from './services/fileService';
-import {FileEntry, toSpriteUri, UiNode} from './shared/types';
+import {FileEntry, UiNode} from './shared/types';
 import {toDegrees, toRadians} from './utils/Equa';
 import type {ImagePropsRef} from './utils/Renderer';
 import {SkeleNode} from './utils/SkeleNode';
@@ -251,21 +256,27 @@ export const AppRoot = () => {
 
   const handleFileClick = async (file: FileEntry) => {
     if (file.type === 'image') {
-      const spriteUri = toSpriteUri(file.path);
-      if (!spriteUri) return;
-      const newSkele = skele.clone();
-      // Add new sprites at a reasonable size
-      newSkele.add(SkeleNode.fromData({angle: 0, mag: 0.25, uri: spriteUri}));
-      updateSkele(newSkele);
+      const imageNode = createImageNode(file);
+      if (imageNode) {
+        const newSkele = skele.clone();
+        newSkele.add(imageNode);
+        updateSkele(newSkele);
+      }
     } else if (file.type === 'fab') {
-      // Check if file is already open in a tab
-      const existingTab = tabs.find(tab => tab.filePath === file.path);
+      const existingTab = findExistingTab(tabs, file.path);
       if (existingTab) {
         setActiveTabId(existingTab.skele.id);
         return;
       }
 
-      await loadFab(file);
+      const newSkele = await loadFabContent(
+        file,
+        toRadians(INITIAL_VIEW_ROTATION)
+      );
+      if (newSkele) {
+        tickSkele(newSkele);
+        updateTab(newSkele, file.path);
+      }
     }
   };
 
