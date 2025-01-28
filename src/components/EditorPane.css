@@ -14,6 +14,7 @@
 .sprite-holder {
   position: absolute;
   pointer-events: none;
+  user-select: none;
 }
 
 .sprite-holder > * {

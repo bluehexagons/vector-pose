@@ -15,7 +15,12 @@
   left: 50%;
   transform: translate(-50%, -50%);
   pointer-events: all;
-  cursor: rotate;
+  cursor: grab;
+}
+
+.rotate-handle:active {
+  cursor: grabbing;
+  background: rgba(100, 200, 255, 0.8);
 }
 
 .scale-handle {
@@ -29,4 +34,8 @@
   transform: translate(50%, 50%);
   pointer-events: all;
   cursor: nwse-resize;
+}
+
+.scale-handle:active {
+  background: rgba(100, 255, 100, 0.8);
 }

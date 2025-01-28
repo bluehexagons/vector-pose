@@ -1,41 +1,33 @@
-import {fromSpriteUri} from '../shared/types';
-import {RenderInfo, SkeleNode} from '../utils/SkeleNode';
+import {SkeleNode} from '../utils/SkeleNode';
 import {EditorCanvas, Viewport} from './EditorCanvas';
-import {NodeGraphLayer} from './NodeGraphLayer';
-import {SpriteLayer} from './SpriteLayer';
 import './EditorPane.css';
-import {GameImage} from './GameImage';
+import {NodeGraphLayer} from './NodeGraphLayer';
+import {SpriteLayer, SpriteLayerProps} from './SpriteLayer';
 
-interface EditorPaneProps {
-  renderedInfo: RenderInfo[];
+interface EditorPaneProps
+  extends Pick<
+    SpriteLayerProps,
+    'renderedInfo' | 'gameDirectory' | 'spriteHolderRef' | 'onTransformStart'
+  > {
   renderedNodes: SkeleNode[];
   activeNode?: {node: SkeleNode};
   lastActiveNode?: {node: SkeleNode};
-  gameDirectory: string;
   onMouseDown: (e: React.MouseEvent, viewport: Viewport) => void;
   spriteHolderRef: React.RefObject<HTMLDivElement>;
   onMouseMove?: (e: React.MouseEvent, viewport: Viewport) => void;
   onMouseUp?: (e: React.MouseEvent, viewport: Viewport) => void;
   rotation: number;
-  onTransformStart?: (nodeId: string, type: 'rotate' | 'scale') => void;
-  onTransformChange?: (delta: number) => void;
-  onTransformEnd?: () => void;
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = ({
-  renderedInfo,
   renderedNodes,
   activeNode,
   lastActiveNode,
-  gameDirectory,
   onMouseDown,
-  spriteHolderRef,
   onMouseMove,
   onMouseUp,
   rotation,
-  onTransformStart,
-  onTransformChange,
-  onTransformEnd,
+  ...spriteLayerProps
 }) => {
   return (
     <div className="editor-pane">
@@ -48,15 +40,10 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
         {viewport => (
           <div className="editor-content">
             <SpriteLayer
-              renderedInfo={renderedInfo}
               activeNode={activeNode}
               lastActiveNode={lastActiveNode}
-              gameDirectory={gameDirectory}
               viewport={viewport}
-              spriteHolderRef={spriteHolderRef}
-              onTransformStart={onTransformStart}
-              onTransformChange={onTransformChange}
-              onTransformEnd={onTransformEnd}
+              {...spriteLayerProps}
             />
             <NodeGraphLayer
               renderedNodes={renderedNodes}

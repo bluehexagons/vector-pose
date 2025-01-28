@@ -1,5 +1,5 @@
 import {vec2} from 'gl-matrix';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, useCallback} from 'react';
 import './AppRoot.css';
 import {Viewport} from './components/EditorCanvas';
 import {EditorPane} from './components/EditorPane';
@@ -435,6 +435,88 @@ export const AppRoot = () => {
     );
   };
 
+  // Replace transforming state with ref
+  const transformingRef = useRef<{
+    nodeId: string;
+    type: 'rotate' | 'scale';
+    startPos: vec2;
+    center: vec2;
+  }>(undefined);
+
+  const handleTransformStart = (
+    nodeId: string,
+    type: 'rotate' | 'scale',
+    e: React.MouseEvent
+  ) => {
+    const rect = spriteHolderRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    // Store transform state in ref
+    transformingRef.current = {
+      nodeId,
+      type,
+      startPos: vec2.fromValues(e.clientX - rect.left, e.clientY - rect.top),
+      center: vec2.fromValues(rect.width / 2, rect.height / 2),
+    };
+
+    window.addEventListener('mousemove', handleWindowTransform);
+    window.addEventListener('mouseup', handleTransformEnd);
+  };
+
+  const handleWindowTransform = useCallback(
+    (e: MouseEvent) => {
+      const transforming = transformingRef.current;
+      console.log(!transforming, !activeTab?.skele, !spriteHolderRef.current);
+      if (!transforming || !activeTab?.skele || !spriteHolderRef.current)
+        return;
+
+      const rect = spriteHolderRef.current.getBoundingClientRect();
+      const currentPos = vec2.fromValues(
+        e.clientX - rect.left,
+        e.clientY - rect.top
+      );
+
+      const newSkele = skele.clone();
+      const newNode = newSkele.findId(transforming.nodeId);
+      if (!newNode) return;
+
+      if (transforming.type === 'rotate') {
+        const startAngle = Math.atan2(
+          transforming.startPos[1] - transforming.center[1],
+          transforming.startPos[0] - transforming.center[0]
+        );
+        const currentAngle = Math.atan2(
+          currentPos[1] - transforming.center[1],
+          currentPos[0] - transforming.center[0]
+        );
+
+        const deltaAngle = currentAngle - startAngle;
+        newNode.rotateSprite(deltaAngle);
+
+        // Update start position in ref
+        transforming.startPos = currentPos;
+      } else {
+        const startDist = vec2.dist(transforming.startPos, transforming.center);
+        const currentDist = vec2.dist(currentPos, transforming.center);
+        const scaleFactor = currentDist / startDist;
+
+        newNode.scaleSprite(scaleFactor);
+
+        // Update start position in ref
+        transforming.startPos = currentPos;
+      }
+
+      updateSkele(newSkele);
+    },
+    [activeTab?.skele, skele, updateSkele]
+  );
+
+  const handleTransformEnd = useCallback(() => {
+    window.removeEventListener('mousemove', handleWindowTransform);
+    window.removeEventListener('mouseup', handleTransformEnd);
+    transformingRef.current = undefined;
+  }, [handleWindowTransform]);
+
   return (
     <div
       className="container"
@@ -485,6 +567,7 @@ export const AppRoot = () => {
             onMouseUp={handleEditorMouseUp}
             spriteHolderRef={spriteHolderRef}
             rotation={activeTab.rotation}
+            onTransformStart={handleTransformStart}
           />
         </div>
 

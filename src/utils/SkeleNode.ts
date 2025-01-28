@@ -446,6 +446,24 @@ export class SkeleNode {
     }
     return out;
   }
+
+  /**
+   * Adjusts sprite rotation relative to its parent
+   */
+  rotateSprite(deltaAngleRad: number) {
+    if (!this.parent) return;
+    this.rotation += deltaAngleRad;
+    this.updateTransform();
+  }
+
+  /**
+   * Adjusts sprite scale by multiplying current magnitude
+   */
+  scaleSprite(factor: number) {
+    if (!this.parent) return;
+    this.mag = Math.max(0.01, this.mag * factor);
+    this.updateTransform();
+  }
 }
 
 // console.log('-- testing skelenode --');

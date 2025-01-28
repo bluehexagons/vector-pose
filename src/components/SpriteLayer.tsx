@@ -5,16 +5,18 @@ import {GameImage} from './GameImage';
 import {fromSpriteUri} from '../shared/types';
 import './SpriteLayer.css';
 
-interface SpriteLayerProps {
+export interface SpriteLayerProps {
   renderedInfo: RenderInfo[];
   activeNode?: UiNode;
   lastActiveNode?: UiNode;
   gameDirectory: string;
   viewport: Viewport;
   spriteHolderRef: React.RefObject<HTMLDivElement>;
-  onTransformStart?: (nodeId: string, type: 'rotate' | 'scale') => void;
-  onTransformChange?: (delta: number) => void;
-  onTransformEnd?: () => void;
+  onTransformStart?: (
+    nodeId: string,
+    type: 'rotate' | 'scale',
+    e: React.MouseEvent
+  ) => void;
 }
 
 export const SpriteLayer: React.FC<SpriteLayerProps> = ({
@@ -25,8 +27,6 @@ export const SpriteLayer: React.FC<SpriteLayerProps> = ({
   viewport,
   spriteHolderRef,
   onTransformStart,
-  onTransformChange,
-  onTransformEnd,
 }) => {
   return (
     <div className="sprite-holder" ref={spriteHolderRef}>
@@ -70,14 +70,14 @@ export const SpriteLayer: React.FC<SpriteLayerProps> = ({
                       className="rotate-handle"
                       onMouseDown={e => {
                         e.stopPropagation();
-                        onTransformStart?.(node.node.id, 'rotate');
+                        onTransformStart?.(node.node.id, 'rotate', e);
                       }}
                     />
                     <div
                       className="scale-handle"
                       onMouseDown={e => {
                         e.stopPropagation();
-                        onTransformStart?.(node.node.id, 'scale');
+                        onTransformStart?.(node.node.id, 'scale', e);
                       }}
                     />
                   </div>
