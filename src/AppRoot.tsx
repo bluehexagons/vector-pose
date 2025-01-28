@@ -16,7 +16,6 @@ import {
 } from './services/contentService';
 import {
   loadDirectoryFiles,
-  loadFabFile,
   saveFabFile,
   selectDirectory,
   selectFiles,
@@ -240,18 +239,6 @@ export const AppRoot = () => {
       localStorage.setItem('gameDirectory', newDir);
       await loadDirectoryContent(newDir);
     }
-  };
-
-  const loadFab = async (file: FileEntry) => {
-    const fabData = await loadFabFile(file.path);
-    if (fabData?.skele) {
-      const newSkele = SkeleNode.fromData(fabData.skele);
-      newSkele.rotation = toRadians(INITIAL_VIEW_ROTATION);
-      tickSkele(newSkele);
-      updateTab(newSkele, file.path);
-      return true;
-    }
-    return false;
   };
 
   const handleFileClick = async (file: FileEntry) => {

@@ -1,5 +1,12 @@
+import type {SkeleData} from 'src/utils/SkeleNode';
 import type {FileEntry} from '../shared/types';
 import {FAB_EXTENSIONS, IMAGE_EXTENSIONS, SEARCH_DIRS} from '../shared/types';
+
+export interface FabData {
+  skele: SkeleData;
+  name?: string;
+  description?: string;
+}
 
 export async function scanDirectory(
   baseDir: string,
@@ -21,6 +28,7 @@ export async function scanDirectory(
         entries.push(...(await scanDirectory(baseDir, relativePath)));
       } else {
         const ext = await window.native.path.extname(file.name);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (IMAGE_EXTENSIONS.includes(ext as any)) {
           entries.push({path: file.path, relativePath, type: 'image'});
         } else if (FAB_EXTENSIONS.some(fabExt => file.name.endsWith(fabExt))) {
@@ -68,7 +76,7 @@ export async function loadFabFile(filePath: string) {
   }
 }
 
-export async function saveFabFile(filePath: string, fabData: any) {
+export async function saveFabFile(filePath: string, fabData: FabData) {
   try {
     await window.native.fs.writeFile(
       filePath,
