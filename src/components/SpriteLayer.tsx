@@ -57,10 +57,8 @@ export const SpriteLayer: React.FC<SpriteLayerProps> = ({
                 <GameImage
                   uri={fromSpriteUri(node.uri)}
                   gameDirectory={gameDirectory}
+                  className="sprite-image"
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
                     opacity: node.node.hidden ? 0.5 : 1,
                   }}
                 />
