@@ -76,7 +76,7 @@ export function useTabs() {
       return [
         ...current,
         {
-          name: filePath ? filePath.split('/').pop() : 'Untitled',
+          name: filePath ? filePath.split(/[\\/]/g).pop() : 'Untitled',
           description: '',
           ...renderSkele(base),
           skele: base,

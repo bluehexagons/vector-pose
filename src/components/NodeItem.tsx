@@ -153,6 +153,20 @@ export const NodeItem: React.FC<NodeItemProps> = ({
     }
   };
 
+  const handleCreateParent = () => {
+    const clone = skele.clone();
+    const targetNode = clone.findIdFromRoot(node.id);
+    if (targetNode) {
+      const parent = targetNode.parent;
+      if (parent) {
+        const newParent = new SkeleNode();
+        newParent.add(targetNode);
+        parent.add(newParent);
+        onNodeUpdate(clone);
+      }
+    }
+  };
+
   const handleMoveToTop = () => {
     const clone = skele.clone();
     const targetNode = clone.findIdFromRoot(node.id);
@@ -197,6 +211,10 @@ export const NodeItem: React.FC<NodeItemProps> = ({
     {
       label: node.hidden ? 'Show' : 'Hide',
       onClick: handleToggleHidden,
+    },
+    {
+      label: 'Create Parent',
+      onClick: handleCreateParent,
     },
     {
       label: 'Move to Top',

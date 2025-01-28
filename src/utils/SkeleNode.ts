@@ -39,7 +39,7 @@ export class SkeleNode {
   sort = 0;
   /** Radians! */
   rotation = 0;
-  mag = 1;
+  mag = 0;
   initialized = false;
   hidden = false;
 
