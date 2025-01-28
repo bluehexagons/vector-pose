@@ -364,6 +364,55 @@ export class SkeleNode {
     this.parent.updateTransform();
   }
 
+  /** Gets the effective node to move - for sprites, returns their parent */
+  getMovableNode(): SkeleNode {
+    return this.uri ? this.parent : this;
+  }
+
+  /**
+   * Tests if a world position is within this node's hit area
+   * Sprites get a larger hit area based on their transform size
+   */
+  hitTest(worldX: number, worldY: number, minSize: number): number | null {
+    if (this.hidden) return null;
+
+    const pos = this.getMovableNode().state.transform;
+    const dist = vec2.dist(pos, [worldX, worldY]);
+
+    // For sprites, use their visual size plus padding
+    const hitSize = this.uri
+      ? Math.sqrt(vec2.dot(this.transform, this.transform)) + minSize * 0.5
+      : minSize;
+
+    // Return distance if within bounds, null if outside
+    return dist <= hitSize ? dist : null;
+  }
+
+  /**
+   * Finds closest node to a world position, prioritizing top layers
+   */
+  findClosestNode(
+    worldX: number,
+    worldY: number,
+    minSize: number
+  ): SkeleNode | null {
+    // Walk nodes in reverse for top-to-bottom layer order
+    const nodes = Array.from(this.walk()).reverse();
+    let closest: {node: SkeleNode; distance: number} | null = null;
+
+    for (const node of nodes) {
+      const dist = node.hitTest(worldX, worldY, minSize);
+      if (dist === null) continue;
+
+      // Update if this is the first hit or closer than previous
+      if (!closest || dist < closest.distance) {
+        closest = {node, distance: dist};
+      }
+    }
+
+    return closest?.node ?? null;
+  }
+
   static test() {
     const testData: SkeleData = {
       angle: 45,

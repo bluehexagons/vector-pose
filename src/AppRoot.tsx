@@ -123,33 +123,9 @@ export const AppRoot = () => {
     worldX: number,
     worldY: number,
     targetSize: number
-  ): SkeleNode | undefined => {
-    if (!activeTab?.renderedNodes) return undefined;
-
-    return activeTab.renderedNodes.reduce((closest, node) => {
-      if (node.hidden) return closest;
-      const center = !node.uri
-        ? node.state.transform
-        : node.parent.state.transform;
-      const dist = vec2.dist(center, [worldX, worldY]);
-
-      const nodeSize = !node.uri
-        ? targetSize
-        : Math.sqrt(vec2.dot(node.transform, node.transform)) +
-          targetSize * 0.5;
-
-      const distBound = Math.min(nodeSize, closest?.distance ?? Infinity);
-
-      if (Math.abs(dist - distBound) < 0.01 && node.uri) {
-        return closest;
-      }
-
-      if (dist <= distBound) {
-        return {node, distance: dist};
-      }
-
-      return closest;
-    }, undefined as {node: SkeleNode; distance: number} | undefined)?.node;
+  ) => {
+    if (!activeTab?.skele) return undefined;
+    return activeTab.skele.findClosestNode(worldX, worldY, targetSize);
   };
 
   const tickSkele = (base: SkeleNode) => {
@@ -244,25 +220,20 @@ export const AppRoot = () => {
 
   const handleEditorMouseMove = (e: React.MouseEvent, viewport: Viewport) => {
     if (!activeNode || !dragStart) return;
-
     e.preventDefault();
 
     const worldPos = viewport.pageToWorld(e.pageX, e.pageY);
     const newSkele = skele.clone();
     const newNode = newSkele.findId(activeNode.node.id);
 
-    tickSkele(newSkele);
-
     if (newNode) {
-      if (newNode.uri) {
-        newNode.parent.updateFromWorldPosition(worldPos[0], worldPos[1]);
-      } else {
-        newNode.updateFromWorldPosition(worldPos[0], worldPos[1]);
-      }
+      tickSkele(newSkele);
+      // Get the node we should actually move (sprite parent or the node itself)
+      const targetNode = newNode.getMovableNode();
+      targetNode.updateFromWorldPosition(worldPos[0], worldPos[1]);
       setDragStart(worldPos);
+      updateSkele(newSkele);
     }
-
-    updateSkele(newSkele);
   };
 
   const loadDirectoryFiles = async (directory: string) => {
