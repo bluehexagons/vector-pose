@@ -1,6 +1,5 @@
 import {vec2} from 'gl-matrix';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {rotateVec2, toRadians} from '../utils/Equa';
 
 // Base scale factor: at scale 1.0, a 1x1 unit square will be this many pixels
 export const BASE_SCALE = 200;
@@ -74,16 +73,11 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return vec2.create();
 
-      // Rotate world coordinates to canvas space
-      const rotated = rotateVec2(
-        vec2.create(),
-        vec2.fromValues(worldX, worldY),
-        toRadians(rotation)
-      );
+      const worldPos = vec2.fromValues(worldX, worldY);
 
       // Apply scale and offset
-      const x = rotated[0] * BASE_SCALE * scale + offset[0] + rect.left;
-      const y = rotated[1] * BASE_SCALE * scale + offset[1] + rect.top;
+      const x = worldPos[0] * BASE_SCALE * scale + offset[0] + rect.left;
+      const y = worldPos[1] * BASE_SCALE * scale + offset[1] + rect.top;
 
       return vec2.fromValues(x, y);
     },
