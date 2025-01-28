@@ -142,6 +142,7 @@ export const AppRoot = () => {
     const clone = base.clone(null);
     tickSkele(clone);
     updateTab(clone, activeTab?.filePath);
+    return clone;
   };
 
   // Replace handleNewTab, handleCloseTab, handleSelectTab with hook methods
@@ -441,6 +442,7 @@ export const AppRoot = () => {
     type: 'rotate' | 'scale';
     startPos: vec2;
     center: vec2;
+    skele: SkeleNode;
   }>(undefined);
 
   const handleTransformStart = (
@@ -457,18 +459,15 @@ export const AppRoot = () => {
       type,
       startPos: vec2.fromValues(e.clientX - rect.left, e.clientY - rect.top),
       center: vec2.fromValues(rect.width / 2, rect.height / 2),
+      skele,
     };
 
-    window.addEventListener('mousemove', handleWindowTransform);
-    window.addEventListener('mouseup', handleTransformEnd);
-  };
-
-  const handleWindowTransform = useCallback(
-    (e: MouseEvent) => {
+    const handleTransformMove = (e: MouseEvent) => {
       const transforming = transformingRef.current;
-      console.log(!transforming, !activeTab?.skele, !spriteHolderRef.current);
-      if (!transforming || !activeTab?.skele || !spriteHolderRef.current)
+      if (!transforming || !transforming.skele || !spriteHolderRef.current)
         return;
+
+      const {skele, center, startPos} = transforming;
 
       const rect = spriteHolderRef.current.getBoundingClientRect();
       const currentPos = vec2.fromValues(
@@ -479,15 +478,16 @@ export const AppRoot = () => {
       const newSkele = skele.clone();
       const newNode = newSkele.findId(transforming.nodeId);
       if (!newNode) return;
+      console.log('hey?');
 
       if (transforming.type === 'rotate') {
         const startAngle = Math.atan2(
-          transforming.startPos[1] - transforming.center[1],
-          transforming.startPos[0] - transforming.center[0]
+          startPos[1] - center[1],
+          startPos[0] - center[0]
         );
         const currentAngle = Math.atan2(
-          currentPos[1] - transforming.center[1],
-          currentPos[0] - transforming.center[0]
+          currentPos[1] - center[1],
+          currentPos[0] - center[0]
         );
 
         const deltaAngle = currentAngle - startAngle;
@@ -496,8 +496,8 @@ export const AppRoot = () => {
         // Update start position in ref
         transforming.startPos = currentPos;
       } else {
-        const startDist = vec2.dist(transforming.startPos, transforming.center);
-        const currentDist = vec2.dist(currentPos, transforming.center);
+        const startDist = vec2.dist(startPos, center);
+        const currentDist = vec2.dist(currentPos, center);
         const scaleFactor = currentDist / startDist;
 
         newNode.scaleSprite(scaleFactor);
@@ -506,16 +506,18 @@ export const AppRoot = () => {
         transforming.startPos = currentPos;
       }
 
-      updateSkele(newSkele);
-    },
-    [activeTab?.skele, skele, updateSkele]
-  );
+      transforming.skele = updateSkele(newSkele);
+    };
 
-  const handleTransformEnd = useCallback(() => {
-    window.removeEventListener('mousemove', handleWindowTransform);
-    window.removeEventListener('mouseup', handleTransformEnd);
-    transformingRef.current = undefined;
-  }, [handleWindowTransform]);
+    const handleTransformEnd = () => {
+      window.removeEventListener('mousemove', handleTransformMove);
+      window.removeEventListener('mouseup', handleTransformEnd);
+      transformingRef.current = undefined;
+    };
+
+    window.addEventListener('mousemove', handleTransformMove);
+    window.addEventListener('mouseup', handleTransformEnd);
+  };
 
   return (
     <div
