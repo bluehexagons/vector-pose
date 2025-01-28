@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback, useEffect, useRef} from 'react';
 import {toDegrees, toRadians} from '../utils/Equa';
 import {SkeleNode} from '../utils/SkeleNode';
 import {AngleInput} from './AngleInput';
 import {UiNode} from '../shared/types';
+import './NodeItem.css';
 
 export const NodeItem: React.FC<{
   node: SkeleNode;
@@ -24,6 +25,26 @@ export const NodeItem: React.FC<{
   skele,
 }) => {
   const [showActions, setShowActions] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setShowActions(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showActions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showActions, handleClickOutside]);
 
   const handleDragStart = (e: React.DragEvent) => {
     // Prevent dragging from input elements or content area
@@ -139,6 +160,46 @@ export const NodeItem: React.FC<{
     setShowActions(false);
   };
 
+  const handleToggleHidden = () => {
+    const clone = skele.clone();
+    const targetNode = clone.findIdFromRoot(node.id);
+    if (targetNode) {
+      targetNode.hidden = !targetNode.hidden;
+      onNodeUpdate(clone);
+    }
+    setShowActions(false);
+  };
+
+  const handleMoveToTop = () => {
+    const clone = skele.clone();
+    const targetNode = clone.findIdFromRoot(node.id);
+    if (targetNode?.parent) {
+      const parent = targetNode.parent;
+      const idx = parent.children.indexOf(targetNode);
+      if (idx > 0) {
+        parent.children.splice(idx, 1);
+        parent.children.unshift(targetNode);
+        onNodeUpdate(clone);
+      }
+    }
+    setShowActions(false);
+  };
+
+  const handleMoveToBottom = () => {
+    const clone = skele.clone();
+    const targetNode = clone.findIdFromRoot(node.id);
+    if (targetNode?.parent) {
+      const parent = targetNode.parent;
+      const idx = parent.children.indexOf(targetNode);
+      if (idx < parent.children.length - 1) {
+        parent.children.splice(idx, 1);
+        parent.children.push(targetNode);
+        onNodeUpdate(clone);
+      }
+    }
+    setShowActions(false);
+  };
+
   return (
     <div
       className="node-wrapper"
@@ -154,7 +215,9 @@ export const NodeItem: React.FC<{
       <div
         className={`node-item ${
           node.id === lastActiveNode?.id ? 'last-active' : ''
-        } ${node.id === activeNode?.id ? 'active' : ''}`}
+        } ${node.id === activeNode?.id ? 'active' : ''} ${
+          node.hidden ? 'hidden' : ''
+        }`}
       >
         <div className="node-header" draggable onDragStart={handleDragStart}>
           <span className="node-title">
@@ -168,7 +231,12 @@ export const NodeItem: React.FC<{
               ⋮
             </button>
             {showActions && (
-              <div className="action-dropdown">
+              <div className="action-dropdown" ref={dropdownRef}>
+                <button onClick={handleToggleHidden}>
+                  {node.hidden ? 'Show' : 'Hide'}
+                </button>
+                <button onClick={handleMoveToTop}>Move to Top</button>
+                <button onClick={handleMoveToBottom}>Move to Bottom</button>
                 <button onClick={handleDelete}>Delete</button>
               </div>
             )}

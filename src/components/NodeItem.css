@@ -1,0 +1,126 @@
+.node-wrapper {
+  position: relative;
+}
+
+.node-item {
+  border: 1px solid #ccc;
+  margin: 4px 0;
+  background: #333;
+}
+
+.node-item.active {
+  border-color: #0066cc;
+}
+
+.node-item.last-active {
+  border-color: #666;
+}
+
+.node-item.hidden {
+  opacity: 0.5;
+}
+
+.node-item.hidden .node-title::after {
+  content: ' (hidden)';
+  font-style: italic;
+  color: #666;
+}
+
+.node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  background: #212121;
+  cursor: grab;
+  user-select: none;
+}
+
+.node-title {
+  font-size: 0.9em;
+}
+
+.node-actions {
+  position: relative;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 8px;
+}
+
+.action-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 120px;
+}
+
+.action-dropdown button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.action-dropdown button:hover {
+  background: #444;
+  color: white;
+}
+
+.node-content {
+  padding: 8px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin: 4px 0;
+}
+
+.input-group label {
+  flex: 0 0 80px;
+  font-size: 0.9em;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.drag-over {
+  position: relative;
+}
+
+.drag-over::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #0066cc;
+}
+
+.drag-over-above::before {
+  top: 0;
+}
+
+.drag-over-below::before {
+  bottom: 0;
+}
+
+.drag-over-content {
+  outline: 2px solid #0066cc;
+}
