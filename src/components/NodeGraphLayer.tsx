@@ -21,8 +21,12 @@ export const NodeGraphLayer: React.FC<NodeGraphLayerProps> = ({
         <div
           key={node.id || index}
           className={`node-label ${
-            node.id === lastActiveNode?.node.id ? 'last-active' : ''
-          } ${node.id === activeNode?.node.id ? 'active' : ''}`}
+            node.id === activeNode?.node.id
+              ? 'active'
+              : node.id === lastActiveNode?.node.id
+              ? 'last-active'
+              : ''
+          }`}
           style={{
             position: 'absolute',
             left: `${

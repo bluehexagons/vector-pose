@@ -214,10 +214,12 @@ export const NodeItem: React.FC<{
     >
       <div
         className={`node-item ${
-          node.id === lastActiveNode?.id ? 'last-active' : ''
-        } ${node.id === activeNode?.id ? 'active' : ''} ${
-          node.hidden ? 'hidden' : ''
-        }`}
+          node.id === activeNode?.id
+            ? 'active'
+            : node.id === lastActiveNode?.id
+            ? 'last-active'
+            : ''
+        } ${node.hidden ? 'hidden' : ''}`}
       >
         <div className="node-header" draggable onDragStart={handleDragStart}>
           <span className="node-title">

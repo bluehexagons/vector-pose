@@ -1,8 +1,6 @@
 .file-explorer-pane {
   grid-column: left-start / left-end;
   grid-row: content-start / content-end;
-  border: 0.5px solid white;
-  border-radius: 9px;
   overflow: auto;
   padding: 8px;
 }

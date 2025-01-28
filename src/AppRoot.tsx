@@ -233,6 +233,8 @@ export const AppRoot = () => {
     );
     if (closestNode) {
       handleNodeSelection({node: closestNode}, e, worldPos);
+    } else {
+      pushActiveNode(undefined);
     }
   };
 
@@ -570,21 +572,26 @@ export const AppRoot = () => {
       onContextMenu={preventDefault}
       onSelect={preventDefault}
     >
-      <HeaderPane
-        activeTab={activeTab}
-        onSave={handleSave}
-        onSaveAs={handleSaveAs}
-        onNameChange={handleNameChange}
-        onRotateView={handleRotateView}
-        viewRotation={activeTab.rotation}
-      />
-      <TabPane
-        tabs={tabs}
-        activeTabId={activeTabId}
-        onNewTab={handleNewTab}
-        onCloseTab={handleCloseTab}
-        onSelectTab={handleSelectTab}
-      />
+      <div className="page-header">
+        <HeaderPane
+          activeTab={activeTab}
+          onSave={handleSave}
+          onSaveAs={handleSaveAs}
+          onNameChange={handleNameChange}
+          onRotateView={handleRotateView}
+          viewRotation={activeTab.rotation}
+        />
+      </div>
+
+      <div className="tab-container">
+        <TabPane
+          tabs={tabs}
+          activeTabId={activeTabId}
+          onNewTab={handleNewTab}
+          onCloseTab={handleCloseTab}
+          onSelectTab={handleSelectTab}
+        />
+      </div>
 
       <div className="panes-container">
         <div className="pane left-pane" style={{width: leftWidth}}>

@@ -47,27 +47,36 @@ body {
 }
 
 .container {
-  --gap: 5px;
   display: grid;
-  grid-template-columns: [left-start] 1fr [left-end];
   grid-template-rows:
-    [top-header-start] var(--header-height)
-    [top-header-end] var(--gap)
-    [header-start] var(--tabs-height)
-    [header-end] var(--gap)
-    [content-start] 1fr
-    [content-end] var(--gap)
-    [footer-start] var(--footer-height)
-    [footer-end];
-  width: 100%;
+    var(--header-height) /* Header */
+    var(--tabs-height) /* Tabs */
+    1fr /* Content */
+    var(--footer-height); /* Footer */
+  grid-template-areas:
+    'header'
+    'tabs'
+    'content'
+    'footer';
   height: 100vh;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
   overflow: hidden;
-  padding: 4px;
 
   > * {
     display: inline;
     overflow: auto;
   }
+}
+
+.page-header {
+  grid-area: header;
+  min-height: var(--header-height);
+}
+
+.tab-container {
+  grid-area: tabs;
+  min-height: var(--tabs-height);
 }
 
 .title {
@@ -84,12 +93,13 @@ body {
 }
 
 .footer {
-  grid-row: footer-start / footer-end;
-  grid-column: left-start / right-end;
+  grid-area: footer;
+  min-height: var(--footer-height);
+  color: var(--text-muted);
   text-align: center;
-  line-height: var(--footer-height);
+  padding: var(--spacing-xs);
   opacity: 0.5;
-  transition: opacity 120ms ease-out;
+  transition: opacity 0.1s ease-out;
 }
 
 .footer:hover {
@@ -100,7 +110,7 @@ body {
   height: 1.5em;
   padding: 0.5em;
   will-change: filter;
-  transition: 0.2s ease-out;
+  transition: 0.1s ease-out;
 }
 
 .logo.vite:hover {
@@ -149,7 +159,7 @@ button {
   font-family: inherit;
   color: #0f0f0f;
   background-color: #ffffff;
-  transition: border-color 0.25s;
+  transition: border-color 0.1s ease-out;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 }
 
@@ -194,34 +204,35 @@ h4 {
   margin-bottom: 0;
 }
 
-.editor-pane {
-  border: 0.5px solid white;
-}
-
 .panes-container {
-  grid-row: content-start / content-end;
+  grid-area: content;
   display: flex;
+  overflow: hidden;
   flex-direction: row;
   align-items: stretch;
-  overflow: hidden; /* Prevent scrolling at container level */
+  grid-row: content-start / content-end;
+
+  min-height: 0; /* Important for scroll containment */
   height: 100%; /* Fill available space */
 }
 
 .pane {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--border-radius-md);
   overflow: auto; /* Allow scrolling within panes */
-  border: 0.5px solid var(--border-color);
-  border-radius: var(--border-radius);
   height: 100%;
 }
 
 .left-pane,
 .right-pane {
-  min-width: 100px;
+  min-width: 200px;
   max-width: 50%;
 }
 
 .middle-pane {
-  min-width: 200px;
+  flex: 1;
+  min-width: 300px;
 }
 
 .node-header {
