@@ -167,10 +167,10 @@ export const AppRoot = () => {
 
   const [activeNode, setActiveNode] = useState<UiNode | undefined>(undefined);
 
-  const pushActiveNode = (node: UiNode) => {
-    console.trace('changing active node');
-    setLastActiveNode(activeNode);
-    setActiveNode(node);
+  const focusNode = (node: UiNode) => {
+    console.trace('changing focused node');
+    setLastActiveNode(node);
+    setActiveNode(undefined);
   };
 
   const appendNewNode = () => {
@@ -202,7 +202,8 @@ export const AppRoot = () => {
       setLastActiveNode({node: newNode});
     }
 
-    pushActiveNode(undefined);
+    setLastActiveNode(activeNode);
+    setActiveNode(undefined);
   };
 
   const handleNodeSelection = (
@@ -218,7 +219,8 @@ export const AppRoot = () => {
     );
 
     setDragStart({worldPos, clickOffset});
-    pushActiveNode({node: node.node});
+    setActiveNode({node: node.node});
+    setLastActiveNode(undefined);
     e.preventDefault();
   };
 
@@ -234,7 +236,7 @@ export const AppRoot = () => {
     if (closestNode) {
       handleNodeSelection({node: closestNode}, e, worldPos);
     } else {
-      pushActiveNode(undefined);
+      focusNode(undefined);
     }
   };
 
@@ -634,7 +636,7 @@ export const AppRoot = () => {
             renderedNodes={activeTab?.skele.children ?? []}
             activeNode={activeNode}
             lastActiveNode={lastActiveNode}
-            pushActiveNode={pushActiveNode}
+            focusNode={focusNode}
             onNodeUpdate={updateSkele}
             skele={activeTab?.skele ?? new SkeleNode()}
             onAddNode={appendNewNode}

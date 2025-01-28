@@ -11,7 +11,7 @@ interface LayersPaneProps {
   onNodeUpdate: (skele: SkeleNode) => void;
   skele: SkeleNode;
   onAddNode: () => void;
-  pushActiveNode: (node: UiNode) => void;
+  focusNode: (node: UiNode) => void;
 }
 
 export const LayersPane: React.FC<LayersPaneProps> = ({
@@ -21,7 +21,7 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
   onNodeUpdate,
   skele,
   onAddNode,
-  pushActiveNode,
+  focusNode,
 }) => {
   const handleRootDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -77,7 +77,7 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
               onNodeUpdate={onNodeUpdate}
               activeNode={activeNode?.node}
               lastActiveNode={lastActiveNode?.node}
-              pushActiveNode={pushActiveNode}
+              focusNode={focusNode}
               skele={skele}
             />
           ))}

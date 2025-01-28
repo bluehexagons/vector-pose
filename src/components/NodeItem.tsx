@@ -9,7 +9,7 @@ export const NodeItem: React.FC<{
   node: SkeleNode;
   activeNode: SkeleNode;
   lastActiveNode: SkeleNode;
-  pushActiveNode: (node: UiNode) => void;
+  focusNode: (node: UiNode) => void;
   index: number;
   depth?: number;
   onNodeUpdate: (skele: SkeleNode) => void;
@@ -21,10 +21,11 @@ export const NodeItem: React.FC<{
   index,
   depth = 0,
   onNodeUpdate,
-  pushActiveNode,
+  focusNode,
   skele,
 }) => {
   const [showActions, setShowActions] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -200,15 +201,20 @@ export const NodeItem: React.FC<{
     setShowActions(false);
   };
 
+  const handleToggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+    setShowActions(false);
+  };
+
   return (
     <div
-      className="node-wrapper"
+      className={`node-wrapper ${isCollapsed ? 'collapsed' : ''}`}
       style={{marginLeft: `${depth * 16}px`}}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       onPointerDown={e => {
-        pushActiveNode({node});
+        focusNode({node});
         e.stopPropagation();
       }}
     >
@@ -223,6 +229,9 @@ export const NodeItem: React.FC<{
       >
         <div className="node-header" draggable onDragStart={handleDragStart}>
           <span className="node-title">
+            <span className="collapse-indicator">
+              {node.children.length > 0 ? (isCollapsed ? '►' : '▼') : ''}
+            </span>
             {node.id ? node.id : `node #${index + 1}`}
           </span>
           <div className="node-actions">
@@ -234,6 +243,11 @@ export const NodeItem: React.FC<{
             </button>
             {showActions && (
               <div className="action-dropdown" ref={dropdownRef}>
+                {node.children.length > 0 && (
+                  <button onClick={handleToggleCollapse}>
+                    {isCollapsed ? 'Expand' : 'Collapse'}
+                  </button>
+                )}
                 <button onClick={handleToggleHidden}>
                   {node.hidden ? 'Show' : 'Hide'}
                 </button>
@@ -291,19 +305,20 @@ export const NodeItem: React.FC<{
           </div>
         </div>
       </div>
-      {node.children.map((child, childIndex) => (
-        <NodeItem
-          activeNode={activeNode}
-          lastActiveNode={lastActiveNode}
-          key={childIndex}
-          node={child}
-          index={childIndex}
-          depth={depth + 1}
-          onNodeUpdate={onNodeUpdate}
-          pushActiveNode={pushActiveNode}
-          skele={skele}
-        />
-      ))}
+      {!isCollapsed &&
+        node.children.map((child, childIndex) => (
+          <NodeItem
+            activeNode={activeNode}
+            lastActiveNode={lastActiveNode}
+            key={childIndex}
+            node={child}
+            index={childIndex}
+            depth={depth + 1}
+            onNodeUpdate={onNodeUpdate}
+            focusNode={focusNode}
+            skele={skele}
+          />
+        ))}
     </div>
   );
 };
