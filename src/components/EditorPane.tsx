@@ -1,6 +1,8 @@
 import {fromSpriteUri} from '../shared/types';
 import {RenderInfo, SkeleNode} from '../utils/SkeleNode';
 import {EditorCanvas, Viewport} from './EditorCanvas';
+import {NodeGraphLayer} from './NodeGraphLayer';
+import {SpriteLayer} from './SpriteLayer';
 import './EditorPane.css';
 import {GameImage} from './GameImage';
 
@@ -15,6 +17,9 @@ interface EditorPaneProps {
   onMouseMove?: (e: React.MouseEvent, viewport: Viewport) => void;
   onMouseUp?: (e: React.MouseEvent, viewport: Viewport) => void;
   rotation: number;
+  onTransformStart?: (nodeId: string, type: 'rotate' | 'scale') => void;
+  onTransformChange?: (delta: number) => void;
+  onTransformEnd?: () => void;
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = ({
@@ -28,6 +33,9 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   onMouseMove,
   onMouseUp,
   rotation,
+  onTransformStart,
+  onTransformChange,
+  onTransformEnd,
 }) => {
   return (
     <div className="editor-pane">
@@ -39,68 +47,23 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
       >
         {viewport => (
           <div className="editor-content">
-            <div className="sprite-holder" ref={spriteHolderRef}>
-              {renderedInfo.map(node => (
-                <div
-                  key={node.node.id}
-                  className={`${node.uri ? 'sprite-node' : 'vector-node'} ${
-                    node.node.id === lastActiveNode?.node.id
-                      ? 'last-active'
-                      : ''
-                  } ${node.node.id === activeNode?.node.id ? 'active' : ''} `}
-                  style={{
-                    position: 'absolute',
-                    // Apply scale to positions and sizes
-                    left: `${node.center[0] * viewport.scale}px`,
-                    top: `${node.center[1] * viewport.scale}px`,
-                    width: `${node.transform[0] * viewport.scale}px`,
-                    height: `${node.transform[1] * viewport.scale}px`,
-                    transform: `translate(-50%, -50%) rotate(${
-                      node.direction + 90
-                    }deg)`,
-                  }}
-                >
-                  {node.uri && (
-                    <GameImage
-                      uri={fromSpriteUri(node.uri)}
-                      gameDirectory={gameDirectory}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
-                        opacity: node.node.hidden ? 0.5 : 1,
-                      }}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="node-graph">
-              {renderedNodes.map((node, index) => (
-                <div
-                  key={node.id || index}
-                  className={`node-label ${
-                    node.id === lastActiveNode?.node.id ? 'last-active' : ''
-                  } ${node.id === activeNode?.node.id ? 'active' : ''} `}
-                  style={{
-                    position: 'absolute',
-                    // Apply scale to positions
-                    left: `${
-                      (node.uri ? node.parent : node).state.mid.transform[0] *
-                      viewport.scale
-                    }px`,
-                    top: `${
-                      (node.uri ? node.parent : node).state.mid.transform[1] *
-                      viewport.scale
-                    }px`,
-                    marginTop: node.uri ? '2em' : '0',
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                >
-                  {node.id ? node.id : `node #${index + 1}`}
-                </div>
-              ))}
-            </div>
+            <SpriteLayer
+              renderedInfo={renderedInfo}
+              activeNode={activeNode}
+              lastActiveNode={lastActiveNode}
+              gameDirectory={gameDirectory}
+              viewport={viewport}
+              spriteHolderRef={spriteHolderRef}
+              onTransformStart={onTransformStart}
+              onTransformChange={onTransformChange}
+              onTransformEnd={onTransformEnd}
+            />
+            <NodeGraphLayer
+              renderedNodes={renderedNodes}
+              activeNode={activeNode}
+              lastActiveNode={lastActiveNode}
+              viewport={viewport}
+            />
           </div>
         )}
       </EditorCanvas>
