@@ -1,10 +1,11 @@
-import React, {useState, useCallback, useEffect, useRef} from 'react';
+import React, {useState} from 'react';
+import {UiNode} from '../shared/types';
 import {toDegrees, toRadians} from '../utils/Equa';
 import {SkeleNode} from '../utils/SkeleNode';
 import {AngleInput} from './AngleInput';
-import {UiNode} from '../shared/types';
+import {MenuAction} from './ContextMenu';
+import {KebabMenu} from './KebabMenu';
 import './NodeItem.css';
-import {ContextMenu, MenuAction} from './ContextMenu';
 
 interface NodeItemProps {
   node: SkeleNode;
@@ -27,10 +28,6 @@ export const NodeItem: React.FC<NodeItemProps> = ({
   focusNode,
   skele,
 }) => {
-  const [menuPosition, setMenuPosition] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isShrunken, setIsShrunken] = useState(true);
 
@@ -217,22 +214,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
 
   const renderActions = () => (
     <div className="node-actions">
-      <button
-        className="action-button"
-        onClick={e => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          setMenuPosition({x: rect.right, y: rect.top});
-        }}
-      >
-        ⋮
-      </button>
-      {menuPosition && (
-        <ContextMenu
-          actions={getMenuActions()}
-          position={menuPosition}
-          onClose={() => setMenuPosition(null)}
-        />
-      )}
+      <KebabMenu actions={getMenuActions()} />
     </div>
   );
 

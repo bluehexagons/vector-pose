@@ -1,0 +1,15 @@
+.kebab-menu {
+  position: relative;
+}
+
+.kebab-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 8px;
+}
+
+.kebab-button:hover {
+  background: var(--overlay-hover);
+  border-radius: var(--border-radius-xs);
+}
