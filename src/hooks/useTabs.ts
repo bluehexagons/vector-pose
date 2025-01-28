@@ -1,5 +1,5 @@
 import {useState, useCallback} from 'react';
-import type {TabData} from '../shared/types';
+import type {TabData, FabData} from '../shared/types';
 import {SkeleNode} from '../utils/SkeleNode';
 import type {ImagePropsRef} from '../utils/Renderer';
 
@@ -14,7 +14,7 @@ const renderSkele = (skele: SkeleNode) => ({
     : [],
 });
 
-const createEmptyTab = (defaultSkele?: SkeleNode) => {
+const createEmptyTab = (defaultSkele?: SkeleNode, fabData?: FabData) => {
   const skele =
     defaultSkele ??
     SkeleNode.fromData({
@@ -26,11 +26,12 @@ const createEmptyTab = (defaultSkele?: SkeleNode) => {
 
   return {
     ...renderSkele(skele),
-    name: 'Untitled',
-    description: '',
+    name: fabData?.name ?? 'Untitled',
+    description: fabData?.description ?? '',
     skele,
     isModified: false,
     rotation: 270, // Add default rotation
+    fabData,
   };
 };
 
@@ -38,57 +39,55 @@ export function useTabs() {
   const [tabs, setTabs] = useState<TabData[]>(() => [createEmptyTab()]);
   const [activeTabId, setActiveTabId] = useState<string>(tabs[0].skele.id);
 
-  const updateTab = useCallback((base: SkeleNode, filePath?: string) => {
-    setTabs(current => {
-      // First try to find tab by ID
-      const existingTab = current.find(tab => tab.skele.id === base.id);
-      if (existingTab) {
-        return current.map(tab =>
-          tab === existingTab
-            ? {
-                ...tab,
-                ...renderSkele(base),
-                skele: base,
-                isModified: true,
-              }
-            : tab
-        );
-      }
-
-      // If loading a file, check for existing file path
-      if (filePath) {
-        const fileTab = current.find(tab => tab.filePath === filePath);
-        if (fileTab) {
+  const updateTab = useCallback(
+    (base: SkeleNode, filePath?: string, fabData?: FabData) => {
+      setTabs(current => {
+        // First try to find tab by ID
+        const existingTab = current.find(tab => tab.skele.id === base.id);
+        if (existingTab) {
           return current.map(tab =>
-            tab === fileTab
+            tab === existingTab
               ? {
                   ...tab,
                   ...renderSkele(base),
                   skele: base,
-                  isModified: false,
+                  isModified: true,
                 }
               : tab
           );
         }
-      }
 
-      // Create new tab as last resort
-      return [
-        ...current,
-        {
-          name: filePath ? filePath.split(/[\\/]/g).pop() : 'Untitled',
-          description: '',
-          ...renderSkele(base),
-          skele: base,
-          filePath,
-          isModified: false,
-          rotation: 270, // Add default rotation
-        },
-      ];
-    });
+        // If loading a file, check for existing file path
+        if (filePath) {
+          const fileTab = current.find(tab => tab.filePath === filePath);
+          if (fileTab) {
+            return current.map(tab =>
+              tab === fileTab
+                ? {
+                    ...tab,
+                    ...renderSkele(base),
+                    skele: base,
+                    isModified: false,
+                  }
+                : tab
+            );
+          }
+        }
 
-    setActiveTabId(base.id);
-  }, []);
+        // Create new tab as last resort
+        return [
+          ...current,
+          {
+            ...createEmptyTab(base, fabData),
+            filePath,
+          },
+        ];
+      });
+
+      setActiveTabId(base.id);
+    },
+    []
+  );
 
   const addNewTab = useCallback(
     (skele: SkeleNode) => {

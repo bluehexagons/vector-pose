@@ -1,14 +1,17 @@
-import {FileEntry, TabData, toSpriteUri} from '../shared/types';
+import {FileEntry, FabData, TabData, toSpriteUri} from '../shared/types';
 import {SkeleNode} from '../utils/SkeleNode';
 import {loadFabFile} from './fileService';
 
-export async function loadFabContent(file: FileEntry, initialRotation: number) {
+export async function loadFabContent(
+  file: FileEntry,
+  initialRotation: number
+): Promise<{skele: SkeleNode; fabData: FabData} | null> {
   const fabData = await loadFabFile(file.path);
   if (!fabData?.skele) return null;
 
   const newSkele = SkeleNode.fromData(fabData.skele);
   newSkele.rotation = initialRotation;
-  return newSkele;
+  return {skele: newSkele, fabData};
 }
 
 export function createImageNode(file: FileEntry, size = 0.25) {

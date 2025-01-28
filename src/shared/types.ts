@@ -1,5 +1,5 @@
 import type {dialog} from 'electron';
-import type {RenderInfo, SkeleNode} from 'src/utils/SkeleNode';
+import type {RenderInfo, SkeleData, SkeleNode} from 'src/utils/SkeleNode';
 
 export interface UiNode {
   node: SkeleNode;
@@ -153,6 +153,13 @@ export function fileEntryToTreeNode(file: FileEntry): FileTreeNode {
   };
 }
 
+export interface FabData {
+  name?: string;
+  description?: string;
+  skele: SkeleData;
+  // Can add more properties here later
+}
+
 export interface TabData {
   name: string;
   description: string;
@@ -161,7 +168,7 @@ export interface TabData {
   isModified?: boolean;
   renderedInfo: RenderInfo[];
   renderedNodes: SkeleNode[];
-  rotation: number; // Added field
+  rotation: number;
 }
 
 declare global {

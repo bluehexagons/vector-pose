@@ -256,13 +256,14 @@ export const AppRoot = () => {
         return;
       }
 
-      const newSkele = await loadFabContent(
+      const result = await loadFabContent(
         file,
         toRadians(INITIAL_VIEW_ROTATION)
       );
-      if (newSkele) {
+      if (result) {
+        const {skele: newSkele, fabData} = result;
         tickSkele(newSkele);
-        updateTab(newSkele, file.path);
+        updateTab(newSkele, file.path, fabData);
       }
     }
   };
@@ -527,7 +528,9 @@ export const AppRoot = () => {
         </div>
       </div>
 
-      <footer className="footer">foot</footer>
+      <footer className="footer">
+        {activeTab?.filePath ? activeTab.filePath : 'No file open'}
+      </footer>
     </div>
   );
 };
