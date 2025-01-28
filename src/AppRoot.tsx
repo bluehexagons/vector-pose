@@ -95,7 +95,11 @@ export const AppRoot = () => {
     () => localStorage.getItem('gameDirectory') || './'
   );
 
-  const [dragStart, setDragStart] = useState<vec2>();
+  // Add clickOffset to dragStart state
+  const [dragStart, setDragStart] = useState<{
+    worldPos: vec2;
+    clickOffset: vec2;
+  }>();
 
   const [time, setTime] = useState(1);
 
@@ -178,6 +182,7 @@ export const AppRoot = () => {
     updateSkele(base);
   };
 
+  // Modify handleEditorMouseUp to match new dragStart type
   const handleEditorMouseUp = () => {
     if (!dragStart || !activeNode) {
       setActiveNode(undefined);
@@ -200,8 +205,15 @@ export const AppRoot = () => {
     e: React.MouseEvent,
     worldPos: vec2
   ) => {
+    const nodePos = node.node.getMovableNode().state.transform;
+    // Calculate offset from node center to click position
+    const clickOffset = vec2.fromValues(
+      worldPos[0] - nodePos[0],
+      worldPos[1] - nodePos[1]
+    );
+
+    setDragStart({worldPos, clickOffset});
     setActiveNode({node: node.node});
-    setDragStart(worldPos);
     e.preventDefault();
   };
 
@@ -229,10 +241,16 @@ export const AppRoot = () => {
 
     if (newNode) {
       tickSkele(newSkele);
-      // Get the node we should actually move (sprite parent or the node itself)
       const targetNode = newNode.getMovableNode();
-      targetNode.updateFromWorldPosition(worldPos[0], worldPos[1]);
-      setDragStart(worldPos);
+
+      // Subtract click offset to maintain relative position
+      const targetPos = vec2.fromValues(
+        worldPos[0] - dragStart.clickOffset[0],
+        worldPos[1] - dragStart.clickOffset[1]
+      );
+
+      targetNode.updateFromWorldPosition(targetPos[0], targetPos[1]);
+      setDragStart({...dragStart, worldPos});
       updateSkele(newSkele);
     }
   };
