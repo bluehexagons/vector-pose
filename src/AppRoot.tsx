@@ -1,26 +1,26 @@
 import {vec2} from 'gl-matrix';
-import {useEffect, useRef, useState, useCallback} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import './AppRoot.css';
-import {BASE_SCALE, Viewport} from './components/EditorCanvas';
+import {Viewport} from './components/EditorCanvas';
 import {EditorPane} from './components/EditorPane';
 import {FileExplorerPane} from './components/FileExplorerPane';
 import {HeaderPane} from './components/HeaderPane';
 import {LayersPane} from './components/LayersPane';
 import {Resizer} from './components/Resizer';
 import {TabPane} from './components/TabPane';
+import {useTabs} from './hooks/useTabs';
 import {
-  FAB_EXTENSIONS,
-  FileEntry,
-  IMAGE_EXTENSIONS,
-  SEARCH_DIRS,
-  TabData,
-  toSpriteUri,
-  UiNode,
-} from './shared/types';
+  loadDirectoryFiles,
+  loadFabFile,
+  saveFabFile,
+  selectDirectory,
+  selectFiles,
+  showSaveDialog,
+} from './services/fileService';
+import {FileEntry, toSpriteUri, UiNode} from './shared/types';
 import {toDegrees, toRadians} from './utils/Equa';
 import type {ImagePropsRef} from './utils/Renderer';
-import {RenderInfo, SkeleNode} from './utils/SkeleNode';
-import {useTabs} from './hooks/useTabs';
+import {SkeleNode} from './utils/SkeleNode';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 0;
@@ -31,47 +31,6 @@ const deduper = (props: ImagePropsRef) => props;
 
 const createDefaultSkele = () =>
   SkeleNode.fromData({angle: 0, mag: 1, children: [{angle: 0, mag: 0}]});
-
-const scanDirectory = async (
-  baseDir: string,
-  subDir: string
-): Promise<FileEntry[]> => {
-  const fullPath = await window.native.path.join(baseDir, subDir);
-  const entries: FileEntry[] = [];
-
-  try {
-    const files = await window.native.fs.readdir(fullPath);
-
-    for (const file of files) {
-      // Build the full relative path including subdirectories
-      const relativePath = await window.native.path.join(
-        subDir,
-        file.relativePath
-      );
-
-      if (file.isDirectory) {
-        entries.push(
-          ...(await scanDirectory(
-            baseDir,
-            relativePath // Pass the full relative path for subdirectories
-          ))
-        );
-      } else {
-        const ext = await window.native.path.extname(file.name);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (IMAGE_EXTENSIONS.includes(ext as any)) {
-          entries.push({path: file.path, relativePath, type: 'image'});
-        } else if (FAB_EXTENSIONS.some(fabExt => file.name.endsWith(fabExt))) {
-          entries.push({path: file.path, relativePath, type: 'fab'});
-        }
-      }
-    }
-  } catch (err) {
-    console.error(`Failed to scan directory ${fullPath}:`, err);
-  }
-
-  return entries;
-};
 
 const preventDefault = (e: React.SyntheticEvent) => e.preventDefault();
 
@@ -264,52 +223,28 @@ export const AppRoot = () => {
     }
   };
 
-  const loadDirectoryFiles = async (directory: string) => {
-    const entries: FileEntry[] = [];
-
-    for (const searchDir of SEARCH_DIRS) {
-      entries.push(...(await scanDirectory(directory, searchDir)));
-    }
-
-    setAvailableFiles(entries);
+  const loadDirectoryContent = async (directory: string) => {
+    const files = await loadDirectoryFiles(directory);
+    setAvailableFiles(files);
   };
 
   const handleDirectorySelect = async () => {
-    try {
-      const response = await window.native.dialog.showOpenDialog({
-        properties: ['openDirectory', 'treatPackageAsDirectory'],
-        title: 'Select Game Directory',
-        buttonLabel: 'Open',
-      });
-
-      if (!response.canceled && response.filePaths.length > 0) {
-        const newDir = response.filePaths[0];
-        setGameDirectory(newDir);
-        localStorage.setItem('gameDirectory', newDir);
-        await loadDirectoryFiles(newDir);
-      }
-    } catch (err) {
-      console.error('Failed to select directory:', err);
+    const newDir = await selectDirectory();
+    if (newDir) {
+      setGameDirectory(newDir);
+      localStorage.setItem('gameDirectory', newDir);
+      await loadDirectoryContent(newDir);
     }
   };
 
-  const loadFabFile = async (file: FileEntry) => {
-    try {
-      const str = (await window.native.fs.readFile(
-        file.path,
-        'utf-8'
-      )) as string;
-      const fabData = JSON.parse(str);
-
-      if (fabData.skele) {
-        const newSkele = SkeleNode.fromData(fabData.skele);
-        newSkele.rotation = toRadians(INITIAL_VIEW_ROTATION);
-        tickSkele(newSkele);
-        updateTab(newSkele, file.path);
-        return true;
-      }
-    } catch (err) {
-      console.error('Failed to load fab file:', err);
+  const loadFab = async (file: FileEntry) => {
+    const fabData = await loadFabFile(file.path);
+    if (fabData?.skele) {
+      const newSkele = SkeleNode.fromData(fabData.skele);
+      newSkele.rotation = toRadians(INITIAL_VIEW_ROTATION);
+      tickSkele(newSkele);
+      updateTab(newSkele, file.path);
+      return true;
     }
     return false;
   };
@@ -330,47 +265,18 @@ export const AppRoot = () => {
         return;
       }
 
-      await loadFabFile(file);
+      await loadFab(file);
     }
   };
 
   const handleFileSelect = async () => {
-    const response = await window.native.dialog.showOpenDialog({
-      properties: ['openFile', 'multiSelections', 'treatPackageAsDirectory'],
-      title: 'Add image layers',
-      buttonLabel: 'Add',
-      filters: [
-        {
-          name: 'Supported Files',
-          extensions: ['fab.json', 'jpg', 'jpeg', 'png', 'webp'],
-        },
-        {name: 'Prefab Files', extensions: ['fab.json']},
-        {name: 'Image Files', extensions: ['jpg', 'jpeg', 'png', 'webp']},
-      ],
-    });
-
-    if (!response || response.canceled) return;
-
-    const newFiles = await Promise.all(
-      response.filePaths.map(
-        async filePath =>
-          ({
-            path: filePath,
-            relativePath: await window.native.path.basename(filePath),
-            type:
-              (await window.native.path.extname(filePath)) === '.json'
-                ? 'fab'
-                : 'image',
-          } as FileEntry)
-      )
-    );
-
+    const newFiles = await selectFiles();
     setAvailableFiles(prev => [...prev, ...newFiles]);
   };
 
   useEffect(() => {
     if (gameDirectory) {
-      loadDirectoryFiles(gameDirectory);
+      loadDirectoryContent(gameDirectory);
     }
   }, [gameDirectory]);
 
@@ -380,54 +286,50 @@ export const AppRoot = () => {
   const handleSave = async () => {
     if (!activeTab) return;
 
-    try {
-      if (!activeTab.filePath) {
-        return handleSaveAs();
-      }
+    if (!activeTab.filePath) {
+      return handleSaveAs();
+    }
 
-      const fabData = {
-        name: activeTab.name,
-        skele: activeTab.skele.toData(), // Use toData() explicitly
-      };
+    const fabData = {
+      name: activeTab.name,
+      skele: activeTab.skele.toData(),
+    };
 
-      // overwrite camera-modified values to their originals
-      fabData.skele.angle = 0;
-      fabData.skele.mag = 1;
+    // overwrite camera-modified values to their originals
+    fabData.skele.angle = 0;
+    fabData.skele.mag = 1;
 
-      await window.native.fs.writeFile(
-        activeTab.filePath,
-        JSON.stringify(fabData, null, 2)
-      );
-
+    const success = await saveFabFile(activeTab.filePath, fabData);
+    if (success) {
       setTabs(current =>
         current.map(tab =>
           tab.skele.id === activeTabId ? {...tab, isModified: false} : tab
         )
       );
-    } catch (err) {
-      console.error('Failed to save file:', err);
     }
   };
 
   const handleSaveAs = async () => {
     if (!activeTab) return;
 
-    try {
-      // Convert tab name to filename format
-      const defaultName = activeTab.name.toLowerCase().replace(/\s+/g, '_');
+    const defaultName = activeTab.name.toLowerCase().replace(/\s+/g, '_');
+    const response = await showSaveDialog(defaultName);
 
-      const response = await window.native.dialog.showSaveDialog({
-        title: 'Save As',
-        buttonLabel: 'Save',
-        defaultPath: defaultName + '.fab.json',
-        filters: [{name: 'Prefab Files', extensions: ['fab.json']}],
-        properties: ['showOverwriteConfirmation', 'createDirectory'],
-      });
+    if (response.canceled || !response.filePath) return;
 
-      if (response.canceled || !response.filePath) return;
+    const filePath = response.filePath;
+    const fabData = {
+      name: activeTab.name,
+      description: activeTab.description,
+      skele: activeTab.skele.toData(),
+    };
 
-      const filePath = response.filePath;
+    // overwrite camera-modified values to their originals
+    fabData.skele.angle = 0;
+    fabData.skele.mag = 1;
 
+    const success = await saveFabFile(filePath, fabData);
+    if (success) {
       setTabs(current =>
         current.map(tab =>
           tab.skele.id === activeTabId
@@ -435,23 +337,6 @@ export const AppRoot = () => {
             : tab
         )
       );
-
-      const fabData = {
-        name: activeTab.name,
-        description: activeTab.description,
-        skele: activeTab.skele.toData(),
-      };
-
-      // overwrite camera-modified values to their originals
-      fabData.skele.angle = 0;
-      fabData.skele.mag = 1;
-
-      await window.native.fs.writeFile(
-        filePath,
-        JSON.stringify(fabData, null, 2)
-      );
-    } catch (err) {
-      console.error('Failed to save file:', err);
     }
   };
 
