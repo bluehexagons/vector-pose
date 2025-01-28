@@ -4,8 +4,9 @@ import {SkeleNode} from '../utils/SkeleNode';
 import {AngleInput} from './AngleInput';
 import {UiNode} from '../shared/types';
 import './NodeItem.css';
+import {ContextMenu, MenuAction} from './ContextMenu';
 
-export const NodeItem: React.FC<{
+interface NodeItemProps {
   node: SkeleNode;
   activeNode: SkeleNode;
   lastActiveNode: SkeleNode;
@@ -14,7 +15,9 @@ export const NodeItem: React.FC<{
   depth?: number;
   onNodeUpdate: (skele: SkeleNode) => void;
   skele: SkeleNode;
-}> = ({
+}
+
+export const NodeItem: React.FC<NodeItemProps> = ({
   activeNode,
   lastActiveNode,
   node,
@@ -24,29 +27,12 @@ export const NodeItem: React.FC<{
   focusNode,
   skele,
 }) => {
-  const [showActions, setShowActions] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isShrunken, setIsShrunken] = useState(true);
-
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node)
-    ) {
-      setShowActions(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (showActions) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showActions, handleClickOutside]);
 
   const handleDragStart = (e: React.DragEvent) => {
     // Prevent dragging from input elements or content area
@@ -159,7 +145,6 @@ export const NodeItem: React.FC<{
       nodeToDelete.remove();
       onNodeUpdate(clone);
     }
-    setShowActions(false);
   };
 
   const handleToggleHidden = () => {
@@ -169,7 +154,6 @@ export const NodeItem: React.FC<{
       targetNode.hidden = !targetNode.hidden;
       onNodeUpdate(clone);
     }
-    setShowActions(false);
   };
 
   const handleMoveToTop = () => {
@@ -184,7 +168,6 @@ export const NodeItem: React.FC<{
         onNodeUpdate(clone);
       }
     }
-    setShowActions(false);
   };
 
   const handleMoveToBottom = () => {
@@ -199,18 +182,59 @@ export const NodeItem: React.FC<{
         onNodeUpdate(clone);
       }
     }
-    setShowActions(false);
   };
 
-  const handleToggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
-    setShowActions(false);
-  };
+  const getMenuActions = (): MenuAction[] => [
+    ...(node.children.length > 0
+      ? [
+          {
+            label: isCollapsed ? 'Expand' : 'Collapse',
+            onClick: () => setIsCollapsed(!isCollapsed),
+          },
+        ]
+      : []),
+    {
+      label: isShrunken ? 'Show Details' : 'Hide Details',
+      onClick: () => setIsShrunken(!isShrunken),
+    },
+    {
+      label: node.hidden ? 'Show' : 'Hide',
+      onClick: handleToggleHidden,
+    },
+    {
+      label: 'Move to Top',
+      onClick: handleMoveToTop,
+    },
+    {
+      label: 'Move to Bottom',
+      onClick: handleMoveToBottom,
+    },
+    {
+      label: 'Delete',
+      onClick: handleDelete,
+    },
+  ];
 
-  const handleToggleShrunken = () => {
-    setIsShrunken(!isShrunken);
-    setShowActions(false);
-  };
+  const renderActions = () => (
+    <div className="node-actions">
+      <button
+        className="action-button"
+        onClick={e => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          setMenuPosition({x: rect.right, y: rect.top});
+        }}
+      >
+        ⋮
+      </button>
+      {menuPosition && (
+        <ContextMenu
+          actions={getMenuActions()}
+          position={menuPosition}
+          onClose={() => setMenuPosition(null)}
+        />
+      )}
+    </div>
+  );
 
   return (
     <div
@@ -242,32 +266,7 @@ export const NodeItem: React.FC<{
             </span>
             {node.id ? node.id : `node #${index + 1}`}
           </span>
-          <div className="node-actions">
-            <button
-              className="action-button"
-              onClick={() => setShowActions(!showActions)}
-            >
-              ⋮
-            </button>
-            {showActions && (
-              <div className="action-dropdown" ref={dropdownRef}>
-                {node.children.length > 0 && (
-                  <button onClick={handleToggleCollapse}>
-                    {isCollapsed ? 'Expand' : 'Collapse'}
-                  </button>
-                )}
-                <button onClick={handleToggleShrunken}>
-                  {isShrunken ? 'Show Details' : 'Hide Details'}
-                </button>
-                <button onClick={handleToggleHidden}>
-                  {node.hidden ? 'Show' : 'Hide'}
-                </button>
-                <button onClick={handleMoveToTop}>Move to Top</button>
-                <button onClick={handleMoveToBottom}>Move to Bottom</button>
-                <button onClick={handleDelete}>Delete</button>
-              </div>
-            )}
-          </div>
+          {renderActions()}
         </div>
         <div
           className="node-content"
@@ -280,6 +279,19 @@ export const NodeItem: React.FC<{
           )}
           {!isShrunken && (
             <>
+              <div className="input-group">
+                <label>ID:</label>
+                <input
+                  type="text"
+                  className="text-input"
+                  value={node.id || ''}
+                  draggable={false}
+                  onChange={evt => {
+                    node.id = evt.target.value || null;
+                    onNodeUpdate(skele.clone());
+                  }}
+                />
+              </div>
               <div className="input-group">
                 <label>Angle:</label>
                 <AngleInput

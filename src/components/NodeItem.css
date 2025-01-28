@@ -59,32 +59,7 @@
   padding: 2px 8px;
 }
 
-.action-dropdown {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--border-radius-sm);
-  box-shadow: var(--shadow-medium);
-  z-index: var(--z-dropdown);
-  min-width: 120px;
-}
-
-.action-dropdown button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: var(--spacing-xs) var(--spacing-md);
-  border: none;
-  background: none;
-  cursor: pointer;
-  color: var(--text-primary);
-}
-
-.action-dropdown button:hover {
-  background: var(--overlay-hover);
-}
+/* Remove the old .action-dropdown styles */
 
 .node-content {
   padding: var(--spacing-sm);

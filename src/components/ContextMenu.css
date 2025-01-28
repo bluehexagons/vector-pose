@@ -1,0 +1,30 @@
+.context-menu {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-medium);
+  z-index: var(--z-menu);
+  min-width: 120px;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.context-menu button:hover:not(:disabled) {
+  background: var(--overlay-hover);
+}
+
+.context-menu button:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
