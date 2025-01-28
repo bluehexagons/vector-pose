@@ -138,9 +138,11 @@ export const AppRoot = () => {
 
   const appendNewNode = () => {
     const base = skele.clone();
-    const newNode = lastActiveNode ? base.findId(lastActiveNode.node.id) : base;
-    if (newNode) {
-      newNode.add(
+    const newParent = lastActiveNode
+      ? base.findId(lastActiveNode.node.id)
+      : base;
+    if (newParent) {
+      newParent.add(
         SkeleNode.fromData({
           angle: 0,
           mag: 0,
@@ -213,7 +215,14 @@ export const AppRoot = () => {
 
     if (newNode) {
       tickSkele(newSkele);
-      const targetNode = newNode.getMovableNode();
+      let targetNode = newNode.getMovableNode();
+
+      if (targetNode === newSkele) {
+        targetNode = new SkeleNode();
+        newNode.remove();
+        newSkele.add(targetNode);
+        targetNode.add(newNode);
+      }
 
       // Subtract click offset to maintain relative position
       const targetPos = vec2.fromValues(
@@ -246,7 +255,13 @@ export const AppRoot = () => {
       const imageNode = createImageNode(file);
       if (imageNode) {
         const newSkele = skele.clone();
-        newSkele.add(imageNode);
+
+        const newParent = lastActiveNode
+          ? newSkele.findId(lastActiveNode.node.id)
+          : newSkele;
+        if (newParent) {
+          newParent.add(imageNode);
+        }
         updateSkele(newSkele);
       }
     } else if (file.type === 'fab') {
