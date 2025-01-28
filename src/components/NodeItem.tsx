@@ -23,8 +23,16 @@ export const NodeItem: React.FC<{
   const [showActions, setShowActions] = useState(false);
 
   const handleDragStart = (e: React.DragEvent) => {
-    console.log(e);
-    if (e.currentTarget.tagName === 'INPUT') return;
+    // Prevent dragging from input elements or content area
+    const target = e.target as HTMLElement;
+    if (
+      target.tagName === 'INPUT' ||
+      target.closest('.node-content') ||
+      !target.closest('.node-header')
+    ) {
+      e.preventDefault();
+      return;
+    }
 
     e.dataTransfer.setData(
       'application/json',
@@ -136,8 +144,6 @@ export const NodeItem: React.FC<{
     <div
       className="node-wrapper"
       style={{marginLeft: `${depth * 16}px`}}
-      draggable
-      onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -147,7 +153,7 @@ export const NodeItem: React.FC<{
           node.id === lastActiveNode?.id ? 'last-active' : ''
         } ${node.id === activeNode?.id ? 'active' : ''}`}
       >
-        <div className="node-header">
+        <div className="node-header" draggable onDragStart={handleDragStart}>
           <span className="node-title">
             {node.id ? node.id : `node #${index + 1}`}
           </span>
