@@ -26,6 +26,7 @@ export const NodeItem: React.FC<{
 }) => {
   const [showActions, setShowActions] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isShrunken, setIsShrunken] = useState(true);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -206,9 +207,16 @@ export const NodeItem: React.FC<{
     setShowActions(false);
   };
 
+  const handleToggleShrunken = () => {
+    setIsShrunken(!isShrunken);
+    setShowActions(false);
+  };
+
   return (
     <div
-      className={`node-wrapper ${isCollapsed ? 'collapsed' : ''}`}
+      className={`node-wrapper ${isCollapsed ? 'collapsed' : ''} ${
+        isShrunken ? 'shrunken' : ''
+      }`}
       style={{marginLeft: `${depth * 16}px`}}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -248,6 +256,9 @@ export const NodeItem: React.FC<{
                     {isCollapsed ? 'Expand' : 'Collapse'}
                   </button>
                 )}
+                <button onClick={handleToggleShrunken}>
+                  {isShrunken ? 'Show Details' : 'Hide Details'}
+                </button>
                 <button onClick={handleToggleHidden}>
                   {node.hidden ? 'Show' : 'Hide'}
                 </button>
@@ -264,45 +275,52 @@ export const NodeItem: React.FC<{
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <div className="input-group">
-            <label>Angle:</label>
-            <AngleInput
-              value={toDegrees(node.rotation)}
-              draggable={false}
-              onChange={v => {
-                node.rotation = toRadians(v);
-                node.updateTransform();
-                onNodeUpdate(skele.clone());
-              }}
-            />
-          </div>
-          <div className="input-group">
-            <label>Magnitude:</label>
-            <input
-              type="number"
-              className="number-input"
-              value={node.mag}
-              draggable={false}
-              onChange={evt => {
-                node.mag = parseFloat(evt.target.value) || 0;
-                node.updateTransform();
-                onNodeUpdate(skele.clone());
-              }}
-            />
-          </div>
-          <div className="input-group">
-            <label>URI:</label>
-            <input
-              type="text"
-              className="text-input"
-              value={node.uri || ''}
-              draggable={false}
-              onChange={evt => {
-                node.uri = evt.target.value || null;
-                onNodeUpdate(skele.clone());
-              }}
-            />
-          </div>
+          {isShrunken && node.uri && (
+            <span className="inline-uri">{node.uri}</span>
+          )}
+          {!isShrunken && (
+            <>
+              <div className="input-group">
+                <label>Angle:</label>
+                <AngleInput
+                  value={toDegrees(node.rotation)}
+                  draggable={false}
+                  onChange={v => {
+                    node.rotation = toRadians(v);
+                    node.updateTransform();
+                    onNodeUpdate(skele.clone());
+                  }}
+                />
+              </div>
+              <div className="input-group">
+                <label>Magnitude:</label>
+                <input
+                  type="number"
+                  className="number-input"
+                  value={node.mag}
+                  draggable={false}
+                  onChange={evt => {
+                    node.mag = parseFloat(evt.target.value) || 0;
+                    node.updateTransform();
+                    onNodeUpdate(skele.clone());
+                  }}
+                />
+              </div>
+              <div className="input-group">
+                <label>URI:</label>
+                <input
+                  type="text"
+                  className="text-input"
+                  value={node.uri || ''}
+                  draggable={false}
+                  onChange={evt => {
+                    node.uri = evt.target.value || null;
+                    onNodeUpdate(skele.clone());
+                  }}
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
       {!isCollapsed &&

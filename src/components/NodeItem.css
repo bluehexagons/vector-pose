@@ -151,3 +151,18 @@
 .node-wrapper.collapsed > .node-item .node-content {
   display: none;
 }
+
+.inline-uri {
+  margin-left: 8px;
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 0.9em;
+}
+
+.node-wrapper.shrunken > .node-item {
+  border-radius: var(--border-radius-sm);
+}
+
+.node-wrapper.shrunken > .node-item .node-header {
+  border-radius: var(--border-radius-sm);
+}
