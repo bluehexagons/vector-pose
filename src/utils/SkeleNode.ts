@@ -464,6 +464,14 @@ export class SkeleNode {
     this.mag = Math.max(0.01, this.mag * factor);
     this.updateTransform();
   }
+
+  /**
+   * Gets the world-space center position of this node
+   */
+  getWorldCenter(): vec2 {
+    if (!this.parent) return vec2.clone(this.state.transform);
+    return vec2.clone(this.parent.state.transform);
+  }
 }
 
 // console.log('-- testing skelenode --');

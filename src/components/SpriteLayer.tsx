@@ -15,7 +15,8 @@ export interface SpriteLayerProps {
   onTransformStart?: (
     nodeId: string,
     type: 'rotate' | 'scale',
-    e: React.MouseEvent
+    e: React.MouseEvent,
+    viewport: Viewport // Add viewport parameter
   ) => void;
 }
 
@@ -68,14 +69,14 @@ export const SpriteLayer: React.FC<SpriteLayerProps> = ({
                       className="rotate-handle"
                       onMouseDown={e => {
                         e.stopPropagation();
-                        onTransformStart?.(node.node.id, 'rotate', e);
+                        onTransformStart?.(node.node.id, 'rotate', e, viewport);
                       }}
                     />
                     <div
                       className="scale-handle"
                       onMouseDown={e => {
                         e.stopPropagation();
-                        onTransformStart?.(node.node.id, 'scale', e);
+                        onTransformStart?.(node.node.id, 'scale', e, viewport);
                       }}
                     />
                   </div>

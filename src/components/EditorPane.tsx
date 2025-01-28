@@ -27,6 +27,7 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   onMouseMove,
   onMouseUp,
   rotation,
+  onTransformStart,
   ...spriteLayerProps
 }) => {
   return (
@@ -43,6 +44,9 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
               activeNode={activeNode}
               lastActiveNode={lastActiveNode}
               viewport={viewport}
+              onTransformStart={(nodeId, type, e) =>
+                onTransformStart?.(nodeId, type, e, viewport)
+              }
               {...spriteLayerProps}
             />
             <NodeGraphLayer

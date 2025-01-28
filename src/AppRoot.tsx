@@ -1,7 +1,7 @@
 import {vec2} from 'gl-matrix';
 import {useEffect, useRef, useState, useCallback} from 'react';
 import './AppRoot.css';
-import {Viewport} from './components/EditorCanvas';
+import {BASE_SCALE, Viewport} from './components/EditorCanvas';
 import {EditorPane} from './components/EditorPane';
 import {FileExplorerPane} from './components/FileExplorerPane';
 import {HeaderPane} from './components/HeaderPane';
@@ -443,66 +443,88 @@ export const AppRoot = () => {
     startPos: vec2;
     center: vec2;
     skele: SkeleNode;
+    viewport: {scale: number; rotation: number; rect: DOMRect};
   }>(undefined);
 
   const handleTransformStart = (
     nodeId: string,
     type: 'rotate' | 'scale',
-    e: React.MouseEvent
+    e: React.MouseEvent,
+    viewport: Viewport // Add viewport parameter
   ) => {
-    const rect = spriteHolderRef.current?.getBoundingClientRect();
-    if (!rect) return;
+    const canvasRect = e.currentTarget
+      .closest('.editor-canvas')
+      ?.getBoundingClientRect();
+    if (!canvasRect) return;
 
-    // Store transform state in ref
+    const node = skele.findId(nodeId);
+    if (!node?.parent) return;
+
+    // Get world coordinates of the sprite's center
+    const worldCenter = node.parent.getWorldCenter();
+    // Convert to screen space through viewport
+    const screenCenter = viewport.worldToPage(worldCenter[0], worldCenter[1]);
+    // Make coordinates relative to canvas
+    const center = vec2.fromValues(
+      screenCenter[0] - canvasRect.left,
+      screenCenter[1] - canvasRect.top
+    );
+
     transformingRef.current = {
       nodeId,
       type,
-      startPos: vec2.fromValues(e.clientX - rect.left, e.clientY - rect.top),
-      center: vec2.fromValues(rect.width / 2, rect.height / 2),
+      startPos: vec2.fromValues(
+        e.clientX - canvasRect.left,
+        e.clientY - canvasRect.top
+      ),
+      center,
       skele,
+      viewport: {
+        rect: canvasRect,
+        scale: viewport.scale,
+        rotation: activeTab.rotation,
+      },
     };
 
     const handleTransformMove = (e: MouseEvent) => {
       const transforming = transformingRef.current;
-      if (!transforming || !transforming.skele || !spriteHolderRef.current)
-        return;
+      if (!transforming || !transforming.skele) return;
 
-      const {skele, center, startPos} = transforming;
-
-      const rect = spriteHolderRef.current.getBoundingClientRect();
+      const {skele, center, startPos, viewport} = transforming;
       const currentPos = vec2.fromValues(
-        e.clientX - rect.left,
-        e.clientY - rect.top
+        e.clientX - viewport.rect.left,
+        e.clientY - viewport.rect.top
       );
 
       const newSkele = skele.clone();
       const newNode = newSkele.findId(transforming.nodeId);
       if (!newNode) return;
-      console.log('hey?');
 
       if (transforming.type === 'rotate') {
-        const startAngle = Math.atan2(
-          startPos[1] - center[1],
-          startPos[0] - center[0]
-        );
-        const currentAngle = Math.atan2(
-          currentPos[1] - center[1],
-          currentPos[0] - center[0]
+        // Calculate relative vectors from center to points
+        const startVec = vec2.sub(vec2.create(), startPos, center);
+        const currentVec = vec2.sub(vec2.create(), currentPos, center);
+
+        // Calculate angle between vectors
+        const deltaAngle = Math.atan2(
+          startVec[0] * currentVec[1] - startVec[1] * currentVec[0],
+          startVec[0] * currentVec[0] + startVec[1] * currentVec[1]
         );
 
-        const deltaAngle = currentAngle - startAngle;
         newNode.rotateSprite(deltaAngle);
-
-        // Update start position in ref
         transforming.startPos = currentPos;
       } else {
-        const startDist = vec2.dist(startPos, center);
-        const currentDist = vec2.dist(currentPos, center);
-        const scaleFactor = currentDist / startDist;
+        // Calculate distances from center
+        const startDist = vec2.len(vec2.sub(vec2.create(), startPos, center));
+        const currentDist = vec2.len(
+          vec2.sub(vec2.create(), currentPos, center)
+        );
 
-        newNode.scaleSprite(scaleFactor);
+        if (startDist > 0) {
+          const scaleFactor = currentDist / startDist;
+          newNode.scaleSprite(scaleFactor);
+        }
 
-        // Update start position in ref
         transforming.startPos = currentPos;
       }
 

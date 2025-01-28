@@ -193,10 +193,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       style={{
-        position: 'relative',
-        overflow: 'hidden',
-        width: '100%',
-        height: '100%',
         cursor: isDragging ? 'grabbing' : 'default',
       }}
     >
