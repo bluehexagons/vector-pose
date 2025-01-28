@@ -461,7 +461,7 @@ export const AppRoot = () => {
     if (!node?.parent) return;
 
     // Get world coordinates of the sprite's center
-    const worldCenter = node.parent.getWorldCenter();
+    const worldCenter = node.getWorldCenter();
     // Convert to screen space through viewport
     const screenCenter = viewport.worldToPage(worldCenter[0], worldCenter[1]);
     // Make coordinates relative to canvas
