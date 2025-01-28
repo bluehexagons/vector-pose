@@ -167,6 +167,12 @@ export const AppRoot = () => {
 
   const [activeNode, setActiveNode] = useState<UiNode | undefined>(undefined);
 
+  const pushActiveNode = (node: UiNode) => {
+    console.trace('changing active node');
+    setLastActiveNode(activeNode);
+    setActiveNode(node);
+  };
+
   const appendNewNode = () => {
     const base = skele.clone();
     const newNode = lastActiveNode ? base.findId(lastActiveNode.node.id) : base;
@@ -185,7 +191,6 @@ export const AppRoot = () => {
   // Modify handleEditorMouseUp to match new dragStart type
   const handleEditorMouseUp = () => {
     if (!dragStart || !activeNode) {
-      setActiveNode(undefined);
       return;
     }
 
@@ -197,7 +202,7 @@ export const AppRoot = () => {
       setLastActiveNode({node: newNode});
     }
 
-    setActiveNode(undefined);
+    pushActiveNode(undefined);
   };
 
   const handleNodeSelection = (
@@ -213,7 +218,7 @@ export const AppRoot = () => {
     );
 
     setDragStart({worldPos, clickOffset});
-    setActiveNode({node: node.node});
+    pushActiveNode({node: node.node});
     e.preventDefault();
   };
 
@@ -622,6 +627,7 @@ export const AppRoot = () => {
             renderedNodes={activeTab?.skele.children ?? []}
             activeNode={activeNode}
             lastActiveNode={lastActiveNode}
+            pushActiveNode={pushActiveNode}
             onNodeUpdate={updateSkele}
             skele={activeTab?.skele ?? new SkeleNode()}
             onAddNode={appendNewNode}

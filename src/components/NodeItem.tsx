@@ -2,11 +2,13 @@ import React, {useState} from 'react';
 import {toDegrees, toRadians} from '../utils/Equa';
 import {SkeleNode} from '../utils/SkeleNode';
 import {AngleInput} from './AngleInput';
+import {UiNode} from '../shared/types';
 
 export const NodeItem: React.FC<{
   node: SkeleNode;
   activeNode: SkeleNode;
   lastActiveNode: SkeleNode;
+  pushActiveNode: (node: UiNode) => void;
   index: number;
   depth?: number;
   onNodeUpdate: (skele: SkeleNode) => void;
@@ -18,6 +20,7 @@ export const NodeItem: React.FC<{
   index,
   depth = 0,
   onNodeUpdate,
+  pushActiveNode,
   skele,
 }) => {
   const [showActions, setShowActions] = useState(false);
@@ -42,6 +45,7 @@ export const NodeItem: React.FC<{
         index,
       })
     );
+
     e.stopPropagation();
   };
 
@@ -82,12 +86,7 @@ export const NodeItem: React.FC<{
     const targetNode = node;
 
     // Add validation for circular references
-    if (
-      !sourceNode ||
-      !targetNode ||
-      sourceNode === targetNode ||
-      targetNode.includes(sourceNode)
-    ) {
+    if (!sourceNode || !targetNode || sourceNode === targetNode) {
       console.warn('Invalid drop operation');
       return;
     }
@@ -147,6 +146,10 @@ export const NodeItem: React.FC<{
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      onPointerDown={e => {
+        pushActiveNode({node});
+        e.stopPropagation();
+      }}
     >
       <div
         className={`node-item ${
@@ -227,6 +230,7 @@ export const NodeItem: React.FC<{
           index={childIndex}
           depth={depth + 1}
           onNodeUpdate={onNodeUpdate}
+          pushActiveNode={pushActiveNode}
           skele={skele}
         />
       ))}

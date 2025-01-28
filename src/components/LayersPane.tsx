@@ -2,6 +2,7 @@ import React from 'react';
 import {SkeleNode} from '../utils/SkeleNode';
 import './LayersPane.css';
 import {NodeItem} from './NodeItem';
+import {UiNode} from '../shared/types';
 
 interface LayersPaneProps {
   renderedNodes: SkeleNode[];
@@ -10,6 +11,7 @@ interface LayersPaneProps {
   onNodeUpdate: (skele: SkeleNode) => void;
   skele: SkeleNode;
   onAddNode: () => void;
+  pushActiveNode: (node: UiNode) => void;
 }
 
 export const LayersPane: React.FC<LayersPaneProps> = ({
@@ -19,6 +21,7 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
   onNodeUpdate,
   skele,
   onAddNode,
+  pushActiveNode,
 }) => {
   const handleRootDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -74,6 +77,7 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
               onNodeUpdate={onNodeUpdate}
               activeNode={activeNode?.node}
               lastActiveNode={lastActiveNode?.node}
+              pushActiveNode={pushActiveNode}
               skele={skele}
             />
           ))}
