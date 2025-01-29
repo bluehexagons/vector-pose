@@ -22,7 +22,7 @@
   --border-separator: #333;
 
   --overlay-hover: rgba(255, 255, 255, 0.05);
-  --overlay-active: rgba(255, 255, 255, 0.1);
+  --overlay-active: rgba(138, 153, 163, 0.4);
 
   /* Shadows and effects */
   --shadow-small: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -31,7 +31,7 @@
 
   --glow-accent: drop-shadow(0 0 4px var(--accent-primary));
   --glow-active: drop-shadow(0 0 4px var(--accent-active));
-  --glow-last-active: drop-shadow(0 0 2px var(--overlay-active));
+  --glow-last-active: drop-shadow(0 0 4px var(--overlay-active));
 
   /* Layout */
   --spacing-xs: 4px;
@@ -56,6 +56,7 @@
 
   /* Z-index layers */
   --z-base: 1;
+  --z-handle: 10;
   --z-dropdown: 1000;
   --z-modal: 2000;
   --z-tooltip: 3000;

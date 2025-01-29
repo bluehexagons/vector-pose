@@ -5,15 +5,18 @@
 }
 
 .sprite-node {
-  outline: 1px solid color-mix(in srgb, var(--border-dim) 50%, transparent);
+  outline: 1px dashed color-mix(in srgb, var(--border-dim) 50%, transparent);
 }
 
-.last-active.sprite-node .sprite-image {
-  filter: var(--glow-last-active);
+.last-active.sprite-node {
+  outline: 1px solid color-mix(in srgb, var(--accent-primary) 50%, transparent);
+  .sprite-image {
+    filter: var(--glow-last-active);
+  }
 }
 
 .active.sprite-node {
-  outline: 1px solid color-mix(in srgb, var(--accent-primary) 50%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--accent-primary) 70%, transparent);
 
   .sprite-image {
     filter: var(--glow-active);
@@ -45,19 +48,34 @@
   border-right: 2px dashed var(--accent-secondary);
 }
 
-.rotate-handle {
+.rotate-handle,
+.scale-handle {
   position: absolute;
   width: var(--spacing-md);
   height: var(--spacing-md);
+  pointer-events: all;
+  z-index: var(--z-handle);
+}
+
+.rotate-handle {
   border-radius: 50%;
-  background: color-mix(in srgb, var(--accent-secondary) 50%, transparent);
-  border: 2px solid var(--accent-secondary);
   top: 0;
   left: 50%;
   transform: translate(-50%, -50%);
-  pointer-events: all;
   cursor: grab;
-  z-index: 10;
+
+  background: color-mix(in srgb, var(--accent-secondary) 50%, transparent);
+  border: 2px solid var(--accent-secondary);
+}
+
+.scale-handle {
+  bottom: 0;
+  right: 0;
+  transform: translate(50%, 50%);
+  cursor: nwse-resize;
+
+  background: color-mix(in srgb, var(--accent-primary) 50%, transparent);
+  border: 2px solid var(--accent-primary);
 }
 
 .rotate-handle:active {
@@ -65,28 +83,8 @@
   background: color-mix(in srgb, var(--accent-secondary) 80%, transparent);
 }
 
-.scale-handle {
-  position: absolute;
-  width: var(--spacing-md);
-  height: var(--spacing-md);
-  background: color-mix(in srgb, var(--accent-primary) 50%, transparent);
-  border: 2px solid var(--accent-primary);
-  bottom: 0;
-  right: 0;
-  transform: translate(50%, 50%);
-  pointer-events: all;
-  cursor: nwse-resize;
-  z-index: 10;
-}
-
 .scale-handle:active {
   background: color-mix(in srgb, var(--accent-primary) 80%, transparent);
-}
-
-.sprite-image {
-  width: '100%';
-  height: '100%';
-  objectfit: 'contain';
 }
 
 .sprite-holder {

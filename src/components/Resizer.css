@@ -7,7 +7,7 @@
 }
 
 .resizer-handle {
-  width: 8px;
+  width: var(--spacing-sm);
 }
 
 .resizer-handle:after {
