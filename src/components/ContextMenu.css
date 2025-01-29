@@ -1,11 +1,13 @@
 .context-menu {
   position: fixed;
-  background: var(--bg-secondary);
+  background: var(--bg-glass);
   border: 1px solid var(--border-dim);
   border-radius: var(--border-radius-sm);
+  backdrop-filter: blur(4px);
   box-shadow: var(--shadow-medium);
   z-index: var(--z-menu);
   min-width: 120px;
+  padding: 2px;
 }
 
 .context-menu button {
@@ -13,7 +15,6 @@
   width: 100%;
   text-align: left;
   padding: var(--spacing-xs) var(--spacing-md);
-  border: none;
   background: none;
   cursor: pointer;
   color: var(--text-primary);

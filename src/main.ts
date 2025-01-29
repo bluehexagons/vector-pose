@@ -94,12 +94,14 @@ const init = async () => {
   const createWindow = async () => {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-      width: 1600,
-      height: 600,
+      width: 1200,
+      height: 800,
       webPreferences: {
         preload: path.join(__dirname, 'preload.js'),
         nodeIntegration: true,
       },
+      show: false,
+      autoHideMenuBar: true,
     });
 
     // and load the index.html of the app.
@@ -112,7 +114,8 @@ const init = async () => {
     }
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    mainWindow.show();
+    // mainWindow.webContents.openDevTools();
   };
 
   // This method will be called when Electron has finished

@@ -11,5 +11,5 @@
 
 .kebab-button:hover {
   background: var(--overlay-hover);
-  border-radius: var(--border-radius-xs);
+  border-radius: var(--border-radius-sm);
 }

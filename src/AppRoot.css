@@ -38,10 +38,6 @@ body {
   filter: drop-shadow(0 0 2px rgba(64, 128, 255, 0.8));
 }
 
-.focused {
-  filter: drop-shadow(0 0 4px rgba(0.1, 0.5, 1, 0.8));
-}
-
 .active {
   filter: drop-shadow(0 0 4px yellow);
 }
