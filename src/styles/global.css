@@ -4,6 +4,8 @@
   --bg-secondary: #2a2a2a;
   --bg-tertiary: #333333;
   --bg-glass: #2a2f3a60;
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(255, 255, 255, 0.1);
 
   --text-primary: #f6f6f6;
   --text-secondary: #b0b0b0;
@@ -12,9 +14,11 @@
   --accent-primary: #396cd8;
   --accent-secondary: #24c8db;
   --accent-warning: #f0a500;
+  --accent-hover: #535bf2;
 
   --border-dim: rgba(255, 255, 255, 0.1);
   --border-bright: rgba(255, 255, 255, 0.2);
+  --border-separator: #333;
 
   --overlay-hover: rgba(255, 255, 255, 0.05);
   --overlay-active: rgba(255, 255, 255, 0.1);
@@ -26,6 +30,8 @@
 
   --glow-accent: drop-shadow(0 0 4px var(--accent-primary));
   --glow-warning: drop-shadow(0 0 4px var(--accent-warning));
+  --glow-active: drop-shadow(0 0 4px yellow);
+  --glow-last-active: drop-shadow(0 0 2px rgba(64, 128, 255, 0.8));
 
   /* Layout */
   --spacing-xs: 4px;
@@ -35,22 +41,35 @@
 
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
+  --border-radius-lg: 12px;
 
   --header-height: 32px;
   --tabs-height: 32px;
   --footer-height: 24px;
 
+  /* Typography */
+  --font-family: Inter, system-ui, -apple-system, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+
   /* Z-index layers */
+  --z-base: 1;
   --z-dropdown: 1000;
   --z-modal: 2000;
   --z-tooltip: 3000;
+
+  /* Transitions */
+  --transition-fast: 0.1s ease-out;
+  --transition-normal: 0.2s ease-out;
 }
 
 /* Base styles */
 body {
   margin: 0;
   padding: 0;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-family);
   background-color: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
@@ -75,7 +94,7 @@ button {
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--border-radius-sm);
   cursor: pointer;
-  transition: all 0.1s ease-out;
+  transition: var(--transition-fast);
 }
 
 button:hover {

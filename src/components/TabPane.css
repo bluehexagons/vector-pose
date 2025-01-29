@@ -8,6 +8,7 @@
   height: var(--header-height);
   overflow: hidden;
   position: relative;
+  user-select: none;
 }
 
 .tab-pane::after {

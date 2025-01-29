@@ -28,7 +28,9 @@ export const TabPane: React.FC<TabPaneProps> = ({
           >
             <span className="tab-name">
               {tab.name}
-              {tab.isModified && '*'}
+              {tab?.isModified && (
+                <span title="This tab has been modified.">*</span>
+              )}
             </span>
             <button
               className="tab-close"

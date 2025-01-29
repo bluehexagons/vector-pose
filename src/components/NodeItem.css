@@ -7,7 +7,7 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-dim);
   border-radius: var(--border-radius-sm);
-  transition: all 0.1s ease-out;
+  transition: var(--transition-fast);
 }
 
 .node-item:hover {
@@ -21,6 +21,7 @@
 
 .node-item.last-active {
   border-color: var(--text-muted);
+  filter: var(--glow-last-active);
 }
 
 .node-item.hidden {

@@ -28,7 +28,20 @@ export const HeaderPane = ({
               onChange={e => onNameChange(e.target.value)}
             />
           )}
-          {activeTab?.isModified && '*'}
+          {activeTab?.isModified && (
+            <span
+              style={{
+                paddingLeft: '4px',
+                display: 'inline-block',
+                width: '42px',
+                textAlign: 'left',
+                cursor: 'default',
+              }}
+              title="This tab has been modified."
+            >
+              *
+            </span>
+          )}
         </h1>
       </div>
       <ul className="header-menu">
