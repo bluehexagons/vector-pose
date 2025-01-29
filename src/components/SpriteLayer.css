@@ -66,7 +66,7 @@
   border-color: var(--accent-secondary);
   top: 0;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -30%);
   cursor: grab;
 }
 
@@ -76,16 +76,26 @@
 }
 
 .scale-handle {
-  background: color-mix(in srgb, var(--accent-primary) 50%, transparent);
-  border-color: var(--accent-primary);
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 var(--handle-size) var(--handle-size);
+  border-color: transparent transparent var(--accent-primary) transparent;
+  background: none;
   bottom: 0;
   right: 0;
-  transform: translate(50%, 50%);
+  transform: translate(-66%, -66%);
   cursor: nwse-resize;
+  z-index: var(--z-handle);
+  transition: opacity var(--transition-fast);
+  opacity: 0.5;
+  border-radius: 0;
 }
 
+.scale-handle:hover,
 .scale-handle:active {
-  background: color-mix(in srgb, var(--accent-primary) 80%, transparent);
+  opacity: 0.8;
 }
 
 .sprite-holder {
