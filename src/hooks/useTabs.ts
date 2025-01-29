@@ -72,6 +72,16 @@ export function useTabs() {
                 : tab
             );
           }
+
+          // Check for an open empty tab to use
+          const emptyTab = current.find(
+            tab => !tab.filePath && !tab.isModified
+          );
+          if (emptyTab) {
+            return current.map(tab =>
+              tab === emptyTab ? createEmptyTab(base, fabData) : tab
+            );
+          }
         }
 
         // Create new tab as last resort
