@@ -214,6 +214,10 @@ export const AppRoot = () => {
     const newNode = newSkele.findId(activeNode.node.id);
 
     if (newNode) {
+      if (newNode === newSkele.root) {
+        return;
+      }
+
       tickSkele(newSkele);
       let targetNode = newNode.getMovableNode();
 
