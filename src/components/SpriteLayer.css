@@ -1,7 +1,8 @@
 .transform-controls {
   position: absolute;
-  inset: -20px;
+  inset: calc(-1 * var(--handle-size));
   pointer-events: none;
+  z-index: var(--z-controls);
 }
 
 .sprite-node {
@@ -51,36 +52,36 @@
 .rotate-handle,
 .scale-handle {
   position: absolute;
-  width: var(--spacing-md);
-  height: var(--spacing-md);
+  width: var(--handle-size);
+  height: var(--handle-size);
+  border-radius: 50%;
+  border: var(--control-border) solid;
   pointer-events: all;
   z-index: var(--z-handle);
+  transition: background-color var(--transition-fast);
 }
 
 .rotate-handle {
-  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent-secondary) 50%, transparent);
+  border-color: var(--accent-secondary);
   top: 0;
   left: 50%;
   transform: translate(-50%, -50%);
   cursor: grab;
-
-  background: color-mix(in srgb, var(--accent-secondary) 50%, transparent);
-  border: 2px solid var(--accent-secondary);
-}
-
-.scale-handle {
-  bottom: 0;
-  right: 0;
-  transform: translate(50%, 50%);
-  cursor: nwse-resize;
-
-  background: color-mix(in srgb, var(--accent-primary) 50%, transparent);
-  border: 2px solid var(--accent-primary);
 }
 
 .rotate-handle:active {
   cursor: grabbing;
   background: color-mix(in srgb, var(--accent-secondary) 80%, transparent);
+}
+
+.scale-handle {
+  background: color-mix(in srgb, var(--accent-primary) 50%, transparent);
+  border-color: var(--accent-primary);
+  bottom: 0;
+  right: 0;
+  transform: translate(50%, 50%);
+  cursor: nwse-resize;
 }
 
 .scale-handle:active {
@@ -102,4 +103,8 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.sprite-image {
+  z-index: var(--z-sprite);
 }

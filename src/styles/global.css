@@ -56,10 +56,17 @@
 
   /* Z-index layers */
   --z-base: 1;
+  --z-sprite: 5;
   --z-handle: 10;
+  --z-controls: 15;
   --z-dropdown: 1000;
+  --z-menu: 1500;
   --z-modal: 2000;
   --z-tooltip: 3000;
+
+  /* Component sizes */
+  --handle-size: 20px;
+  --control-border: 2px;
 
   /* Transitions */
   --transition-fast: 0.1s ease-out;

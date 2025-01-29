@@ -1,10 +1,20 @@
 .angle-input {
   flex: 1;
   min-width: 0;
-  padding: 4px;
+  padding: var(--spacing-xs);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-dim);
+  color: var(--text-primary);
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition-fast);
+}
+
+.angle-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-small);
 }
 
 .angle-input.invalid {
-  color: #999;
+  color: var(--text-muted);
   font-style: italic;
 }
