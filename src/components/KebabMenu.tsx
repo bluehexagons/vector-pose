@@ -19,7 +19,11 @@ export const KebabMenu: React.FC<KebabMenuProps> = ({actions}) => {
       setMenuPosition(null);
     } else {
       const rect = e.currentTarget.getBoundingClientRect();
-      setMenuPosition({x: rect.right, y: rect.top});
+      // Position menu to the left of the kebab button
+      setMenuPosition({
+        x: rect.left - 8, // Small offset from button
+        y: rect.top,
+      });
     }
   };
 

@@ -25,6 +25,8 @@ import {FileEntry, UiNode} from './shared/types';
 import {toDegrees, toRadians} from './utils/Equa';
 import type {ImagePropsRef} from './utils/Renderer';
 import {SkeleNode} from './utils/SkeleNode';
+import {getNodeActions} from './utils/nodeActions';
+import {MenuAction} from './components/ContextMenu';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 0;
@@ -471,6 +473,18 @@ export const AppRoot = () => {
     window.addEventListener('mouseup', handleTransformEnd);
   };
 
+  const handleEditorContextMenu = (
+    node: SkeleNode | null,
+    e: React.MouseEvent,
+    viewport: Viewport
+  ): MenuAction[] => {
+    if (!node) return [];
+    return getNodeActions({
+      node,
+      updateNode: updateSkele,
+    });
+  };
+
   return (
     <div
       className="container"
@@ -520,6 +534,7 @@ export const AppRoot = () => {
             renderedNodes={activeTab?.renderedNodes ?? []}
             activeNode={activeNode}
             lastActiveNode={lastActiveNode}
+            focusNode={focusNode}
             gameDirectory={gameDirectory}
             onMouseDown={handleEditorMouseDown}
             onMouseMove={handleEditorMouseMove}
@@ -527,6 +542,7 @@ export const AppRoot = () => {
             spriteHolderRef={spriteHolderRef}
             rotation={activeTab.rotation}
             onTransformStart={handleTransformStart}
+            onContextMenu={handleEditorContextMenu}
           />
         </div>
 

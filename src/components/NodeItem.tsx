@@ -7,6 +7,7 @@ import {MenuAction} from './ContextMenu';
 import {KebabMenu} from './KebabMenu';
 import {NumberInput} from './NumberInput';
 import './NodeItem.css';
+import {getNodeActions} from '../utils/nodeActions';
 
 interface NodeItemProps {
   node: SkeleNode;
@@ -196,44 +197,14 @@ export const NodeItem: React.FC<NodeItemProps> = ({
     }
   };
 
-  const getMenuActions = (): MenuAction[] => [
-    ...(node.children.length > 0
-      ? [
-          {
-            label: isCollapsed ? 'Expand' : 'Collapse',
-            onClick: () => setIsCollapsed(!isCollapsed),
-          },
-        ]
-      : []),
-    {
-      label: isShrunken ? 'Show Details' : 'Hide Details',
-      onClick: () => setIsShrunken(!isShrunken),
-    },
-    {
-      label: node.hidden ? 'Show' : 'Hide',
-      onClick: handleToggleHidden,
-    },
-    {
-      label: 'Create Parent',
-      onClick: handleCreateParent,
-    },
-    {
-      label: 'Move to Top',
-      onClick: handleMoveToTop,
-    },
-    {
-      label: 'Move to Bottom',
-      onClick: handleMoveToBottom,
-    },
-    {
-      label: 'Delete',
-      onClick: handleDelete,
-    },
-  ];
-
   const renderActions = () => (
     <div className="node-actions">
-      <KebabMenu actions={getMenuActions()} />
+      <KebabMenu
+        actions={getNodeActions({
+          node,
+          updateNode: onNodeUpdate,
+        })}
+      />
     </div>
   );
 

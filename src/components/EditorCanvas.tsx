@@ -18,6 +18,7 @@ interface EditorCanvasProps {
   onCanvasMouseDown?: (e: React.MouseEvent, viewport: Viewport) => void;
   onCanvasMouseMove?: (e: React.MouseEvent, viewport: Viewport) => void;
   onCanvasMouseUp?: (e: React.MouseEvent, viewport: Viewport) => void;
+  onContextMenu?: (e: React.MouseEvent, viewport: Viewport) => void;
   rotation: number;
 }
 
@@ -27,6 +28,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   onCanvasMouseDown,
   onCanvasMouseMove,
   onCanvasMouseUp,
+  onContextMenu,
   rotation = 0,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -186,6 +188,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onContextMenu={e => onContextMenu?.(e, viewport)}
       style={{
         cursor: isDragging ? 'grabbing' : 'default',
       }}

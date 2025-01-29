@@ -32,16 +32,38 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [onClose]);
 
+  useEffect(() => {
+    // Position menu to avoid screen edges
+    if (menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect();
+      const viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+
+      // Default offset from cursor
+      const offset = {x: 0, y: 0};
+
+      // Handle horizontal positioning
+      if (position.x + rect.width > viewport.width) {
+        // If menu would go off right edge, position to left of cursor/button
+        offset.x = -rect.width;
+      }
+
+      // Handle vertical positioning
+      if (position.y + rect.height > viewport.height) {
+        // If menu would go off bottom edge, position above cursor/button
+        offset.y = -rect.height;
+      }
+
+      menuRef.current.style.transform = 'none';
+      menuRef.current.style.left = `${position.x + offset.x}px`;
+      menuRef.current.style.top = `${position.y + offset.y}px`;
+    }
+  }, [position]);
+
   return createPortal(
-    <div
-      className="context-menu"
-      ref={menuRef}
-      style={{
-        position: 'fixed',
-        right: 10,
-        top: position.y + 20,
-      }}
-    >
+    <div className="context-menu" ref={menuRef}>
       {actions.map((action, index) => (
         <button
           key={index}
