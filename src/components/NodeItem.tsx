@@ -137,72 +137,16 @@ export const NodeItem: React.FC<NodeItemProps> = ({
     }
   };
 
-  const handleDelete = () => {
-    const clone = skele.clone();
-    const nodeToDelete = clone.findIdFromRoot(node.id);
-    if (nodeToDelete) {
-      nodeToDelete.remove();
-      onNodeUpdate(clone);
-    }
-  };
-
-  const handleToggleHidden = () => {
-    const clone = skele.clone();
-    const targetNode = clone.findIdFromRoot(node.id);
-    if (targetNode) {
-      targetNode.hidden = !targetNode.hidden;
-      onNodeUpdate(clone);
-    }
-  };
-
-  const handleCreateParent = () => {
-    const clone = skele.clone();
-    const targetNode = clone.findIdFromRoot(node.id);
-    if (targetNode) {
-      const parent = targetNode.parent;
-      if (parent) {
-        const newParent = new SkeleNode();
-        newParent.add(targetNode);
-        parent.add(newParent);
-        onNodeUpdate(clone);
-      }
-    }
-  };
-
-  const handleMoveToTop = () => {
-    const clone = skele.clone();
-    const targetNode = clone.findIdFromRoot(node.id);
-    if (targetNode?.parent) {
-      const parent = targetNode.parent;
-      const idx = parent.children.indexOf(targetNode);
-      if (idx > 0) {
-        parent.children.splice(idx, 1);
-        parent.children.unshift(targetNode);
-        onNodeUpdate(clone);
-      }
-    }
-  };
-
-  const handleMoveToBottom = () => {
-    const clone = skele.clone();
-    const targetNode = clone.findIdFromRoot(node.id);
-    if (targetNode?.parent) {
-      const parent = targetNode.parent;
-      const idx = parent.children.indexOf(targetNode);
-      if (idx < parent.children.length - 1) {
-        parent.children.splice(idx, 1);
-        parent.children.push(targetNode);
-        onNodeUpdate(clone);
-      }
-    }
-  };
-
   const renderActions = () => (
     <div className="node-actions">
       <KebabMenu
         actions={getNodeActions({
           node,
           updateNode: onNodeUpdate,
+          isCollapsed,
+          isShrunken,
+          onToggleCollapse: () => setIsCollapsed(!isCollapsed),
+          onToggleShrunken: () => setIsShrunken(!isShrunken),
         })}
       />
     </div>

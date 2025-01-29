@@ -11,10 +11,14 @@
 }
 
 .context-menu button {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  justify-content: space-between;
   width: 100%;
   text-align: left;
   padding: var(--spacing-xs) var(--spacing-md);
+  padding-right: var(--spacing-sm);
   background: none;
   cursor: pointer;
   color: var(--text-primary);
@@ -28,4 +32,17 @@
 .context-menu button:disabled {
   color: var(--text-muted);
   cursor: default;
+}
+
+.menu-icon {
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+  width: 16px;
+  height: 16px;
+}
+
+.menu-icon svg {
+  width: 14px;
+  height: 14px;
 }

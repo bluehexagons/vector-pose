@@ -4,6 +4,7 @@ import './ContextMenu.css';
 
 export interface MenuAction {
   label: string;
+  icon?: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
 }
@@ -74,6 +75,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
           disabled={action.disabled}
         >
           {action.label}
+          {action.icon && <span className="menu-icon">{action.icon}</span>}
         </button>
       ))}
     </div>,
