@@ -293,6 +293,20 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                 />
               </div>
               <div className="input-group">
+                <label>Sort:</label>
+                <input
+                  type="number"
+                  className="number-input"
+                  value={node.sort?.toString() ?? ''}
+                  draggable={false}
+                  onChange={evt => {
+                    const val = parseFloat(evt.target.value) ?? undefined;
+                    node.sort = val;
+                    onNodeUpdate(skele.clone());
+                  }}
+                />
+              </div>
+              <div className="input-group">
                 <label>Angle:</label>
                 <AngleInput
                   value={toDegrees(node.rotation)}
@@ -309,8 +323,9 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                 <input
                   type="number"
                   className="number-input"
-                  value={node.mag}
+                  value={node.mag?.toString() ?? ''}
                   draggable={false}
+                  step={0.1}
                   onChange={evt => {
                     node.mag = parseFloat(evt.target.value) || 0;
                     node.updateTransform();
