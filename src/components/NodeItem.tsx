@@ -5,6 +5,7 @@ import {SkeleNode} from '../utils/SkeleNode';
 import {AngleInput} from './AngleInput';
 import {MenuAction} from './ContextMenu';
 import {KebabMenu} from './KebabMenu';
+import {NumberInput} from './NumberInput';
 import './NodeItem.css';
 
 interface NodeItemProps {
@@ -294,13 +295,10 @@ export const NodeItem: React.FC<NodeItemProps> = ({
               </div>
               <div className="input-group">
                 <label>Sort:</label>
-                <input
-                  type="number"
-                  className="number-input"
-                  value={node.sort?.toString() ?? ''}
-                  draggable={false}
-                  onChange={evt => {
-                    const val = parseFloat(evt.target.value) ?? undefined;
+                <NumberInput
+                  value={node.sort}
+                  allowUndefined
+                  onChange={val => {
                     node.sort = val;
                     onNodeUpdate(skele.clone());
                   }}
@@ -320,14 +318,11 @@ export const NodeItem: React.FC<NodeItemProps> = ({
               </div>
               <div className="input-group">
                 <label>Magnitude:</label>
-                <input
-                  type="number"
-                  className="number-input"
-                  value={node.mag?.toString() ?? ''}
-                  draggable={false}
+                <NumberInput
+                  value={node.mag}
                   step={0.1}
-                  onChange={evt => {
-                    node.mag = parseFloat(evt.target.value) || 0;
+                  onChange={val => {
+                    node.mag = val ?? 0;
                     node.updateTransform();
                     onNodeUpdate(skele.clone());
                   }}
