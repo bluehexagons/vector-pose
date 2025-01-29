@@ -20,13 +20,29 @@
   }
 }
 
+.active.vector-node {
+  .sprite-image {
+    filter: var(--glow-active);
+  }
+}
+
 .vector-node::after {
   content: '';
   position: absolute;
   left: 50%;
   top: -50%;
   bottom: 50%;
-  border-right: 1px dashed var(--accent-secondary);
+  transform: translateX(-50%);
+  border-right: 1px dashed var(--accent-primary);
+}
+
+.vector-node.last-active::after {
+  border-right: 2px dashed
+    color-mix(in srgb, var(--accent-secondary) 50%, transparent);
+}
+
+.vector-node.active::after {
+  border-right: 2px dashed var(--accent-secondary);
 }
 
 .rotate-handle {

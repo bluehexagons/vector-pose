@@ -41,6 +41,9 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
 
       <div className="open-file">
         <button onClick={onFileSelect}>Open File</button>
+        <div>
+          <small>Note: imported images do not work yet.</small>
+        </div>
       </div>
 
       <div className="game-directory">

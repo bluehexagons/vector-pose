@@ -41,7 +41,7 @@ export const SpriteLayer: React.FC<SpriteLayerProps> = ({
             key={node.node.id}
             className={`${node.uri ? 'sprite-node' : 'vector-node'} ${
               node.node.id === lastActiveNode?.node.id ? 'last-active' : ''
-            } ${isActive ? 'active' : ''}`}
+            } ${node.node.id === activeNode?.node.id ? 'active' : ''}`}
             style={{
               position: 'absolute',
               left: `${node.center[0] * viewport.scale}px`,

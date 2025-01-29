@@ -2,6 +2,7 @@
   grid-column: middle-start / middle-end;
   grid-row: content-start / content-end;
   height: 100%;
+  background: var(--bg-tertiary);
 }
 
 .editor-window {
@@ -14,7 +15,6 @@
 .node-graph {
   position: absolute;
   pointer-events: none;
-  opacity: 0.25;
 }
 
 .node-graph > * {
@@ -55,4 +55,14 @@
   color: var(--text-primary);
   pointer-events: none;
   white-space: nowrap;
+  opacity: 0.4;
+  position: 'absolute';
+}
+
+.node-label.active {
+  opacity: 1;
+}
+
+.node-label.last-active {
+  opacity: 0.9;
 }

@@ -57,7 +57,7 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
   return (
     <div className="layers-pane">
       <div className="nodes-container">
-        <div className="pane-header">
+        <div className="pane-header title">
           <h2>Nodes</h2>
           <button className="add-node" onClick={onAddNode} title="Add Node">
             +

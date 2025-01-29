@@ -28,7 +28,6 @@ export const NodeGraphLayer: React.FC<NodeGraphLayerProps> = ({
               : ''
           }`}
           style={{
-            position: 'absolute',
             left: `${
               (node.uri ? node.parent : node).state.mid.transform[0] *
               viewport.scale
@@ -37,7 +36,7 @@ export const NodeGraphLayer: React.FC<NodeGraphLayerProps> = ({
               (node.uri ? node.parent : node).state.mid.transform[1] *
               viewport.scale
             }px`,
-            marginTop: node.uri ? '2em' : '0',
+            marginTop: node.uri ? '28px' : '0',
             transform: 'translate(-50%, -50%)',
           }}
         >
