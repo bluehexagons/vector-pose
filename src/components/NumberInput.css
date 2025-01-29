@@ -1,11 +1,11 @@
 .number-input {
   width: 100%;
-  padding: 2px 4px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
+  padding: var(--spacing-xs) var(--spacing-xs);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--border-radius-sm);
 }
 
 .number-input:focus {
   outline: none;
-  border-color: #666;
+  border-color: var(--border-bright);
 }

@@ -1,48 +1,34 @@
-.file-list-item {
-  padding: 4px 8px;
+.file-list-item,
+.tree-item {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  gap: var(--spacing-sm);
+  transition: var(--transition-fast);
   cursor: pointer;
-  border-radius: 4px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: background-color 0.1s ease;
 }
 
-.file-list-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+.file-list-item:hover,
+.tree-item:hover {
+  background: var(--bg-hover);
 }
 
-.file-list-item.selected {
-  background: rgba(57, 108, 216, 0.2);
+.file-list-item.selected,
+.tree-item.selected {
+  background: color-mix(in srgb, var(--accent-primary) 20%, transparent);
 }
 
 .file-tree-list {
   user-select: none;
 }
 
-.tree-item {
-  padding: 4px 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: background-color 0.1s ease;
-}
-
-.tree-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.tree-item.selected {
-  background: rgba(57, 108, 216, 0.2);
-}
-
-.file-type-fab::before {
+.file-type-fab::before,
+.file-type-image::before {
+  font-size: var(--font-size-sm);
   content: '📄';
-  font-size: 14px;
 }
 
 .file-type-image::before {
   content: '🖼️';
-  font-size: 14px;
 }

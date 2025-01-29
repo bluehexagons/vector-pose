@@ -28,7 +28,7 @@ export const FileTreeView: React.FC<FileTreeViewProps> = ({
   return (
     <div className="file-tree-list">
       {sortedNodes.map(node => (
-        <div key={node.path}>
+        <div key={node.path} title={node.path}>
           {node.type === 'directory' ? (
             <>
               <div

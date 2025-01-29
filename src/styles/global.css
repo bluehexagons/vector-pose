@@ -15,6 +15,7 @@
   --accent-secondary: #24c8db;
   --accent-warning: #f0a500;
   --accent-hover: #535bf2;
+  --accent-active: rgb(136, 159, 207);
 
   --border-dim: rgba(255, 255, 255, 0.1);
   --border-bright: rgba(255, 255, 255, 0.2);
@@ -29,9 +30,8 @@
   --shadow-large: 0 4px 16px rgba(0, 0, 0, 0.4);
 
   --glow-accent: drop-shadow(0 0 4px var(--accent-primary));
-  --glow-warning: drop-shadow(0 0 4px var(--accent-warning));
-  --glow-active: drop-shadow(0 0 4px yellow);
-  --glow-last-active: drop-shadow(0 0 2px rgba(64, 128, 255, 0.8));
+  --glow-active: drop-shadow(0 0 4px var(--accent-active));
+  --glow-last-active: drop-shadow(0 0 2px var(--overlay-active));
 
   /* Layout */
   --spacing-xs: 4px;

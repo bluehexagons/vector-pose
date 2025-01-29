@@ -4,13 +4,38 @@
   pointer-events: none;
 }
 
+.sprite-node {
+  outline: 1px solid color-mix(in srgb, var(--border-dim) 50%, transparent);
+}
+
+.last-active.sprite-node .sprite-image {
+  filter: var(--glow-last-active);
+}
+
+.active.sprite-node {
+  outline: 1px solid color-mix(in srgb, var(--accent-primary) 50%, transparent);
+
+  .sprite-image {
+    filter: var(--glow-active);
+  }
+}
+
+.vector-node::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -50%;
+  bottom: 50%;
+  border-right: 1px dashed var(--accent-secondary);
+}
+
 .rotate-handle {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: var(--spacing-md);
+  height: var(--spacing-md);
   border-radius: 50%;
-  background: rgba(100, 200, 255, 0.5);
-  border: 2px solid rgb(100, 200, 255);
+  background: color-mix(in srgb, var(--accent-secondary) 50%, transparent);
+  border: 2px solid var(--accent-secondary);
   top: 0;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -21,15 +46,15 @@
 
 .rotate-handle:active {
   cursor: grabbing;
-  background: rgba(100, 200, 255, 0.8);
+  background: color-mix(in srgb, var(--accent-secondary) 80%, transparent);
 }
 
 .scale-handle {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  background: rgba(100, 255, 100, 0.5);
-  border: 2px solid rgb(100, 255, 100);
+  width: var(--spacing-md);
+  height: var(--spacing-md);
+  background: color-mix(in srgb, var(--accent-primary) 50%, transparent);
+  border: 2px solid var(--accent-primary);
   bottom: 0;
   right: 0;
   transform: translate(50%, 50%);
@@ -39,11 +64,28 @@
 }
 
 .scale-handle:active {
-  background: rgba(100, 255, 100, 0.8);
+  background: color-mix(in srgb, var(--accent-primary) 80%, transparent);
 }
 
 .sprite-image {
   width: '100%';
   height: '100%';
   objectfit: 'contain';
+}
+
+.sprite-holder {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+}
+
+.sprite-holder > * {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.sprite-holder img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }

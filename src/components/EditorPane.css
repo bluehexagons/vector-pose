@@ -11,23 +11,6 @@
   overflow: auto;
 }
 
-.sprite-holder {
-  position: absolute;
-  pointer-events: none;
-  user-select: none;
-}
-
-.sprite-holder > * {
-  position: absolute;
-  transform: translate(-50%, -50%);
-}
-
-.sprite-holder img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
 .node-graph {
   position: absolute;
   pointer-events: none;
@@ -37,10 +20,10 @@
 .node-graph > * {
   position: absolute;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.5);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
+  background: var(--bg-glass);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
 }
 
 .editor-content {
@@ -56,36 +39,20 @@
 
   background-image: linear-gradient(
       to right,
-      rgba(255, 255, 255, 0.05) 1px,
+      var(--border-dim) 1px,
       transparent 1px
     ),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(to bottom, var(--border-dim) 1px, transparent 1px);
   /* Grid size of 0.1 units * BASE_SCALE */
   background-size: 20px 20px;
 }
 
 .node-label {
-  background: rgba(0, 0, 0, 0.5);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  color: white;
+  background: var(--bg-glass);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
   pointer-events: none;
   white-space: nowrap;
-}
-
-.sprite-node {
-  outline: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.vector-node {
-}
-
-.vector-node::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: -50%;
-  bottom: 50%;
-  border-right: 1px dashed rgba(0, 255, 255, 0.5);
 }

@@ -7,7 +7,7 @@
   box-shadow: var(--shadow-medium);
   z-index: var(--z-menu);
   min-width: 120px;
-  padding: 2px;
+  padding: var(--spacing-xs);
 }
 
 .context-menu button {
@@ -22,7 +22,7 @@
 }
 
 .context-menu button:hover:not(:disabled) {
-  background: var(--overlay-hover);
+  background: var(--bg-hover);
 }
 
 .context-menu button:disabled {

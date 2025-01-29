@@ -1,13 +1,13 @@
 @import './styles/global.css';
 
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
   font-weight: 400;
 
-  color: #f6f6f6;
-  background-color: #0f0f0f;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -32,14 +32,6 @@ body {
 
 .editor-window {
   background: transparent;
-}
-
-.last-active {
-  filter: drop-shadow(0 0 2px rgba(64, 128, 255, 0.8));
-}
-
-.active {
-  filter: drop-shadow(0 0 4px yellow);
 }
 
 .container {
@@ -248,36 +240,36 @@ h4 {
 .action-button {
   background: none;
   border: none;
-  color: #f6f6f6;
-  padding: 2px 8px;
+  color: var(--text-primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
   cursor: pointer;
 }
 
 .action-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--bg-hover);
 }
 
 .action-dropdown {
   position: absolute;
   right: 0;
   top: 100%;
-  background-color: #2f2f2f;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  z-index: 1000;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--border-radius-sm);
+  z-index: var(--z-dropdown);
   min-width: 120px;
 }
 
 .action-dropdown button {
   width: 100%;
   text-align: left;
-  padding: 8px 12px;
+  padding: var(--spacing-sm) var(--spacing-md);
   background: none;
   border: none;
-  color: #f6f6f6;
+  color: var(--text-primary);
   cursor: pointer;
 }
 
 .action-dropdown button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--bg-hover);
 }

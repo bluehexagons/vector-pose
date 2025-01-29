@@ -16,7 +16,7 @@
   display: block;
   width: 100%;
   height: 1px;
-  background: #333;
+  background: var(--border-separator);
   position: absolute;
   bottom: 0px;
 }
@@ -30,7 +30,6 @@
   gap: 10px;
   overflow-x: auto;
   height: 100%;
-  border-bottom: 2px solid #222;
 }
 
 .tab {
@@ -39,15 +38,16 @@
   gap: 8px;
   padding: 0 12px;
   height: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-dim);
+  border-bottom: 2px solid transparent;
   border-radius: var(--border-radius);
   cursor: pointer;
 }
 
 .tab.active {
-  background: rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid yellow;
+  background: var(--bg-active);
+  border-bottom: 2px solid var(--accent-primary);
 }
 
 .tab-name {
@@ -59,7 +59,7 @@
   font-size: 16px;
   background: none;
   border: none;
-  color: #f6f6f6;
+  color: var(--text-primary);
   opacity: 0.5;
 }
 
@@ -72,10 +72,10 @@
   height: 80%;
   background: none;
   border: none;
-  color: #f6f6f6;
+  color: var(--text-primary);
   cursor: pointer;
 }
 
 .new-tab:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
 }

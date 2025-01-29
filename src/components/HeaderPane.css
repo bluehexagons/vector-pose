@@ -5,9 +5,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 var(--spacing-md);
   height: 100%;
-  background: var(--bg-color);
   overflow: hidden;
 }
 
@@ -16,7 +15,7 @@
 }
 
 .header-title {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   margin: 0;
   font-weight: normal;
   opacity: 0.8;
@@ -24,15 +23,15 @@
 
 .header-menu {
   display: flex;
-  gap: 8px;
+  gap: var(--spacing-sm);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .header-menu button {
-  font-size: 12px;
-  padding: 4px 8px;
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
   height: 24px;
   line-height: 1;
 }
@@ -49,18 +48,18 @@
 }
 
 .tab-name-input {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   background: none;
   border: 1px solid transparent;
-  color: var(--text-color);
-  padding: 2px 4px;
+  color: var(--text-primary);
+  padding: var(--spacing-xs) var(--spacing-xs);
   width: 200px;
 }
 
 .tab-name-input:hover,
 .tab-name-input:focus {
-  border-color: var(--border-color);
-  background: rgba(0, 0, 0, 0.2);
+  border-color: var(--border-dim);
+  background: var(--bg-hover);
 }
 
 .modified-indicator {
@@ -85,8 +84,8 @@
   text-align: right;
   background: none;
   border: 1px solid transparent;
-  color: var(--text-color);
-  font-size: 12px;
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
 
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button {
@@ -96,8 +95,8 @@
 
 .rotation-input:hover,
 .rotation-input:focus {
-  border-color: var(--border-color);
-  background: rgba(0, 0, 0, 0.2);
+  border-color: var(--border-dim);
+  background: var(--bg-hover);
 }
 
 .view-controls span {

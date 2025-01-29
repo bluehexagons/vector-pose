@@ -4,14 +4,14 @@
   grid-row-start: content-start;
   grid-row-end: content-end;
   overflow-y: auto;
-  padding: 2px;
+  padding: var(--spacing-xs);
 }
 
 .pane-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
+  padding: var(--spacing-sm);
 
   h2 {
     margin: 2px;
@@ -19,20 +19,21 @@
 }
 
 .node-item {
-  border-bottom: 1px solid #888;
-  border-radius: 4px;
-  background: hsl(180, 0.9%, 15%);
-  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-bright);
+  border-radius: var(--border-radius-sm);
+  background: var(--bg-secondary);
+  padding-bottom: var(--spacing-md);
 }
 
 .node-header {
-  background: hsl(180, 0.9%, 21.8%);
-  padding: 16px 8px 8px 8px;
-  border-bottom: 1px solid #777;
+  background: var(--bg-tertiary);
+  padding: var(--spacing-md) var(--spacing-sm) var(--spacing-sm)
+    var(--spacing-sm);
+  border-bottom: 1px solid var(--border-bright);
 }
 
 .node-content {
-  padding: 8px;
+  padding: var(--spacing-sm);
   padding-bottom: 0;
 }
 
@@ -40,12 +41,12 @@
   display: flex;
   align-items: center;
   margin: 4px 0;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .input-group label {
   min-width: 80px;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .number-input,
@@ -56,8 +57,8 @@
 }
 
 .add-node {
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
 }
 
 .node-wrapper {
@@ -71,8 +72,8 @@
   right: 0;
   top: -2px;
   height: 4px;
-  background: #0066cc;
-  border-radius: 2px;
+  background: var(--accent-primary);
+  border-radius: var(--border-radius-sm);
 }
 
 .node-wrapper.drag-over-below::after {
@@ -82,13 +83,13 @@
   right: 0;
   bottom: -2px;
   height: 4px;
-  background: #0066cc;
-  border-radius: 2px;
+  background: var(--accent-primary);
+  border-radius: var(--border-radius-sm);
 }
 
 .node-content.drag-over-content {
-  background: hsla(180, 0.9%, 18%, 0.5);
-  outline: 2px dashed #0066cc;
+  background: var(--bg-hover);
+  outline: 2px dashed var(--accent-primary);
 }
 
 .node-content.drag-over {

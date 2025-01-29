@@ -11,20 +11,20 @@
 }
 
 .resizer-handle:after {
-  background: rgba(255, 255, 255, 0.1);
-  transition: background-color 0.1s ease-out;
+  background: var(--border-dim);
+  transition: var(--transition-fast);
   content: '';
   display: block;
   height: 100%;
   width: 2px;
-  border-radius: 50%;
-  margin: 4px auto;
+  border-radius: 2px;
+  margin: var(--spacing-xs) auto;
 }
 
 .resizer:hover .resizer-handle:after {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--border-bright);
 }
 
 .resizer:active .resizer-handle:after {
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--text-muted);
 }
