@@ -1,13 +1,12 @@
 import React, {useState} from 'react';
 import {UiNode} from '../shared/types';
 import {toDegrees, toRadians} from '../utils/Equa';
+import {getNodeActions} from '../utils/nodeActions';
 import {SkeleNode} from '../utils/SkeleNode';
 import {AngleInput} from './AngleInput';
-import {MenuAction} from './ContextMenu';
 import {KebabMenu} from './KebabMenu';
-import {NumberInput} from './NumberInput';
 import './NodeItem.css';
-import {getNodeActions} from '../utils/nodeActions';
+import {NumberInput} from './NumberInput';
 
 interface NodeItemProps {
   node: SkeleNode;
@@ -16,7 +15,11 @@ interface NodeItemProps {
   focusNode: (node: UiNode) => void;
   index: number;
   depth?: number;
-  onNodeUpdate: (skele: SkeleNode) => void;
+  onNodeUpdate: (
+    skele: SkeleNode,
+    description?: string,
+    continuityKey?: string
+  ) => void;
   skele: SkeleNode;
 }
 
@@ -131,7 +134,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
         }
       }
 
-      onNodeUpdate(clone);
+      onNodeUpdate(clone, `Dragged node ${sourceNode.id} to ${clone.id}`);
     } catch (err) {
       console.warn('Drop operation failed:', err);
     }
@@ -203,8 +206,13 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   value={node.id || ''}
                   draggable={false}
                   onChange={evt => {
+                    const oldId = node.id;
                     node.id = evt.target.value || null;
-                    onNodeUpdate(skele.clone());
+                    onNodeUpdate(
+                      skele.clone(),
+                      `Updated node ${node.id} ID (was ${oldId})`,
+                      `update_id_${node.id}`
+                    );
                   }}
                 />
               </div>
@@ -214,8 +222,13 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   value={node.sort}
                   allowUndefined
                   onChange={val => {
+                    const oldSort = node.sort;
                     node.sort = val;
-                    onNodeUpdate(skele.clone());
+                    onNodeUpdate(
+                      skele.clone(),
+                      `Updated node ${node.id} sort to ${node.sort} (was ${oldSort})`,
+                      `update_sort_${node.id}`
+                    );
                   }}
                 />
               </div>
@@ -225,9 +238,16 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   value={toDegrees(node.rotation)}
                   draggable={false}
                   onChange={v => {
+                    const oldRotation = node.rotation;
                     node.rotation = toRadians(v);
                     node.updateTransform();
-                    onNodeUpdate(skele.clone());
+                    onNodeUpdate(
+                      skele.clone(),
+                      `Updated node ${node.id} angle to ${toDegrees(
+                        node.rotation
+                      ).toFixed(2)} (was ${toDegrees(oldRotation).toFixed(2)})`,
+                      `update_rotation_${node.id}`
+                    );
                   }}
                 />
               </div>
@@ -237,9 +257,14 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   value={node.mag}
                   step={0.1}
                   onChange={val => {
+                    const oldMag = node.mag;
                     node.mag = val ?? 0;
                     node.updateTransform();
-                    onNodeUpdate(skele.clone());
+                    onNodeUpdate(
+                      skele.clone(),
+                      `Updated node ${node.id} magnitude to ${node.mag} (was ${oldMag})`,
+                      `update_mag_${node.id}`
+                    );
                   }}
                 />
               </div>
@@ -251,8 +276,13 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   value={node.uri || ''}
                   draggable={false}
                   onChange={evt => {
+                    const oldUri = node.uri;
                     node.uri = evt.target.value || null;
-                    onNodeUpdate(skele.clone());
+                    onNodeUpdate(
+                      skele.clone(),
+                      `Updated node ${node.id} URI to ${node.uri} (was ${oldUri})`,
+                      `update_uri_${node.id}`
+                    );
                   }}
                 />
               </div>

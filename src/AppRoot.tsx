@@ -300,9 +300,15 @@ export const AppRoot = () => {
           ? newSkele.findId(lastActiveNode.node.id)
           : newSkele;
         if (newParent) {
-          newParent.getMovableNode().add(imageNode);
+          const base = newParent.getMovableNode();
+          base.add(imageNode);
+          updateSkele(
+            newSkele,
+            `Added image ${imageNode.uri} (${imageNode.id}) to ${
+              base.id === base.root.id ? `#ROOT ${base.id}` : base.id
+            }`
+          );
         }
-        updateSkele(newSkele);
       }
     } else if (file.type === 'fab') {
       const existingTab = findExistingTab(tabs, file.path);
@@ -520,11 +526,7 @@ export const AppRoot = () => {
     window.addEventListener('mouseup', handleTransformEnd);
   };
 
-  const handleEditorContextMenu = (
-    node: SkeleNode | null,
-    e: React.MouseEvent,
-    viewport: Viewport
-  ): MenuAction[] => {
+  const handleEditorContextMenu = (node: SkeleNode | null): MenuAction[] => {
     if (!node) return [];
     return getNodeActions({
       node,

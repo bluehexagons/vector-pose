@@ -8,7 +8,11 @@ interface LayersPaneProps {
   renderedNodes: SkeleNode[];
   activeNode?: {node: SkeleNode};
   lastActiveNode?: {node: SkeleNode};
-  onNodeUpdate: (skele: SkeleNode) => void;
+  onNodeUpdate: (
+    skele: SkeleNode,
+    description?: string,
+    continuityKey?: string
+  ) => void;
   skele: SkeleNode;
   onAddNode: () => void;
   focusNode: (node: UiNode) => void;
@@ -48,7 +52,10 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
     try {
       sourceNode.remove();
       clone.add(sourceNode);
-      onNodeUpdate(clone);
+      onNodeUpdate(
+        clone,
+        `Dragged node ${sourceNode.id} to #ROOT (${clone.id})`
+      );
     } catch (err) {
       console.warn('Root drop operation failed:', err);
     }
