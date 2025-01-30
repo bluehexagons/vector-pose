@@ -1,4 +1,6 @@
 import {TabData} from '../shared/types';
+import {HistoryEntry} from '../utils/HistoryManager';
+import {HistoryDropdown} from './HistoryDropdown';
 import './HeaderPane.css';
 
 export const HeaderPane = ({
@@ -12,6 +14,9 @@ export const HeaderPane = ({
   onRedo,
   canUndo,
   canRedo,
+  historyEntries,
+  currentHistoryIndex,
+  onHistorySelect,
 }: {
   activeTab?: TabData;
   onSave: () => Promise<void>;
@@ -23,6 +28,9 @@ export const HeaderPane = ({
   onRedo: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  historyEntries: HistoryEntry<any>[];
+  currentHistoryIndex: number;
+  onHistorySelect: (index: number) => void;
 }) => {
   return (
     <div className="header-pane">
@@ -57,6 +65,13 @@ export const HeaderPane = ({
         </h1>
       </div>
       <ul className="header-menu">
+        <li className="header-menu-item">
+          <HistoryDropdown
+            entries={historyEntries}
+            currentIndex={currentHistoryIndex}
+            onSelect={onHistorySelect}
+          />
+        </li>
         <li className="header-menu-item">
           <button
             onClick={onUndo}

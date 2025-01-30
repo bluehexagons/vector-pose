@@ -1,0 +1,40 @@
+.history-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.history-button {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  height: 24px;
+  line-height: 1;
+}
+
+.history-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  min-width: 200px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.history-item {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+}
+
+.history-item:hover {
+  background: var(--bg-hover);
+}
+
+.history-item.current {
+  background: var(--bg-selected);
+  color: var(--text-selected);
+}

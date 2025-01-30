@@ -52,5 +52,7 @@ export function useHistory<T>(initialState: T, tabId: string) {
     clearHistory: history.clear,
     canUndo: history.canUndo(),
     canRedo: history.canRedo(),
+    getCurrentIndex: () => history.getCurrentIndex(),
+    getHistoryEntries: () => history.getHistoryEntries(),
   };
 }

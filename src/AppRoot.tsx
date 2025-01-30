@@ -583,6 +583,16 @@ export const AppRoot = () => {
           }}
           canUndo={history.canUndo}
           canRedo={history.canRedo}
+          historyEntries={history.getHistoryEntries()}
+          currentHistoryIndex={history.getCurrentIndex()}
+          onHistorySelect={index => {
+            const entries = history.getHistoryEntries();
+            if (index < entries.length) {
+              const targetState = entries[index].state;
+              updateTab(targetState, activeTab.filePath);
+              // Optionally update history state here if needed
+            }
+          }}
         />
       </div>
 

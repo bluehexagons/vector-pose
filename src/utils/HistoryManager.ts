@@ -68,8 +68,16 @@ export class HistoryManager<T> {
     return this.undoStack[this.undoStack.length - 1];
   }
 
+  getCurrentIndex(): number {
+    return this.undoStack.length - 1;
+  }
+
   clear() {
     this.undoStack = [];
     this.redoStack = [];
+  }
+
+  getHistoryEntries(): HistoryEntry<T>[] {
+    return [...this.undoStack];
   }
 }
