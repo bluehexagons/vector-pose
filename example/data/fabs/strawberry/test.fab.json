@@ -1,0 +1,85 @@
+{
+  "name": "strawberry default pose",
+  "skele": {
+    "angle": 0,
+    "mag": 1,
+    "id": "q3569oc",
+    "children": [
+      {
+        "angle": 0,
+        "mag": 0.3,
+        "id": "BB",
+        "uri": "sprite:strawberry/still/bottom/bb",
+        "props": {
+          "hueRot": 0
+        }
+      },
+      {
+        "angle": -358.260965926089,
+        "mag": 0.14147270925769265,
+        "id": "eegc71r",
+        "children": [
+          {
+            "angle": 0,
+            "mag": 0.25,
+            "id": "MM",
+            "uri": "sprite:strawberry/still/middle/mm",
+            "props": {
+              "hueRot": 0
+            }
+          }
+        ]
+      },
+      {
+        "angle": -358.457028348512,
+        "mag": 0.2803093007878762,
+        "id": "5rlviol",
+        "children": [
+          {
+            "angle": -4.722801414723192,
+            "mag": 0.04149868797197053,
+            "id": "1sgc4u8",
+            "children": [
+              {
+                "angle": 0,
+                "mag": 0.05,
+                "id": "MT",
+                "uri": "sprite:strawberry/still/middle/mt"
+              }
+            ]
+          },
+          {
+            "angle": 0,
+            "mag": 0.05,
+            "id": "BT",
+            "uri": "sprite:strawberry/still/bottom/bt",
+            "sort": -1
+          }
+        ]
+      },
+      {
+        "angle": -180.0694480884708,
+        "mag": 0.2638843805916364,
+        "id": "5myywe0",
+        "children": [
+          {
+            "angle": 180,
+            "mag": 0.5,
+            "id": "MB",
+            "uri": "sprite:strawberry/still/middle/mb",
+            "props": {
+              "hueRot": 0
+            }
+          }
+        ]
+      },
+      {
+        "angle": 0,
+        "mag": 1,
+        "id": "ei8kfv7",
+        "uri": "sprite:strawberry/still/outline",
+        "hidden": true
+      }
+    ]
+  }
+}

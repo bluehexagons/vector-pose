@@ -78,10 +78,15 @@
   border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
   cursor: grab;
   user-select: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .node-title {
+  white-space: nowrap;
   font-size: 0.9em;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .node-actions {
@@ -91,6 +96,8 @@
 .node-content {
   padding: var(--spacing-sm);
   padding-bottom: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .input-group {

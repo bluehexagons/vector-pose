@@ -18,7 +18,7 @@ export interface FileEntry {
   type: 'fab' | 'image';
 }
 
-export const SEARCH_DIRS = ['./data/fabs', './src/renderer/gfx'] as const;
+export const SEARCH_DIRS = ['./data/fabs', './gfx'] as const;
 export const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp'] as const;
 export const FAB_EXTENSIONS = ['.fab.json'] as const;
 
@@ -40,11 +40,11 @@ export function toSpriteUri(fullPath: string): string | null {
 export function fromSpriteUri(uri: string): string {
   if (uri.startsWith(SPRITE_PREFIX)) {
     const spriteName = uri.slice(SPRITE_PREFIX.length);
-    return `./src/renderer/gfx/sprite/${spriteName}.png`;
+    return `./gfx/sprite/${spriteName}.png`;
   }
   if (uri.startsWith(GFX_PREFIX)) {
-    const spriteName = uri.slice(GFX_PREFIX.length);
-    return `./src/renderer/gfx/${spriteName}.png`;
+    const gfxName = uri.slice(GFX_PREFIX.length);
+    return `./gfx/${gfxName}.png`;
   }
   return uri;
 }

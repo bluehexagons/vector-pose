@@ -194,7 +194,9 @@ export const NodeItem: React.FC<NodeItemProps> = ({
           onDrop={handleDrop}
         >
           {isShrunken && node.uri && (
-            <span className="inline-uri">{node.uri}</span>
+            <span className="inline-uri" title={node.uri}>
+              {node.uri}
+            </span>
           )}
           {!isShrunken && (
             <>
