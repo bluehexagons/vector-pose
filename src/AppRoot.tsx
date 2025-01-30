@@ -517,7 +517,6 @@ export const AppRoot = () => {
 
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
-      console.log('keeb', e, e.ctrlKey, e.shiftKey, e.key);
       if (!activeTab) return;
 
       const keyName = e.key.toLocaleLowerCase();
@@ -557,7 +556,21 @@ export const AppRoot = () => {
           onSaveAs={handleSaveAs}
           onNameChange={handleNameChange}
           onRotateView={handleRotateView}
-          viewRotation={activeTab.rotation}
+          viewRotation={activeTab?.rotation ?? 0}
+          onUndo={() => {
+            const undoState = history.undo();
+            if (undoState) {
+              updateTab(undoState, activeTab.filePath);
+            }
+          }}
+          onRedo={() => {
+            const redoState = history.redo();
+            if (redoState) {
+              updateTab(redoState, activeTab.filePath);
+            }
+          }}
+          canUndo={history.canUndo}
+          canRedo={history.canRedo}
         />
       </div>
 

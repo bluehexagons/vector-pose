@@ -8,6 +8,10 @@ export const HeaderPane = ({
   onNameChange,
   onRotateView,
   viewRotation,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
 }: {
   activeTab?: TabData;
   onSave: () => Promise<void>;
@@ -15,11 +19,16 @@ export const HeaderPane = ({
   onNameChange: (name: string) => void;
   onRotateView: (degrees: number) => void;
   viewRotation: number;
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }) => {
   return (
     <div className="header-pane">
       <div className="header-left">
         <h1 className="header-title">
+          Name:
           {activeTab && (
             <input
               type="text"
@@ -45,6 +54,22 @@ export const HeaderPane = ({
         </h1>
       </div>
       <ul className="header-menu">
+        <li className="header-menu-item">
+          <button
+            onClick={onUndo}
+            disabled={!canUndo}
+            title="Undo last action (ctrl+z)"
+          >
+            Undo
+          </button>
+          <button
+            onClick={onRedo}
+            disabled={!canRedo}
+            title="Redo action (ctrl+shift+z)"
+          >
+            Redo
+          </button>
+        </li>
         <li className="header-menu-item">
           <div className="view-controls">
             <button onClick={() => onRotateView(viewRotation - 45)}>⟲</button>

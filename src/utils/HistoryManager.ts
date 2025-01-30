@@ -31,13 +31,11 @@ export class HistoryManager<T> {
       }
     }
     this.lastContinuityKey = continuityKey;
-    console.log(continuityKey, this.undoStack);
   }
 
   undo(): HistoryEntry<T> | undefined {
     if (this.undoStack.length > 1) {
       const entry = this.undoStack.pop();
-      console.log(entry, this.undoStack);
       if (entry) {
         this.redoStack.push(entry);
       }
@@ -50,7 +48,6 @@ export class HistoryManager<T> {
 
   redo(): HistoryEntry<T> | undefined {
     const entry = this.redoStack.pop();
-    console.log(entry, this.redoStack);
     if (entry) {
       this.undoStack.push(entry);
       return entry;

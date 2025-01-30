@@ -29,11 +29,9 @@ export function toSpriteUri(fullPath: string): string | null {
   let match = fullPath.match(
     /[/\\]gfx[/\\]sprite[/\\](([^/\\]*[/\\])*[^/\\]+)\.[^.]+$/i
   );
-  console.log('match', match);
   if (match?.[1]) return `${SPRITE_PREFIX}${match[1]}`;
 
   match = fullPath.match(/[/\\]gfx[/\\](([^/\\]*[/\\])*[^/\\]+)\.[^.]+$/i);
-  console.log('match2', match);
   if (match?.[1]) return `${GFX_PREFIX}${match[1]}`;
 
   return null;
