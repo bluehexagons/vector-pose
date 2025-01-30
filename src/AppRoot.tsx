@@ -9,6 +9,7 @@ import {LayersPane} from './components/LayersPane';
 import {Resizer} from './components/Resizer';
 import {TabPane} from './components/TabPane';
 import {useTabs} from './hooks/useTabs';
+import {useHistory} from './hooks/useHistory';
 import {
   createImageNode,
   findExistingTab,
@@ -40,6 +41,8 @@ const createDefaultSkele = () =>
 
 const preventDefault = (e: React.SyntheticEvent) => e.preventDefault();
 
+let atomicCounter = 0;
+
 export const AppRoot = () => {
   const {
     tabs,
@@ -69,6 +72,8 @@ export const AppRoot = () => {
   const [time, setTime] = useState(1);
 
   const skele = activeTab.skele;
+
+  const history = useHistory(skele);
 
   const handleRotateView = (degrees: number) => {
     // Allow any angle, just normalize display to 0-360
@@ -107,10 +112,20 @@ export const AppRoot = () => {
     base.render(time, deduper);
   };
 
-  const updateSkele = (base: SkeleNode) => {
+  const updateSkele = (
+    base: SkeleNode,
+    description?: string,
+    continuityKey?: string
+  ) => {
     const clone = base.clone(null);
     tickSkele(clone);
     updateTab(clone, activeTab?.filePath);
+
+    // Only push to history if description is provided
+    if (description) {
+      history.pushState(clone, description, continuityKey);
+    }
+
     return clone;
   };
 
@@ -161,14 +176,6 @@ export const AppRoot = () => {
       return;
     }
 
-    const newSkele = skele.clone();
-    const newNode = newSkele.findId(activeNode.node.id);
-
-    if (newNode) {
-      updateSkele(newSkele);
-      setLastActiveNode({node: newNode});
-    }
-
     setLastActiveNode(activeNode);
     setActiveNode(undefined);
   };
@@ -201,6 +208,7 @@ export const AppRoot = () => {
       0.02 * vec2.len(viewport.pageToWorld(0, 1))
     );
     if (closestNode) {
+      atomicCounter++;
       handleNodeSelection({node: closestNode}, e, worldPos);
     } else {
       focusNode(undefined);
@@ -238,7 +246,13 @@ export const AppRoot = () => {
 
       targetNode.updateFromWorldPosition(targetPos[0], targetPos[1]);
       setDragStart({...dragStart, worldPos});
-      updateSkele(newSkele);
+      updateSkele(
+        newSkele,
+        `Moved node ${activeNode.node.id} to (${targetPos[0].toFixed(
+          2
+        )}, ${targetPos[1].toFixed(2)})`,
+        `drag_${activeNode.node.id}_${atomicCounter}`
+      );
     }
   };
 
@@ -418,6 +432,13 @@ export const AppRoot = () => {
       },
     };
 
+    // Use transform type and node ID as continuity key
+    history.pushState(
+      skele,
+      `${type === 'rotate' ? 'Rotating' : 'Scaling'} node ${nodeId}`,
+      `${type}_${nodeId}`
+    );
+
     const handleTransformMove = (e: MouseEvent) => {
       const transforming = transformingRef.current;
       if (!transforming || !transforming.skele) return;
@@ -460,7 +481,13 @@ export const AppRoot = () => {
         transforming.startPos = currentPos;
       }
 
-      transforming.skele = updateSkele(newSkele);
+      transforming.skele = updateSkele(
+        newSkele,
+        `${transforming.type === 'rotate' ? 'Rotated' : 'Scaled'} node ${
+          transforming.nodeId
+        }`,
+        `${transforming.type}_${transforming.nodeId}`
+      );
     };
 
     const handleTransformEnd = () => {
@@ -484,6 +511,33 @@ export const AppRoot = () => {
       updateNode: updateSkele,
     });
   };
+
+  useEffect(() => {
+    const handleKeyboard = (e: KeyboardEvent) => {
+      if (!activeTab) return;
+
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'z') {
+          e.preventDefault();
+          if (e.shiftKey) {
+            const redoState = history.redo();
+            if (redoState) {
+              updateSkele(redoState);
+            }
+          } else {
+            const undoState = history.undo();
+            console.log('hey', history, undoState);
+            if (undoState) {
+              updateSkele(undoState);
+            }
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyboard);
+    return () => window.removeEventListener('keydown', handleKeyboard);
+  }, [activeTab, history]);
 
   return (
     <div
