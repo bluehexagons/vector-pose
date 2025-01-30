@@ -17,6 +17,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
   onCloseTab,
   onSelectTab,
 }) => {
+  console.log(tabs);
   return (
     <div className="tab-pane">
       <ul>
@@ -25,11 +26,17 @@ export const TabPane: React.FC<TabPaneProps> = ({
             key={tab.skele.id}
             className={`tab ${tab.skele.id === activeTabId ? 'active' : ''}`}
             onClick={() => onSelectTab(tab.skele.id)}
+            title={tab.filePath ? `${tab.name} (${tab.filePath})` : tab.name}
           >
             <span className="tab-name">
               {tab.name}
               {tab?.isModified && (
-                <span title="This tab has been modified.">*</span>
+                <span
+                  style={{color: 'var(--text-muted)'}}
+                  title="This object has been modified."
+                >
+                  *
+                </span>
               )}
             </span>
             <button

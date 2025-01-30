@@ -46,10 +46,12 @@ export const HeaderPane = ({
                 width: '42px',
                 textAlign: 'left',
                 cursor: 'default',
+                fontStyle: 'italic',
+                color: 'var(--text-muted)',
               }}
-              title="This tab has been modified."
+              title="This object has been modified."
             >
-              *
+              (modified)
             </span>
           )}
         </h1>

@@ -14,7 +14,11 @@ const renderSkele = (skele: SkeleNode) => ({
     : [],
 });
 
-const createEmptyTab = (defaultSkele?: SkeleNode, fabData?: FabData) => {
+const createEmptyTab = (
+  defaultSkele?: SkeleNode,
+  fabData?: FabData,
+  filePath?: string
+) => {
   const skele =
     defaultSkele ??
     SkeleNode.fromData({
@@ -31,6 +35,7 @@ const createEmptyTab = (defaultSkele?: SkeleNode, fabData?: FabData) => {
     skele,
     isModified: false,
     rotation: 270, // Add default rotation
+    filePath,
     fabData,
   };
 };
@@ -79,7 +84,7 @@ export function useTabs() {
           );
           if (emptyTab) {
             return current.map(tab =>
-              tab === emptyTab ? createEmptyTab(base, fabData) : tab
+              tab === emptyTab ? createEmptyTab(base, fabData, filePath) : tab
             );
           }
         }
