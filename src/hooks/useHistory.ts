@@ -1,4 +1,4 @@
-import {useState, useCallback} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import {HistoryManager, HistoryEntry} from '../utils/HistoryManager';
 
 export function useHistory<T>(initialState: T) {
@@ -26,6 +26,10 @@ export function useHistory<T>(initialState: T) {
     setCurrentEntry(entry);
     return entry?.state;
   }, [history]);
+
+  useEffect(() => {
+    pushState(initialState, 'Initial state');
+  }, []);
 
   return {
     currentState: currentEntry?.state,

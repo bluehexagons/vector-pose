@@ -38,6 +38,10 @@ export class HistoryManager<T> {
     const entry = this.undoStack.pop();
     if (entry) {
       this.redoStack.push(entry);
+
+      if (this.undoStack.length === 0) {
+        this.undoStack.push(entry);
+      }
     }
     this.lastContinuityKey = undefined;
     return this.undoStack[this.undoStack.length - 1];
