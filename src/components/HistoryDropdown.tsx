@@ -21,7 +21,7 @@ export function HistoryDropdown<T>({
 
   return (
     <KebabMenu
-      actions={actions}
+      actions={actions.reverse()}
       trigger={<button className="history-button">History ▾</button>}
       align="left"
     />

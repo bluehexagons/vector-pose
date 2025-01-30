@@ -36,7 +36,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   }, [onClose]);
 
   useEffect(() => {
-    // Position menu to avoid screen edges
     if (menuRef.current) {
       const rect = menuRef.current.getBoundingClientRect();
       const viewport = {
@@ -44,36 +43,33 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         height: window.innerHeight,
       };
 
-      // Default offset from cursor
-      const offset = {x: 0, y: 0};
+      let top = position.y;
+      let left = position.x;
 
-      // Handle horizontal positioning
-      if (position.x + rect.width > viewport.width) {
-        // If menu would go off right edge, position to left of cursor/button
-        offset.x = -rect.width;
-      }
-
-      // Handle vertical positioning
+      // Check vertical overflow
       if (position.y + rect.height > viewport.height) {
-        // If menu would go off bottom edge, position above cursor/button
-        offset.y = -rect.height;
+        // Position above trigger if it would go off bottom
+        top = Math.max(0, position.y - rect.height);
       }
 
-      menuRef.current.style.transform = 'none';
-      menuRef.current.style.left = `${position.x + offset.x}px`;
-      menuRef.current.style.top = `${position.y + offset.y}px`;
+      // Check horizontal overflow
+      if (align === 'right') {
+        if (position.x + rect.width > viewport.width) {
+          left = Math.max(0, viewport.width - rect.width);
+        }
+      } else {
+        if (position.x + rect.width > viewport.width) {
+          left = Math.max(0, position.x - rect.width);
+        }
+      }
+
+      menuRef.current.style.left = `${left}px`;
+      menuRef.current.style.top = `${top}px`;
     }
-  }, [position]);
+  }, [position, align]);
 
   return createPortal(
-    <div
-      ref={menuRef}
-      className="context-menu"
-      style={{
-        left: position.x,
-        top: position.y,
-      }}
-    >
+    <div ref={menuRef} className="context-menu">
       {actions.map((action, i) => (
         <button
           key={i}

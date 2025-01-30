@@ -8,6 +8,23 @@
   z-index: var(--z-menu);
   min-width: 120px;
   padding: var(--spacing-xs);
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.context-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.context-menu::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+.context-menu::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 4px;
 }
 
 .context-menu button {

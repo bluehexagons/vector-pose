@@ -2,6 +2,7 @@ import {TabData} from '../shared/types';
 import {HistoryEntry} from '../utils/HistoryManager';
 import {HistoryDropdown} from './HistoryDropdown';
 import './HeaderPane.css';
+import {SkeleNode} from '../utils/SkeleNode';
 
 export const HeaderPane = ({
   activeTab,
@@ -28,7 +29,7 @@ export const HeaderPane = ({
   onRedo: () => void;
   canUndo: boolean;
   canRedo: boolean;
-  historyEntries: HistoryEntry<any>[];
+  historyEntries: HistoryEntry<SkeleNode>[];
   currentHistoryIndex: number;
   onHistorySelect: (index: number) => void;
 }) => {
