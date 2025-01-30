@@ -72,7 +72,7 @@ export function useTabs() {
                     ...tab,
                     ...renderSkele(base),
                     skele: base,
-                    isModified: false,
+                    isModified: true,
                   }
                 : tab
             );
