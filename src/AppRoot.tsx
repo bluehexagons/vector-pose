@@ -98,7 +98,19 @@ export const AppRoot = () => {
     targetSize: number
   ) => {
     if (!activeTab?.skele) return undefined;
-    return activeTab.skele.findClosestNode(worldX, worldY, targetSize);
+    const closest = activeTab.skele.findClosestNode(worldX, worldY, targetSize);
+    const priorityNode = lastActiveNode;
+    if (
+      priorityNode &&
+      closest &&
+      vec2.dist(
+        closest.getMovableNode().state.transform,
+        priorityNode.node.state.transform
+      ) < 0.01
+    ) {
+      return priorityNode.node;
+    }
+    return closest;
   };
 
   const tickSkele = (base: SkeleNode) => {
@@ -162,7 +174,7 @@ export const AppRoot = () => {
       ? base.findId(lastActiveNode.node.id)
       : base;
     if (newParent) {
-      newParent.add(
+      newParent.getMovableNode().add(
         SkeleNode.fromData({
           angle: 0,
           mag: 0,
@@ -283,7 +295,7 @@ export const AppRoot = () => {
           ? newSkele.findId(lastActiveNode.node.id)
           : newSkele;
         if (newParent) {
-          newParent.add(imageNode);
+          newParent.getMovableNode().add(imageNode);
         }
         updateSkele(newSkele);
       }

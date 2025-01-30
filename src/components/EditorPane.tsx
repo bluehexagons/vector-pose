@@ -7,6 +7,7 @@ import {EditorCanvas, Viewport} from './EditorCanvas';
 import './EditorPane.css';
 import {NodeGraphLayer} from './NodeGraphLayer';
 import {SpriteLayer, SpriteLayerProps} from './SpriteLayer';
+import {vec2} from 'gl-matrix';
 
 interface EditorPaneProps
   extends Pick<
@@ -53,7 +54,19 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
 
     const worldPos = viewport.pageToWorld(e.pageX, e.pageY);
     // Use the more accurate findClosestNode utility
-    const targetNode = findClosestNode(worldPos, renderedNodes, viewport);
+    let targetNode = findClosestNode(worldPos, renderedNodes, viewport);
+
+    const priorityNode = lastActiveNode;
+    if (
+      priorityNode &&
+      targetNode &&
+      vec2.dist(
+        targetNode.getMovableNode().state.transform,
+        priorityNode.node.state.transform
+      ) < 0.01
+    ) {
+      targetNode = priorityNode.node;
+    }
 
     if (targetNode) {
       const actions = onContextMenu(targetNode, e, viewport);

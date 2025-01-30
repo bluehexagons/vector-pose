@@ -33,6 +33,7 @@ export const HeaderPane = ({
             <input
               type="text"
               className="tab-name-input"
+              style={{marginLeft: 'var(--spacing-xs)'}}
               value={activeTab.name}
               onChange={e => onNameChange(e.target.value)}
             />
@@ -40,7 +41,7 @@ export const HeaderPane = ({
           {activeTab?.isModified && (
             <span
               style={{
-                paddingLeft: '4px',
+                paddingLeft: 'var(--spacing-xs)',
                 display: 'inline-block',
                 width: '42px',
                 textAlign: 'left',
