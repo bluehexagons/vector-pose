@@ -4,47 +4,48 @@ import './KebabMenu.css';
 
 interface KebabMenuProps {
   actions: MenuAction[];
+  trigger?: React.ReactNode;
+  align?: 'left' | 'right';
 }
 
-export const KebabMenu: React.FC<KebabMenuProps> = ({actions}) => {
+export const KebabMenu: React.FC<KebabMenuProps> = ({
+  actions,
+  trigger,
+  align = 'right',
+}) => {
   const [menuPosition, setMenuPosition] = useState<{
     x: number;
     y: number;
   } | null>(null);
-  const [shouldClose, setShouldClose] = useState(false);
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (shouldClose || menuPosition) {
+    if (menuPosition) {
       setMenuPosition(null);
     } else {
       const rect = e.currentTarget.getBoundingClientRect();
-      // Position menu to the left of the kebab button
       setMenuPosition({
-        x: rect.left - 8, // Small offset from button
-        y: rect.top,
+        x: align === 'right' ? rect.right : rect.left,
+        y: rect.bottom,
       });
     }
   };
 
-  const handleMouseDown = () => {
-    setShouldClose(!!menuPosition);
-  };
-
   return (
     <div className="kebab-menu">
-      <button
-        className="kebab-button"
-        onClick={handleClick}
-        onMouseDown={handleMouseDown}
-      >
-        ⋮
-      </button>
+      {trigger ? (
+        <div onClick={handleClick}>{trigger}</div>
+      ) : (
+        <button className="kebab-button" onClick={handleClick}>
+          ⋮
+        </button>
+      )}
       {menuPosition && (
         <ContextMenu
           actions={actions}
           position={menuPosition}
           onClose={() => setMenuPosition(null)}
+          align={align}
         />
       )}
     </div>

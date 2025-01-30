@@ -1,5 +1,5 @@
-import {useState} from 'react';
 import {HistoryEntry} from '../utils/HistoryManager';
+import {KebabMenu} from './KebabMenu';
 import './HistoryDropdown.css';
 
 interface HistoryDropdownProps<T> {
@@ -13,33 +13,17 @@ export function HistoryDropdown<T>({
   onSelect,
   currentIndex,
 }: HistoryDropdownProps<T>) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  console.log('got', entries, isOpen);
+  const actions = entries.map((entry, index) => ({
+    label: entry.description,
+    action: () => onSelect(index),
+    isSelected: index === currentIndex,
+  }));
 
   return (
-    <div className="history-dropdown">
-      <button onClick={() => setIsOpen(!isOpen)} className="history-button">
-        History ▾
-      </button>
-      {isOpen && (
-        <div className="history-menu">
-          {entries.map((entry, index) => (
-            <div
-              key={index}
-              className={`history-item ${
-                index === currentIndex ? 'current' : ''
-              }`}
-              onClick={() => {
-                onSelect(index);
-                setIsOpen(false);
-              }}
-            >
-              {entry.description}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <KebabMenu
+      actions={actions}
+      trigger={<button className="history-button">History ▾</button>}
+      align="left"
+    />
   );
 }

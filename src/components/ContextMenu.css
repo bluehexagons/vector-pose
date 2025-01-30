@@ -46,3 +46,8 @@
   width: 14px;
   height: 14px;
 }
+
+.menu-item.selected {
+  background: var(--bg-selected);
+  color: var(--text-selected);
+}

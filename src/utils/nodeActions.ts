@@ -27,7 +27,7 @@ export function getNodeActions({
     actions.push({
       label: isCollapsed ? 'Expand' : 'Collapse',
       icon: isCollapsed ? icons.expand : icons.collapse,
-      onClick: onToggleCollapse,
+      action: onToggleCollapse,
     });
   }
 
@@ -35,7 +35,7 @@ export function getNodeActions({
     actions.push({
       label: isShrunken ? 'Show Details' : 'Hide Details',
       icon: icons.details,
-      onClick: onToggleShrunken,
+      action: onToggleShrunken,
     });
   }
 
@@ -43,7 +43,7 @@ export function getNodeActions({
     {
       label: node.hidden ? 'Show' : 'Hide',
       icon: node.hidden ? icons.visibility : icons.hidden,
-      onClick: () => {
+      action: () => {
         const clone = node.root.clone();
         const targetNode = clone.findId(node.id);
         if (targetNode) {
@@ -55,7 +55,7 @@ export function getNodeActions({
     {
       label: 'Create Parent',
       icon: icons.addParent,
-      onClick: () => {
+      action: () => {
         const clone = node.root.clone();
         const targetNode = clone.findId(node.id);
         if (targetNode?.parent) {
@@ -70,7 +70,7 @@ export function getNodeActions({
     {
       label: 'Move to Top',
       icon: icons.moveTop,
-      onClick: () => {
+      action: () => {
         const clone = node.root.clone();
         const targetNode = clone.findId(node.id);
         if (targetNode?.parent) {
@@ -87,7 +87,7 @@ export function getNodeActions({
     {
       label: 'Move to Bottom',
       icon: icons.moveBottom,
-      onClick: () => {
+      action: () => {
         const clone = node.root.clone();
         const targetNode = clone.findId(node.id);
         if (targetNode?.parent) {
@@ -104,7 +104,7 @@ export function getNodeActions({
     {
       label: 'Delete',
       icon: icons.delete,
-      onClick: () => {
+      action: () => {
         const clone = node.root.clone();
         const nodeToDelete = clone.findId(node.id);
         if (nodeToDelete) {

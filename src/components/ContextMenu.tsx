@@ -4,21 +4,23 @@ import './ContextMenu.css';
 
 export interface MenuAction {
   label: string;
+  action: () => void;
   icon?: React.ReactNode;
-  onClick: () => void;
-  disabled?: boolean;
+  isSelected?: boolean;
 }
 
 interface ContextMenuProps {
   actions: MenuAction[];
   position: {x: number; y: number};
   onClose: () => void;
+  align?: 'left' | 'right';
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({
   actions,
   position,
   onClose,
+  align = 'right',
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -64,17 +66,26 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   }, [position]);
 
   return createPortal(
-    <div className="context-menu" ref={menuRef}>
-      {actions.map((action, index) => (
+    <div
+      ref={menuRef}
+      className="context-menu"
+      style={{
+        left: position.x,
+        top: position.y,
+      }}
+    >
+      {actions.map((action, i) => (
         <button
-          key={index}
+          key={i}
+          className={`menu-item ${action.isSelected ? 'selected' : ''}`}
           onClick={() => {
-            action.onClick();
+            const callback = action.action;
             onClose();
+            // Execute action after menu is closed
+            setTimeout(() => callback(), 0);
           }}
-          disabled={action.disabled}
         >
-          {action.label}
+          <span className="menu-label">{action.label}</span>
           {action.icon && <span className="menu-icon">{action.icon}</span>}
         </button>
       ))}
