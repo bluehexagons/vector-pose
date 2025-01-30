@@ -54,7 +54,7 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
       clone.add(sourceNode);
       onNodeUpdate(
         clone,
-        `Dragged node ${sourceNode.id} to #ROOT (${clone.id})`
+        `Dragged node ${sourceNode.id} to ROOT (${clone.id})`
       );
     } catch (err) {
       console.warn('Root drop operation failed:', err);

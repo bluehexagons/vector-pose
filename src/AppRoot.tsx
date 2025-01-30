@@ -181,12 +181,7 @@ export const AppRoot = () => {
       });
       newParent.getMovableNode().add(newNode);
 
-      updateSkele(
-        base,
-        `Added node ${newNode.id} to ${
-          base.id === base.root.id ? '#ROOT' : base.id
-        }`
-      );
+      updateSkele(base, `Added node ${newNode.id} to ${base.id}`);
     }
   };
 
@@ -304,9 +299,7 @@ export const AppRoot = () => {
           base.add(imageNode);
           updateSkele(
             newSkele,
-            `Added image ${imageNode.uri} (${imageNode.id}) to ${
-              base.id === base.root.id ? `#ROOT ${base.id}` : base.id
-            }`
+            `Added image ${imageNode.uri} (${imageNode.id}) to ${base.id}`
           );
         }
       }

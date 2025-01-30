@@ -4,7 +4,11 @@ import {icons} from './Icons';
 
 export interface NodeActionContext {
   node: SkeleNode;
-  updateNode: (node: SkeleNode) => void;
+  updateNode: (
+    node: SkeleNode,
+    description?: string,
+    continuityKey?: string
+  ) => void;
   isCollapsed?: boolean;
   isShrunken?: boolean;
   onToggleCollapse?: () => void;
@@ -48,7 +52,13 @@ export function getNodeActions({
         const targetNode = clone.findId(node.id);
         if (targetNode) {
           targetNode.hidden = !targetNode.hidden;
-          updateNode(clone);
+          updateNode(
+            clone,
+            `Set node ${targetNode.id} to ${
+              targetNode.hidden ? 'HIDE' : 'SHOW'
+            } (was ${!targetNode.hidden})`,
+            `visibility_${node.id}`
+          );
         }
       },
     },
@@ -58,8 +68,12 @@ export function getNodeActions({
       action: () => {
         const clone = node.root.clone();
         const targetNode = clone.findId(node.id);
-        targetNode.add(new SkeleNode());
-        updateNode(clone);
+        const newNode = new SkeleNode();
+        targetNode.add(newNode);
+        updateNode(
+          clone,
+          `Created node ${newNode.id} and added to ${targetNode.id}`
+        );
       },
     },
     {
@@ -73,7 +87,10 @@ export function getNodeActions({
           const parent = targetNode.parent;
           parent.add(newParent);
           newParent.add(targetNode);
-          updateNode(clone);
+          updateNode(
+            clone,
+            `Added node ${targetNode} to new parent node ${newParent.id}, added to ${parent.id}`
+          );
         }
       },
     },
@@ -89,7 +106,10 @@ export function getNodeActions({
           if (idx > 0) {
             parent.children.splice(idx, 1);
             parent.children.unshift(targetNode);
-            updateNode(clone);
+            updateNode(
+              clone,
+              `Moved node ${targetNode.id} to top of ${parent.id}`
+            );
           }
         }
       },
@@ -106,7 +126,10 @@ export function getNodeActions({
           if (idx < parent.children.length - 1) {
             parent.children.splice(idx, 1);
             parent.children.push(targetNode);
-            updateNode(clone);
+            updateNode(
+              clone,
+              `Moved node ${targetNode.id} to top of ${parent.id}`
+            );
           }
         }
       },
@@ -118,8 +141,12 @@ export function getNodeActions({
         const clone = node.root.clone();
         const nodeToDelete = clone.findId(node.id);
         if (nodeToDelete) {
+          const parent = nodeToDelete.parent;
           nodeToDelete.remove();
-          updateNode(clone);
+          updateNode(
+            clone,
+            `Deleted node ${nodeToDelete.id} from ${parent.id}`
+          );
         }
       },
     }
