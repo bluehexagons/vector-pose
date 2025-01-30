@@ -56,6 +56,19 @@ export class HistoryManager<T> {
     return undefined;
   }
 
+  jumpToState(index: number): HistoryEntry<T> | undefined {
+    const entries = this.getHistoryEntries();
+    if (index < 0 || index >= entries.length) return undefined;
+
+    // Move everything after target index to redo stack
+    const targetEntry = entries[index];
+    this.undoStack = entries.slice(0, index + 1);
+    this.redoStack = entries.slice(index + 1);
+
+    this.lastContinuityKey = undefined;
+    return targetEntry;
+  }
+
   canUndo(): boolean {
     return this.undoStack.length > 1;
   }

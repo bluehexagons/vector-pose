@@ -586,11 +586,9 @@ export const AppRoot = () => {
           historyEntries={history.getHistoryEntries()}
           currentHistoryIndex={history.getCurrentIndex()}
           onHistorySelect={index => {
-            const entries = history.getHistoryEntries();
-            if (index < entries.length) {
-              const targetState = entries[index].state;
-              updateTab(targetState, activeTab.filePath);
-              // Optionally update history state here if needed
+            const entry = history.jumpToState(index);
+            if (entry) {
+              updateTab(entry.state, activeTab.filePath);
             }
           }}
         />

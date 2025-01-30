@@ -54,5 +54,6 @@ export function useHistory<T>(initialState: T, tabId: string) {
     canRedo: history.canRedo(),
     getCurrentIndex: () => history.getCurrentIndex(),
     getHistoryEntries: () => history.getHistoryEntries(),
+    jumpToState: (index: number) => history.jumpToState(index),
   };
 }
