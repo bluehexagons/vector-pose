@@ -99,16 +99,17 @@ export const AppRoot = () => {
   ) => {
     if (!activeTab?.skele) return undefined;
     const closest = activeTab.skele.findClosestNode(worldX, worldY, targetSize);
-    const priorityNode = lastActiveNode;
+    const priorityNode =
+      lastActiveNode && activeTab.skele.findId(lastActiveNode.node.id);
     if (
       priorityNode &&
       closest &&
       vec2.dist(
         closest.getMovableNode().state.transform,
-        priorityNode.node.state.transform
+        priorityNode.state.transform
       ) < 0.01
     ) {
-      return priorityNode.node;
+      return priorityNode;
     }
     return closest;
   };
@@ -174,15 +175,19 @@ export const AppRoot = () => {
       ? base.findId(lastActiveNode.node.id)
       : base;
     if (newParent) {
-      newParent.getMovableNode().add(
-        SkeleNode.fromData({
-          angle: 0,
-          mag: 0,
-        })
+      const newNode = SkeleNode.fromData({
+        angle: 0,
+        mag: 0,
+      });
+      newParent.getMovableNode().add(newNode);
+
+      updateSkele(
+        base,
+        `Added node ${newNode.id} to ${
+          base.id === base.root.id ? '#ROOT' : base.id
+        }`
       );
     }
-
-    updateSkele(base);
   };
 
   // Modify handleEditorMouseUp to match new dragStart type

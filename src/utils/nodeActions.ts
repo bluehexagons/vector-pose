@@ -53,6 +53,16 @@ export function getNodeActions({
       },
     },
     {
+      label: 'Create Child',
+      icon: icons.addParent,
+      action: () => {
+        const clone = node.root.clone();
+        const targetNode = clone.findId(node.id);
+        targetNode.add(new SkeleNode());
+        updateNode(clone);
+      },
+    },
+    {
       label: 'Create Parent',
       icon: icons.addParent,
       action: () => {
