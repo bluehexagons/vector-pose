@@ -1,11 +1,15 @@
 import {useState, useCallback, useEffect} from 'react';
-import {HistoryManager, HistoryEntry} from '../utils/HistoryManager';
+import {TabHistory} from '../utils/TabHistory';
+import {HistoryEntry} from '../utils/HistoryManager';
 
-export function useHistory<T>(initialState: T) {
-  const [history] = useState(() => new HistoryManager<T>());
+export function useHistory<T>(initialState: T, tabId: string) {
+  const [tabHistory] = useState(() => new TabHistory<T>());
   const [currentEntry, setCurrentEntry] = useState<
     HistoryEntry<T> | undefined
   >();
+
+  // Get the history for current tab
+  const history = tabHistory.getHistory(tabId);
 
   const pushState = useCallback(
     (state: T, description: string, continuityKey?: string) => {
@@ -27,9 +31,17 @@ export function useHistory<T>(initialState: T) {
     return entry?.state;
   }, [history]);
 
+  // Reset current entry when tab changes
   useEffect(() => {
-    pushState(initialState, 'Initial state');
-  }, []);
+    setCurrentEntry(history.getCurrentState());
+  }, [tabId, history]);
+
+  // Initialize history for new tabs
+  useEffect(() => {
+    if (!history.getCurrentState()) {
+      pushState(initialState, 'Initial state');
+    }
+  }, [history, initialState, pushState]);
 
   return {
     currentState: currentEntry?.state,
@@ -37,6 +49,7 @@ export function useHistory<T>(initialState: T) {
     pushState,
     undo,
     redo,
+    clearHistory: history.clear,
     canUndo: history.canUndo(),
     canRedo: history.canRedo(),
   };

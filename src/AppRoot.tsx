@@ -72,8 +72,7 @@ export const AppRoot = () => {
   const [time, setTime] = useState(1);
 
   const skele = activeTab.skele;
-
-  const history = useHistory(skele);
+  const history = useHistory(skele, activeTabId);
 
   const handleRotateView = (degrees: number) => {
     // Allow any angle, just normalize display to 0-360
@@ -117,11 +116,12 @@ export const AppRoot = () => {
     description?: string,
     continuityKey?: string
   ) => {
+    if (!activeTab) return base;
+
     const clone = base.clone(null);
     tickSkele(clone);
-    updateTab(clone, activeTab?.filePath);
+    updateTab(clone, activeTab.filePath);
 
-    // Only push to history if description is provided
     if (description) {
       history.pushState(clone, description, continuityKey);
     }
@@ -136,7 +136,10 @@ export const AppRoot = () => {
     tickSkele(skele);
     addNewTab(skele);
   };
-  const handleCloseTab = closeTab;
+  const handleCloseTab = (tabId: string) => {
+    history.clearHistory();
+    closeTab(tabId);
+  };
   const handleSelectTab = selectTab;
 
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
@@ -514,21 +517,23 @@ export const AppRoot = () => {
 
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
+      console.log('keeb', e, e.ctrlKey, e.shiftKey, e.key);
       if (!activeTab) return;
 
+      const keyName = e.key.toLocaleLowerCase();
+
       if (e.ctrlKey || e.metaKey) {
-        if (e.key === 'z') {
+        if (keyName === 'z') {
           e.preventDefault();
           if (e.shiftKey) {
             const redoState = history.redo();
             if (redoState) {
-              updateSkele(redoState);
+              updateTab(redoState, activeTab.filePath);
             }
           } else {
             const undoState = history.undo();
-            console.log('hey', history, undoState);
             if (undoState) {
-              updateSkele(undoState);
+              updateTab(undoState, activeTab.filePath);
             }
           }
         }

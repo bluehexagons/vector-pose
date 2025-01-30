@@ -35,20 +35,22 @@ export class HistoryManager<T> {
   }
 
   undo(): HistoryEntry<T> | undefined {
-    const entry = this.undoStack.pop();
-    if (entry) {
-      this.redoStack.push(entry);
-
-      if (this.undoStack.length === 0) {
-        this.undoStack.push(entry);
+    if (this.undoStack.length > 1) {
+      const entry = this.undoStack.pop();
+      console.log(entry, this.undoStack);
+      if (entry) {
+        this.redoStack.push(entry);
       }
+      this.lastContinuityKey = undefined;
+      return this.undoStack[this.undoStack.length - 1];
     }
-    this.lastContinuityKey = undefined;
-    return this.undoStack[this.undoStack.length - 1];
+
+    return this.undoStack[0];
   }
 
   redo(): HistoryEntry<T> | undefined {
     const entry = this.redoStack.pop();
+    console.log(entry, this.redoStack);
     if (entry) {
       this.undoStack.push(entry);
       return entry;
