@@ -78,6 +78,6 @@ export class HistoryManager<T> {
   }
 
   getHistoryEntries(): HistoryEntry<T>[] {
-    return [...this.undoStack];
+    return [...this.undoStack, ...this.redoStack];
   }
 }
