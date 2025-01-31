@@ -72,13 +72,6 @@
             }
           }
         ]
-      },
-      {
-        "angle": 0,
-        "mag": 1,
-        "id": "ei8kfv7",
-        "uri": "sprite:strawberry/still/outline",
-        "hidden": true
       }
     ]
   }
