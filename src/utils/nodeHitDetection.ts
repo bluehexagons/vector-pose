@@ -1,6 +1,6 @@
 import {vec2} from 'gl-matrix';
-import {SkeleNode} from './SkeleNode';
 import {Viewport} from '../components/EditorCanvas';
+import {SkeleNode} from './SkeleNode';
 
 export function findClosestNode(
   worldPos: vec2,

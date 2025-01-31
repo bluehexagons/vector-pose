@@ -1,8 +1,8 @@
 import {TabData} from '../shared/types';
 import {HistoryEntry} from '../utils/HistoryManager';
-import {HistoryDropdown} from './HistoryDropdown';
-import './HeaderPane.css';
 import {SkeleNode} from '../utils/SkeleNode';
+import './HeaderPane.css';
+import {HistoryDropdown} from './HistoryDropdown';
 
 export const HeaderPane = ({
   activeTab,

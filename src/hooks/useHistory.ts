@@ -1,6 +1,6 @@
-import {useState, useCallback, useEffect} from 'react';
-import {TabHistory} from '../utils/TabHistory';
+import {useCallback, useEffect, useState} from 'react';
 import {HistoryEntry} from '../utils/HistoryManager';
+import {TabHistory} from '../utils/TabHistory';
 
 export function useHistory<T>(initialState: T, tabId: string) {
   const [tabHistory] = useState(() => new TabHistory<T>());

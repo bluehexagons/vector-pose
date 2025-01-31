@@ -1,3 +1,4 @@
+import {vec2} from 'gl-matrix';
 import {useState} from 'react';
 import {UiNode} from '../shared/types';
 import {findClosestNode} from '../utils/nodeHitDetection';
@@ -7,7 +8,6 @@ import {EditorCanvas, Viewport} from './EditorCanvas';
 import './EditorPane.css';
 import {NodeGraphLayer} from './NodeGraphLayer';
 import {SpriteLayer, SpriteLayerProps} from './SpriteLayer';
-import {vec2} from 'gl-matrix';
 
 interface EditorPaneProps
   extends Pick<

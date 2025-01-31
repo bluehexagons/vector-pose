@@ -1,6 +1,6 @@
-// Partial copy from game codebase, MIT license
-
 import {vec2} from 'gl-matrix';
+
+// Partial copy from game codebase, MIT license
 
 export const TAU = Math.PI * 2;
 

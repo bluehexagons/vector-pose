@@ -1,5 +1,5 @@
-import type {SkeleNode} from '../utils/SkeleNode';
 import type {UiNode} from '../shared/types';
+import type {SkeleNode} from '../utils/SkeleNode';
 import type {Viewport} from './EditorCanvas';
 
 interface NodeGraphLayerProps {

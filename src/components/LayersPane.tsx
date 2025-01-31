@@ -1,8 +1,8 @@
 import React from 'react';
+import {UiNode} from '../shared/types';
 import {SkeleNode} from '../utils/SkeleNode';
 import './LayersPane.css';
 import {NodeItem} from './NodeItem';
-import {UiNode} from '../shared/types';
 
 interface LayersPaneProps {
   renderedNodes: SkeleNode[];

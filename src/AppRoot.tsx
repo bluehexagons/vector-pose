@@ -1,6 +1,7 @@
 import {vec2} from 'gl-matrix';
 import {useEffect, useRef, useState} from 'react';
 import './AppRoot.css';
+import {MenuAction} from './components/ContextMenu';
 import {Viewport} from './components/EditorCanvas';
 import {EditorPane} from './components/EditorPane';
 import {FileExplorerPane} from './components/FileExplorerPane';
@@ -8,8 +9,8 @@ import {HeaderPane} from './components/HeaderPane';
 import {LayersPane} from './components/LayersPane';
 import {Resizer} from './components/Resizer';
 import {TabPane} from './components/TabPane';
-import {useTabs} from './hooks/useTabs';
 import {useHistory} from './hooks/useHistory';
+import {useTabs} from './hooks/useTabs';
 import {
   createImageNode,
   findExistingTab,
@@ -27,7 +28,6 @@ import {toDegrees, toRadians} from './utils/Equa';
 import type {ImagePropsRef} from './utils/Renderer';
 import {SkeleNode} from './utils/SkeleNode';
 import {getNodeActions} from './utils/nodeActions';
-import {MenuAction} from './components/ContextMenu';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 0;

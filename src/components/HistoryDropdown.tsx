@@ -1,6 +1,6 @@
 import {HistoryEntry} from '../utils/HistoryManager';
-import {KebabMenu} from './KebabMenu';
 import './HistoryDropdown.css';
+import {KebabMenu} from './KebabMenu';
 
 interface HistoryDropdownProps<T> {
   entries: HistoryEntry<T>[];

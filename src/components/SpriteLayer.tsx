@@ -1,8 +1,8 @@
-import type {RenderInfo} from '../utils/SkeleNode';
 import type {UiNode} from '../shared/types';
+import {fromSpriteUri} from '../shared/types';
+import type {RenderInfo} from '../utils/SkeleNode';
 import type {Viewport} from './EditorCanvas';
 import {GameImage} from './GameImage';
-import {fromSpriteUri} from '../shared/types';
 import './SpriteLayer.css';
 
 export interface SpriteLayerProps {

@@ -1,4 +1,4 @@
-import {FileEntry, FabData, TabData, toSpriteUri} from '../shared/types';
+import {FabData, FileEntry, TabData, toSpriteUri} from '../shared/types';
 import {SkeleNode} from '../utils/SkeleNode';
 import {loadFabFile} from './fileService';
 

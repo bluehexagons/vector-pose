@@ -1,6 +1,6 @@
 import {MenuAction} from '../components/ContextMenu';
-import {SkeleNode} from './SkeleNode';
 import {icons} from './Icons';
+import {SkeleNode} from './SkeleNode';
 
 export interface NodeActionContext {
   node: SkeleNode;

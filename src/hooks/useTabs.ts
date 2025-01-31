@@ -1,7 +1,7 @@
-import {useState, useCallback} from 'react';
-import type {TabData, FabData} from '../shared/types';
-import {SkeleNode} from '../utils/SkeleNode';
+import {useCallback, useState} from 'react';
+import type {FabData, TabData} from '../shared/types';
 import type {ImagePropsRef} from '../utils/Renderer';
+import {SkeleNode} from '../utils/SkeleNode';
 
 const deduper = (props: ImagePropsRef) => props;
 
