@@ -1,6 +1,6 @@
 # vector-pose
 
-A professional vector-based skeletal rigging and animation tool built with Electron and React.
+A vector-based skeletal rigging tool built with Electron and React.
 
 ## Features
 
@@ -70,10 +70,8 @@ vector-pose uses the .fab file format for storing pose and animation data. Files
 
 - Ctrl+Z: Undo
 - Ctrl+Y/Ctrl+Shift+Z: Redo
-- Ctrl+S: Save
-- Ctrl+Shift+S: Save As
 - Delete: Remove selected node
-- Space: Add new node to selection
+- (...)
 
 ## Contributing
 
