@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import {FileEntry, FileTreeNode, createFileTree} from '../shared/types';
 import './FileExplorerPane.css';
 import {FileTreeView} from './FileTreeView';
@@ -28,12 +29,17 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
     });
   };
 
+  const availableFileNodes = useMemo(
+    () => createFileTree(availableFiles),
+    [availableFiles]
+  );
+
   return (
     <div className="file-explorer-pane">
       <h2 className="title">Files</h2>
       <ul className="file-list">
         <FileTreeView
-          nodes={createFileTree(availableFiles)}
+          nodes={availableFileNodes}
           onFileClick={handleTreeNodeClick}
           activeFile={activeFile}
         />

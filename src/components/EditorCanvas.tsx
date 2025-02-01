@@ -1,5 +1,5 @@
 import {vec2} from 'gl-matrix';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 // Base scale factor: at scale 1.0, a 1x1 unit square will be this many pixels
 export const BASE_SCALE = 200;
@@ -83,16 +83,19 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
       return vec2.fromValues(x, y);
     },
-    [scale, offset, rotation]
+    [scale, offset]
   );
 
-  const viewport: Viewport = {
-    scale: BASE_SCALE * scale,
-    offset,
-    rotation,
-    pageToWorld,
-    worldToPage,
-  };
+  const viewport: Viewport = useMemo(
+    () => ({
+      scale: BASE_SCALE * scale,
+      offset,
+      rotation,
+      pageToWorld,
+      worldToPage,
+    }),
+    [offset, pageToWorld, rotation, scale, worldToPage]
+  );
 
   const handleWheel = useCallback(
     (e: WheelEvent) => {
@@ -124,7 +127,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       setOffset(newOffset);
       onViewportChange?.(viewport);
     },
-    [scale, offset, viewport]
+    [scale, offset, onViewportChange, viewport]
   );
 
   const handleMouseDown = useCallback(
@@ -138,7 +141,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         onCanvasMouseDown?.(e, viewport);
       }
     },
-    [viewport]
+    [onCanvasMouseDown, viewport]
   );
 
   const handleMouseMove = useCallback(
@@ -157,7 +160,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         onCanvasMouseMove?.(e, viewport);
       }
     },
-    [isDragging, lastPos, offset, viewport]
+    [isDragging, lastPos, offset, onCanvasMouseMove, onViewportChange, viewport]
   );
 
   const handleMouseUp = useCallback(
@@ -169,7 +172,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         onCanvasMouseUp?.(e, viewport);
       }
     },
-    [isDragging, viewport]
+    [isDragging, onCanvasMouseUp, viewport]
   );
 
   useEffect(() => {

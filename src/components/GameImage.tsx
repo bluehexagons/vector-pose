@@ -45,6 +45,7 @@ export const GameImage: React.FC<GameImageProps> = ({
         URL.revokeObjectURL(imageSrc);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uri, gameDirectory]);
 
   if (!imageSrc) {

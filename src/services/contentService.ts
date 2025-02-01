@@ -14,7 +14,7 @@ export async function loadFabContent(
   const newSkele = SkeleNode.fromData(fabData.skele);
   newSkele.rotation = initialRotation;
   newSkele.mag = 1;
-  newSkele.id = `#ROOT_${++loadAtom}`;
+  newSkele.id = `#FAB_ROOT_${++loadAtom}`;
   return {skele: newSkele, fabData};
 }
 

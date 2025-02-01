@@ -397,7 +397,7 @@ export class SkeleNode {
     minSize: number
   ): SkeleNode | null {
     // Walk nodes in reverse for top-to-bottom layer order
-    const nodes = Array.from(this.walk()).reverse();
+    const nodes = Array.from(this.walk()).slice(1).reverse();
     let closest: {node: SkeleNode; distance: number} | null = null;
 
     for (const node of nodes) {

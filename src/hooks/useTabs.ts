@@ -106,14 +106,11 @@ export function useTabs() {
     []
   );
 
-  const addNewTab = useCallback(
-    (skele: SkeleNode) => {
-      const newTab = createEmptyTab(skele);
-      setTabs(current => [...current, newTab]);
-      setActiveTabId(newTab.skele.id);
-    },
-    [createEmptyTab]
-  );
+  const addNewTab = useCallback((skele: SkeleNode) => {
+    const newTab = createEmptyTab(skele);
+    setTabs(current => [...current, newTab]);
+    setActiveTabId(newTab.skele.id);
+  }, []);
 
   const closeTab = useCallback(
     (tabId: string) => {
@@ -130,7 +127,7 @@ export function useTabs() {
         return newTabs;
       });
     },
-    [activeTabId, createEmptyTab]
+    [activeTabId]
   );
 
   const selectTab = useCallback((tabId: string) => {
