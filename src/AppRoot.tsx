@@ -508,7 +508,6 @@ export const AppRoot = () => {
         const newNode = newSkele.findId(transforming.nodeId);
         if (!newNode) return;
 
-        let oldVal;
         let newVal;
 
         if (transforming.type === 'rotate') {
@@ -701,7 +700,9 @@ export const AppRoot = () => {
       </div>
 
       <footer className="footer">
-        {activeTab?.filePath ? activeTab.filePath : 'No file open'}
+        <div>{activeTab?.filePath ? activeTab.filePath : 'No file open'}</div>
+
+        <div>{history?.description}</div>
       </footer>
     </div>
   );

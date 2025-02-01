@@ -83,6 +83,9 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: space-between;
 }
 
 .footer:hover {
