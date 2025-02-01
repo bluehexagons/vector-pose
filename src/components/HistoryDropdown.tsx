@@ -22,7 +22,11 @@ export function HistoryDropdown<T>({
   return (
     <KebabMenu
       actions={actions.reverse()}
-      trigger={<button className="history-button">History ▾</button>}
+      trigger={
+        <button className="history-button" title="View undo and redo history">
+          History ▾
+        </button>
+      }
       align="left"
     />
   );

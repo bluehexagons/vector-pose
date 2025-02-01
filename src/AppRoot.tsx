@@ -621,6 +621,15 @@ export const AppRoot = () => {
       onContextMenu={preventDefault}
       onSelect={preventDefault}
     >
+      <div className="tab-container">
+        <TabPane
+          tabs={tabs}
+          activeTabId={activeTabId}
+          onNewTab={handleNewTab}
+          onCloseTab={closeTab}
+          onSelectTab={selectTab}
+        />
+      </div>
       <div className="page-header">
         <HeaderPane
           activeTab={activeTab}
@@ -636,16 +645,6 @@ export const AppRoot = () => {
           historyEntries={history.getHistoryEntries()}
           currentHistoryIndex={history.getCurrentIndex()}
           onHistorySelect={onHistorySelect}
-        />
-      </div>
-
-      <div className="tab-container">
-        <TabPane
-          tabs={tabs}
-          activeTabId={activeTabId}
-          onNewTab={handleNewTab}
-          onCloseTab={closeTab}
-          onSelectTab={selectTab}
         />
       </div>
 

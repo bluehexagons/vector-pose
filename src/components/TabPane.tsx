@@ -63,7 +63,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
       <button
         className="tab-scroll-button left"
         onClick={() => scrollTabs('left')}
-        title="Scroll left"
+        title="Scroll tabs left"
       >
         ‹
       </button>
@@ -101,11 +101,11 @@ export const TabPane: React.FC<TabPaneProps> = ({
       <button
         className="tab-scroll-button right"
         onClick={() => scrollTabs('right')}
-        title="Scroll right"
+        title="Scroll tabs right"
       >
         ›
       </button>
-      <button className="new-tab" onClick={onNewTab}>
+      <button className="new-tab" onClick={onNewTab} title="New tab">
         +
       </button>
     </div>

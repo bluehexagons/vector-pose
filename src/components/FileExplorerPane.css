@@ -57,6 +57,12 @@
   border-top: 1px solid var(--border-bright);
 }
 
+.game-directory {
+  white-space: wrap;
+  word-break: break-word;
+  overflow: hidden;
+}
+
 .change-directory {
   margin: var(--spacing-md) 0;
   width: 100%;

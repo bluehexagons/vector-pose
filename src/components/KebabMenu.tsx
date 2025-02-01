@@ -36,7 +36,11 @@ export const KebabMenu: React.FC<KebabMenuProps> = ({
       {trigger ? (
         <div onClick={handleClick}>{trigger}</div>
       ) : (
-        <button className="kebab-button" onClick={handleClick}>
+        <button
+          className="kebab-button"
+          onClick={handleClick}
+          title="Node menu actions"
+        >
           ⋮
         </button>
       )}

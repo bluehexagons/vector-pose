@@ -207,6 +207,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   className="text-input"
                   value={node.id || ''}
                   draggable={false}
+                  title="Set node ID, used to reference in animations"
                   onChange={evt => {
                     const oldId = node.id;
                     node.id = evt.target.value || null;
@@ -223,6 +224,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                 <NumberInput
                   value={node.sort}
                   allowUndefined
+                  title="The sort value overrides the normal z sorting for this specific node, and not children"
                   onChange={val => {
                     const oldSort = node.sort;
                     node.sort = val;
@@ -239,6 +241,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                 <AngleInput
                   value={toDegrees(node.rotation)}
                   draggable={false}
+                  title="Enter the angle that this node turns by"
                   onChange={v => {
                     const oldRotation = node.rotation;
                     node.rotation = toRadians(v);
@@ -258,6 +261,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                 <NumberInput
                   value={node.mag}
                   step={0.1}
+                  title="Enter the magnitude (length or size) of this node"
                   onChange={val => {
                     const oldMag = node.mag;
                     node.mag = val ?? 0;
@@ -277,6 +281,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   className="text-input"
                   value={node.uri || ''}
                   draggable={false}
+                  title="The URI marks a sprite node and points to the image location"
                   onChange={evt => {
                     const oldUri = node.uri;
                     node.uri = evt.target.value || null;

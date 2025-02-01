@@ -45,6 +45,7 @@ export const HeaderPane = ({
               style={{marginLeft: 'var(--spacing-xs)'}}
               value={activeTab.name}
               onChange={e => onNameChange(e.target.value)}
+              title="Set name of file"
             />
           )}
           {activeTab?.isModified && (
@@ -91,25 +92,50 @@ export const HeaderPane = ({
         </li>
         <li className="header-menu-item">
           <div className="view-controls">
-            <button onClick={() => onRotateView(viewRotation - 45)}>⟲</button>
+            <button
+              title="Rotate counter-clockwise 45 degrees"
+              onClick={() => onRotateView(viewRotation - 45)}
+            >
+              ⟲
+            </button>
             <input
               type="number"
               className="rotation-input"
+              title="Set rotation in degrees"
               value={viewRotation}
               onChange={e => onRotateView(Number(e.target.value) || 0)}
               step={15}
             />
             <span>°</span>
-            <button onClick={() => onRotateView(viewRotation + 45)}>⟳</button>
+            <button
+              title="Rotate clockwise 45 degrees"
+              onClick={() => onRotateView(viewRotation + 45)}
+            >
+              ⟳
+            </button>
           </div>
         </li>
         <li className="header-menu-item">
-          <button onClick={onSave} disabled={!activeTab}>
+          <button
+            onClick={onSave}
+            title={
+              activeTab?.filePath
+                ? `Save over file ${activeTab?.filePath}`
+                : 'Save as a new file'
+            }
+          >
             Save
           </button>
         </li>
         <li className="header-menu-item">
-          <button onClick={onSaveAs} disabled={!activeTab}>
+          <button
+            onClick={onSaveAs}
+            title={
+              activeTab?.filePath
+                ? `Save as a new file (${activeTab?.filePath})`
+                : 'Save as a new file'
+            }
+          >
             Save As...
           </button>
         </li>

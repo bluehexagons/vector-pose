@@ -46,19 +46,25 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
       </ul>
 
       <div className="open-file">
-        <button onClick={onFileSelect}>Open File</button>
-        <div>
-          <small>Note: imported images do not work yet.</small>
-        </div>
+        <button
+          onClick={onFileSelect}
+          title="Open and add a file to the tile list. (Image import incomplete)"
+        >
+          Open/Import File (WIP)
+        </button>
       </div>
 
-      <div className="game-directory">
+      <div className="game-directory" title={gameDirectory}>
         <small>
-          Game Directory: <strong>{gameDirectory}</strong>
+          Base Directory: <strong>{gameDirectory}</strong>
         </small>
       </div>
-      <button onClick={onDirectorySelect} className="change-directory">
-        <div>Choose Game Directory</div>
+      <button
+        onClick={onDirectorySelect}
+        className="change-directory"
+        title="Select a new game directory. Should be the renderer folder, with data and gfx folders."
+      >
+        <div>Choose Base Directory</div>
       </button>
     </div>
   );

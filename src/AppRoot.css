@@ -59,12 +59,10 @@ body {
 
 .page-header {
   grid-area: header;
-  min-height: var(--header-height);
 }
 
 .tab-container {
   grid-area: tabs;
-  min-height: var(--tabs-height);
 }
 
 .page-title,
@@ -77,7 +75,6 @@ body {
 
 .footer {
   grid-area: footer;
-  height: var(--footer-height);
   padding: 0 var(--spacing-sm);
   background-color: var(--bg-parimary);
   color: var(--text-secondary);
@@ -90,25 +87,6 @@ body {
 
 .footer:hover {
   opacity: 1;
-}
-
-.logo {
-  height: 1.5em;
-  padding: 0.5em;
-  will-change: filter;
-  transition: 0.1s ease-out;
-}
-
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.solid:hover {
-  filter: drop-shadow(0 0 2em #2f5d90);
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
 }
 
 .row {

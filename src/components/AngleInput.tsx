@@ -5,6 +5,7 @@ interface AngleInputProps {
   value: number;
   onChange: (value: number) => void;
   draggable: boolean;
+  title?: string;
 }
 
 const isValidAngle = (angle: number) => !isNaN(angle);
