@@ -17,7 +17,6 @@ export const TabPane: React.FC<TabPaneProps> = ({
   onCloseTab,
   onSelectTab,
 }) => {
-  console.log(tabs);
   return (
     <div className="tab-pane">
       <ul>

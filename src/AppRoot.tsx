@@ -164,7 +164,6 @@ export const AppRoot = () => {
   const [activeNode, setActiveNode] = useState<UiNode | undefined>(undefined);
 
   const focusNode = (node: UiNode) => {
-    console.trace('changing focused node');
     setLastActiveNode(node);
     setActiveNode(undefined);
   };
