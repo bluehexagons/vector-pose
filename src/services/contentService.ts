@@ -2,6 +2,8 @@ import {FabData, FileEntry, TabData, toSpriteUri} from '../shared/types';
 import {SkeleNode} from '../utils/SkeleNode';
 import {loadFabFile} from './fileService';
 
+let loadAtom = 0;
+
 export async function loadFabContent(
   file: FileEntry,
   initialRotation: number
@@ -11,6 +13,8 @@ export async function loadFabContent(
 
   const newSkele = SkeleNode.fromData(fabData.skele);
   newSkele.rotation = initialRotation;
+  newSkele.mag = 1;
+  newSkele.id = `#ROOT_${++loadAtom}`;
   return {skele: newSkele, fabData};
 }
 

@@ -375,6 +375,7 @@ export const AppRoot = () => {
       name: activeTab.name,
       description: activeTab.description,
       skele: activeTab.skele.toData(),
+      filePath,
     };
 
     // overwrite camera-modified values to their originals
@@ -383,6 +384,7 @@ export const AppRoot = () => {
 
     const success = await saveFabFile(filePath, fabData);
     if (success) {
+      loadDirectoryContent(gameDirectory);
       setTabs(current =>
         current.map(tab =>
           tab.skele.id === activeTabId
@@ -527,27 +529,57 @@ export const AppRoot = () => {
     });
   };
 
+  const keyBindings: Record<string, string> = {
+    'ctrl+z': 'undo',
+    'ctrl+shift+z': 'redo',
+    'ctrl+y': 'redo',
+    delete: 'delete',
+    p: 'createParent',
+    c: 'createChild',
+  };
+
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
       if (!activeTab) return;
 
-      const keyName = e.key.toLocaleLowerCase();
+      if ((e.target as HTMLElement).tagName === 'INPUT') {
+        console.log('in input');
+        return;
+      }
 
-      if (e.ctrlKey || e.metaKey) {
-        if (keyName === 'z') {
-          e.preventDefault();
-          if (e.shiftKey) {
-            const redoState = history.redo();
-            if (redoState) {
-              updateTab(redoState, activeTab.filePath);
-            }
-          } else {
-            const undoState = history.undo();
-            if (undoState) {
-              updateTab(undoState, activeTab.filePath);
-            }
-          }
+      const comboName = [
+        e.altKey ? 'alt' : '',
+        e.ctrlKey ? 'ctrl' : '',
+        e.shiftKey ? 'shift' : '',
+        e.key.toLocaleLowerCase(),
+      ]
+        .filter(Boolean)
+        .join('+');
+      const actionName = keyBindings[comboName];
+
+      if (actionName) {
+        e.preventDefault();
+      }
+
+      if (actionName === 'undo') {
+        const undoState = history.undo();
+        if (undoState) {
+          updateTab(undoState, activeTab.filePath);
         }
+      } else if (actionName === 'redo') {
+        const redoState = history.redo();
+        if (redoState) {
+          updateTab(redoState, activeTab.filePath);
+        }
+      } else if (actionName === 'delete') {
+        // run delete action
+        console.log('del', e);
+      } else if (actionName === 'createParent') {
+        // create new parent
+        console.log('parent');
+      } else if (actionName === 'createChild') {
+        // append child
+        console.log('child');
       }
     };
 

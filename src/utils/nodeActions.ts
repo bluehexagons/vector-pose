@@ -89,7 +89,7 @@ export function getNodeActions({
           newParent.add(targetNode);
           updateNode(
             clone,
-            `Added node ${targetNode} to new parent node ${newParent.id}, added to ${parent.id}`
+            `Added node ${targetNode.id} to new parent node ${newParent.id}, added to ${parent.id}`
           );
         }
       },
