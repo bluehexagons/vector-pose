@@ -1,7 +1,7 @@
 {
   "name": "vector-pose",
   "productName": "vector-pose",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "skeletal rigging software built using Electron",
   "main": ".vite/build/main.js",
   "scripts": {
