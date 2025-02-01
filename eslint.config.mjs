@@ -22,7 +22,9 @@ export default [
       'plugin:@typescript-eslint/recommended',
       'plugin:import/recommended',
       'plugin:import/electron',
-      'plugin:import/typescript'
+      'plugin:import/typescript',
+      'plugin:react/recommended',
+      'plugin:react-hooks/recommended'
     )
   ),
   {
@@ -38,6 +40,7 @@ export default [
     rules: {
       '@typescript-eslint/no-non-null-assertion': 0,
       '@typescript-eslint/no-unused-vars': 1,
+      'react/react-in-jsx-scope': 0,
     },
 
     ignores: [],
