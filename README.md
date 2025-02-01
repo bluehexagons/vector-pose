@@ -6,13 +6,10 @@ A vector-based skeletal rigging tool built with Electron and React.
 
 - Vector-based skeletal rigging system
 - Real-time preview and manipulation
-- Support for image sprites and vector graphics
 - Node-based hierarchy system
 - Undo/redo functionality
-- File explorer with drag-and-drop support
-- Custom file format (.fab) for saving poses and animations
+- Custom file format (.fab.json) for saving poses and animations
 - Keyboard shortcuts for common operations
-- Customizable workspace layout
 
 ## Prerequisites
 
