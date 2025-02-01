@@ -508,6 +508,9 @@ export const AppRoot = () => {
         const newNode = newSkele.findId(transforming.nodeId);
         if (!newNode) return;
 
+        let oldVal;
+        let newVal;
+
         if (transforming.type === 'rotate') {
           // Calculate relative vectors from center to points
           const startVec = vec2.sub(vec2.create(), startPos, center);
@@ -520,6 +523,7 @@ export const AppRoot = () => {
           );
 
           newNode.rotateSprite(deltaAngle);
+          newVal = newNode.rotation;
           transforming.startPos = currentPos;
         } else {
           // Calculate distances from center
@@ -531,6 +535,7 @@ export const AppRoot = () => {
           if (startDist > 0) {
             const scaleFactor = currentDist / startDist;
             newNode.scaleSprite(scaleFactor);
+            newVal = newNode.mag;
           }
 
           transforming.startPos = currentPos;
@@ -540,7 +545,7 @@ export const AppRoot = () => {
           newSkele,
           `${transforming.type === 'rotate' ? 'Rotated' : 'Scaled'} node ${
             transforming.nodeId
-          }`,
+          } to ${newVal.toFixed(4)}`,
           `${transforming.type}_${transforming.nodeId}`
         );
       };

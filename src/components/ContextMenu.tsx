@@ -7,6 +7,7 @@ export interface MenuAction {
   action: () => void;
   icon?: React.ReactNode;
   isSelected?: boolean;
+  title?: string;
 }
 
 interface ContextMenuProps {
@@ -74,6 +75,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         <button
           key={i}
           className={`menu-item ${action.isSelected ? 'selected' : ''}`}
+          title={action.title}
           onClick={() => {
             const callback = action.action;
             onClose();

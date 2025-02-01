@@ -91,6 +91,7 @@ export function getNodeActions({
       label: isCollapsed ? 'Expand' : 'Collapse',
       icon: isCollapsed ? icons.expand : icons.collapse,
       action: onToggleCollapse,
+      title: 'Collapse this node in the layers pane',
     });
   }
 
@@ -99,6 +100,7 @@ export function getNodeActions({
       label: isShrunken ? 'Show Details' : 'Hide Details',
       icon: icons.details,
       action: onToggleShrunken,
+      title: 'Show details for this node in the layers pane',
     });
   }
 
@@ -107,16 +109,21 @@ export function getNodeActions({
       label: node.hidden ? 'Show' : 'Hide',
       icon: node.hidden ? icons.visibility : icons.hidden,
       action: () => nodeActions.toggleVisibility({node, updateNode}),
+      title:
+        "Toggle the node's visibility; hidden nodes can be used for reference",
     },
     {
       label: 'Create Child',
       icon: icons.addParent,
       action: () => nodeActions.createChild({node, updateNode}),
+      title: 'Append a new child node to this one',
     },
     {
       label: 'Create Parent',
       icon: icons.addParent,
       action: () => nodeActions.createParent({node, updateNode}),
+      title:
+        'Append a new parent for this node to its parent, and add this node to that',
     },
     {
       label: 'Move to Top',
@@ -137,6 +144,7 @@ export function getNodeActions({
           }
         }
       },
+      title: 'Move this node to the top of its parent',
     },
     {
       label: 'Move to Bottom',
@@ -157,11 +165,13 @@ export function getNodeActions({
           }
         }
       },
+      title: 'Move this node to the bottom of its parent',
     },
     {
       label: 'Delete',
       icon: icons.delete,
       action: () => nodeActions.delete({node, updateNode}),
+      title: 'Delete this node and its children',
     }
   );
 

@@ -45,7 +45,7 @@ export const HeaderPane = ({
               style={{marginLeft: 'var(--spacing-xs)'}}
               value={activeTab.name}
               onChange={e => onNameChange(e.target.value)}
-              title="Set name of file"
+              title="Set the name of the opened fab"
             />
           )}
           {activeTab?.isModified && (
