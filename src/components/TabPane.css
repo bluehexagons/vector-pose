@@ -37,6 +37,9 @@
   white-space: nowrap; /* Prevent wrapping */
   min-width: 0; /* Allow flex shrinking */
   overflow-y: hidden; /* Prevent vertical scrolling */
+  overscroll-behavior-x: contain; /* Prevent overscroll on touch devices */
+  scroll-snap-type: x proximity; /* Optional: adds subtle snapping to tabs */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 .tab-pane ul::-webkit-scrollbar {
@@ -126,6 +129,7 @@
   border-radius: var(--border-radius);
   cursor: pointer;
   flex-shrink: 0; /* Prevent tabs from shrinking */
+  scroll-snap-align: start; /* Optional: works with scroll-snap-type above */
 }
 
 .tab.active {

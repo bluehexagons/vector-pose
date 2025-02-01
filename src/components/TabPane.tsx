@@ -35,6 +35,29 @@ export const TabPane: React.FC<TabPaneProps> = ({
     });
   }, []);
 
+  const handleWheel = useCallback((e: React.WheelEvent<HTMLUListElement>) => {
+    const tabList = tabListRef.current;
+    if (!tabList) return;
+
+    // Prevent vertical scrolling if this is a horizontal scroll gesture
+    if (e.deltaX !== 0) {
+      e.preventDefault();
+      return;
+    }
+
+    // Handle regular mouse wheel - convert vertical to horizontal scroll
+    // Use shift + wheel for horizontal scroll (standard browser behavior)
+    const delta = e.shiftKey ? e.deltaY : e.deltaX;
+
+    // If device supports horizontal scroll (like touchpad), use it directly
+    const scrollDelta = delta || e.deltaY;
+
+    tabList.scrollBy({
+      left: scrollDelta,
+      behavior: e.deltaMode === 1 ? 'smooth' : 'auto', // Use smooth scrolling for line-based delta
+    });
+  }, []);
+
   return (
     <div className="tab-pane">
       <button
@@ -44,7 +67,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
       >
         ‹
       </button>
-      <ul ref={tabListRef}>
+      <ul ref={tabListRef} onWheel={handleWheel}>
         {tabs.map(tab => (
           <li
             key={tab.skele.id}
