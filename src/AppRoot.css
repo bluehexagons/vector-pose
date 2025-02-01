@@ -37,8 +37,8 @@ body {
 .container {
   display: grid;
   grid-template-rows:
-    var(--header-height) /* Header */
     var(--tabs-height) /* Tabs */
+    var(--header-height) /* Header */
     1fr /* Content */
     var(--footer-height); /* Footer */
   grid-template-areas:

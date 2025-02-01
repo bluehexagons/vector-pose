@@ -28,21 +28,43 @@
   margin: 0;
   margin-bottom: 1px;
   display: flex;
-  gap: 4px; // Reduced gap between tabs
+  gap: 4px;
   overflow-x: auto; // Change back to auto for consistent behavior
-  scrollbar-width: none; // Hide Firefox scrollbar
+  scrollbar-width: thin; /* Show thin scrollbar in Firefox */
   height: 100%;
-  padding-bottom: 2px; // Prevent scrollbar from eating into tab bottom border
-  -ms-overflow-style: none; // Hide IE/Edge scrollbar
+  -ms-overflow-style: -ms-autohiding-scrollbar; /* Auto-hiding scrollbar in IE/Edge */
   flex: 1; /* Allow list to take up available space */
   white-space: nowrap; /* Prevent wrapping */
   min-width: 0; /* Allow flex shrinking */
   overflow-y: hidden; /* Prevent vertical scrolling */
 }
 
-/* Hide default webkit scrollbar */
 .tab-pane ul::-webkit-scrollbar {
-  display: none;
+  display: block;
+  height: 4px;
+  opacity: 0;
+}
+
+.tab-pane:hover ul::-webkit-scrollbar {
+  opacity: 1;
+}
+
+.tab-pane ul::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tab-pane ul::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  transition: background 600ms ease-out;
+  background: var(--border-bright);
+  opacity: 0;
+}
+
+.tab-pane:hover ul::-webkit-scrollbar-thumb {
+}
+
+.tab-pane ul::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
 
 /* Add scroll buttons */
