@@ -155,7 +155,6 @@ export interface FabData {
   name?: string;
   description?: string;
   skele: SkeleData;
-  // Can add more properties here later
 }
 
 export interface TabData {

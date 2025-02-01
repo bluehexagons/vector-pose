@@ -1,96 +1,84 @@
 export interface HistoryEntry<T> {
   state: T;
   description: string;
+  continuityKey?: string;
 }
 
 export class HistoryManager<T> {
-  private undoStack: HistoryEntry<T>[] = [];
-  private redoStack: HistoryEntry<T>[] = [];
-  private maxSize: number;
+  private entries: HistoryEntry<T>[] = [];
+  private currentIndex = -1;
   private lastContinuityKey?: string;
+  private readonly maxHistory: number;
 
-  constructor(maxSize = 100) {
-    this.maxSize = maxSize;
+  constructor(maxHistory = 100) {
+    this.maxHistory = maxHistory;
   }
 
-  push(state: T, description: string, continuityKey?: string) {
-    if (
-      continuityKey &&
-      continuityKey === this.lastContinuityKey &&
-      this.undoStack.length > 0
-    ) {
-      // Replace the last entry if continuity key matches
-      this.undoStack[this.undoStack.length - 1] = {state, description};
-    } else {
-      this.undoStack.push({state, description});
-      this.redoStack = []; // Clear redo stack on new action
+  getCurrentState() {
+    return this.entries[this.currentIndex];
+  }
 
-      // Maintain max size
-      if (this.undoStack.length > this.maxSize) {
-        this.undoStack.shift();
-      }
+  pushState(state: T, description: string, continuityKey?: string) {
+    // Handle continuity - replace last entry if keys match
+    if (continuityKey && continuityKey === this.lastContinuityKey) {
+      this.entries[this.currentIndex] = {state, description, continuityKey};
+      return;
     }
+
+    // Trim future states when pushing new state
+    this.entries = this.entries.slice(0, this.currentIndex + 1);
+
+    // Add new entry
+    this.entries.push({state, description, continuityKey});
+
+    // Maintain history limit
+    if (this.entries.length > this.maxHistory) {
+      this.entries.shift();
+      this.currentIndex--;
+    }
+
+    this.currentIndex++;
     this.lastContinuityKey = continuityKey;
   }
 
-  undo(): HistoryEntry<T> | undefined {
-    if (this.undoStack.length > 1) {
-      const entry = this.undoStack.pop();
-      if (entry) {
-        this.redoStack.push(entry);
-      }
-      this.lastContinuityKey = undefined;
-      return this.undoStack[this.undoStack.length - 1];
-    }
-
-    return this.undoStack[0];
-  }
-
-  redo(): HistoryEntry<T> | undefined {
-    const entry = this.redoStack.pop();
-    if (entry) {
-      this.undoStack.push(entry);
-      return entry;
-    }
+  undo(): HistoryEntry<T> | null {
+    if (this.currentIndex <= 0) return null;
     this.lastContinuityKey = undefined;
-    return undefined;
+    return this.entries[--this.currentIndex];
   }
 
-  jumpToState(index: number): HistoryEntry<T> | undefined {
-    const entries = this.getHistoryEntries();
-    if (index < 0 || index >= entries.length) return undefined;
-
-    // Move everything after target index to redo stack
-    const targetEntry = entries[index];
-    this.undoStack = entries.slice(0, index + 1);
-    this.redoStack = entries.slice(index + 1);
-
+  redo(): HistoryEntry<T> | null {
+    if (this.currentIndex >= this.entries.length - 1) return null;
     this.lastContinuityKey = undefined;
-    return targetEntry;
+    return this.entries[++this.currentIndex];
   }
 
-  canUndo(): boolean {
-    return this.undoStack.length > 1;
-  }
-
-  canRedo(): boolean {
-    return this.redoStack.length > 0;
-  }
-
-  getCurrentState(): HistoryEntry<T> | undefined {
-    return this.undoStack[this.undoStack.length - 1];
-  }
-
-  getCurrentIndex(): number {
-    return this.undoStack.length - 1;
+  jumpToState(index: number): HistoryEntry<T> | null {
+    if (index < 0 || index >= this.entries.length) return null;
+    this.currentIndex = index;
+    this.lastContinuityKey = undefined;
+    return this.entries[index];
   }
 
   clear() {
-    this.undoStack = [];
-    this.redoStack = [];
+    this.entries = [];
+    this.currentIndex = -1;
+    this.lastContinuityKey = undefined;
   }
 
-  getHistoryEntries(): HistoryEntry<T>[] {
-    return [...this.undoStack, ...this.redoStack];
+  canUndo() {
+    return this.currentIndex > 0;
+  }
+
+  canRedo() {
+    return this.currentIndex < this.entries.length - 1;
+  }
+
+  getEntries() {
+    return this.entries;
+  }
+
+  getCurrentIndex() {
+    return this.currentIndex;
   }
 }

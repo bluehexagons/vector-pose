@@ -10,6 +10,7 @@ import {LayersPane} from './components/LayersPane';
 import {Resizer} from './components/Resizer';
 import {TabPane} from './components/TabPane';
 import {useHistory} from './hooks/useHistory';
+import {useKeyboardShortcuts} from './hooks/useKeyboardShortcuts';
 import {useTabs} from './hooks/useTabs';
 import {
   createImageNode,
@@ -27,7 +28,7 @@ import {FileEntry, UiNode} from './shared/types';
 import {toDegrees, toRadians} from './utils/Equa';
 import type {ImagePropsRef} from './utils/Renderer';
 import {SkeleNode} from './utils/SkeleNode';
-import {getNodeActions, nodeActions} from './utils/nodeActions';
+import {getNodeActions} from './utils/nodeActions';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 0;
@@ -45,17 +46,6 @@ const createDefaultSkele = () =>
 const preventDefault = (e: React.SyntheticEvent) => e.preventDefault();
 
 let atomicCounter = 0;
-
-const keyBindings: Record<string, {action: string; contexts: string[]}> = {
-  'ctrl+z': {action: 'undo', contexts: ['node', 'editor']},
-  'ctrl+shift+z': {action: 'redo', contexts: ['node', 'editor']},
-  'ctrl+y': {action: 'redo', contexts: ['node', 'editor']},
-  delete: {action: 'delete', contexts: ['node']},
-  backspace: {action: 'delete', contexts: ['node']},
-  p: {action: 'createParent', contexts: ['node']},
-  c: {action: 'createChild', contexts: ['node']},
-  h: {action: 'toggleVisibility', contexts: ['node']},
-};
 
 export const AppRoot = () => {
   const {
@@ -90,7 +80,7 @@ export const AppRoot = () => {
   const [time, setTime] = useState(1);
 
   const skele = activeTab.skele;
-  const history = useHistory(skele, activeTabId);
+  const history = useHistory(skele, skele.id);
 
   const tickSkele = useCallback(
     (base: SkeleNode) => {
@@ -175,15 +165,6 @@ export const AppRoot = () => {
     tickSkele(skele);
     addNewTab(skele);
   }, [addNewTab, tickSkele]);
-
-  const handleCloseTab = useCallback(
-    (tabId: string) => {
-      history.clearHistory();
-      closeTab(tabId);
-    },
-    [closeTab, history]
-  );
-  const handleSelectTab = selectTab;
 
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
 
@@ -587,109 +568,35 @@ export const AppRoot = () => {
     [updateSkele]
   );
 
-  useEffect(() => {
-    const handleKeyboard = (e: KeyboardEvent) => {
-      if (!activeTab) return;
-
-      // Don't trigger shortcuts when typing in inputs
-      if (
-        (e.target as HTMLElement).tagName === 'INPUT' ||
-        (e.target as HTMLElement).tagName === 'TEXTAREA'
-      ) {
-        return;
-      }
-
-      const comboName = [
-        e.altKey ? 'alt' : '',
-        e.ctrlKey ? 'ctrl' : '',
-        e.shiftKey ? 'shift' : '',
-        e.key.toLowerCase(),
-      ]
-        .filter(Boolean)
-        .join('+');
-
-      const {action, contexts} = keyBindings[comboName] || {};
-
-      if (!action) {
-        return;
-      }
-
-      // Get the target node for the action
-      const targetNode =
-        activeTab.lastActiveNode?.node || activeTab.activeNode?.node;
-
-      const context = targetNode ? 'node' : 'editor';
-      if (!contexts.includes(context)) return;
-
-      e.preventDefault();
-
-      const currentNode = targetNode ? skele.findId(targetNode.id) : null;
-
-      const actionParams = {
-        node: currentNode, // Use node from current skele state
-        updateNode: updateSkele,
-      };
-
-      switch (action) {
-        case 'undo': {
-          const undoState = history.undo();
-          if (undoState) {
-            updateTab(undoState, activeTab.filePath);
-          }
-          break;
-        }
-        case 'redo': {
-          const redoState = history.redo();
-          if (redoState) {
-            updateTab(redoState, activeTab.filePath);
-          }
-          break;
-        }
-        case 'delete':
-          nodeActions.delete(actionParams);
-          break;
-        case 'createParent':
-          nodeActions.createParent(actionParams);
-          break;
-        case 'createChild':
-          nodeActions.createChild(actionParams);
-          break;
-        case 'toggleVisibility':
-          nodeActions.toggleVisibility(actionParams);
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyboard);
-    return () => window.removeEventListener('keydown', handleKeyboard);
-  }, [
+  useKeyboardShortcuts({
     activeTab,
-    skele,
-    history,
-    activeNode,
-    lastActiveNode,
     updateSkele,
     updateTab,
-  ]);
+    history,
+  });
 
   const onUndo = useCallback(() => {
     const undoState = history.undo();
-    if (undoState) {
-      updateTab(undoState, activeTab.filePath);
+    if (undoState?.state) {
+      const clone = undoState.state.clone();
+      tickSkele(clone); // Make sure state is properly initialized
+      updateTab(clone, activeTab.filePath);
     }
-  }, [activeTab.filePath, history, updateTab]);
+  }, [activeTab.filePath, history, tickSkele, updateTab]);
 
   const onRedo = useCallback(() => {
     const redoState = history.redo();
-    if (redoState) {
-      updateTab(redoState, activeTab.filePath);
+    if (redoState?.state) {
+      const clone = redoState.state.clone();
+      tickSkele(clone);
+      updateTab(clone, activeTab.filePath);
     }
-  }, [activeTab.filePath, history, updateTab]);
+  }, [activeTab.filePath, history, tickSkele, updateTab]);
 
   const onHistorySelect = useCallback(
     (index: number) => {
       const entry = history.jumpToState(index);
-      if (entry) {
+      if (entry?.state) {
         updateTab(entry.state, activeTab.filePath);
       }
     },
@@ -737,8 +644,8 @@ export const AppRoot = () => {
           tabs={tabs}
           activeTabId={activeTabId}
           onNewTab={handleNewTab}
-          onCloseTab={handleCloseTab}
-          onSelectTab={handleSelectTab}
+          onCloseTab={closeTab}
+          onSelectTab={selectTab}
         />
       </div>
 

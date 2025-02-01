@@ -1,59 +1,42 @@
-import {useCallback, useEffect, useState} from 'react';
-import {HistoryEntry} from '../utils/HistoryManager';
-import {TabHistory} from '../utils/TabHistory';
+import {useCallback, useEffect, useRef} from 'react';
+import {SkeleNode} from '../utils/SkeleNode';
+import {HistoryManager} from '../utils/HistoryManager';
 
-export function useHistory<T>(initialState: T, tabId: string) {
-  const [tabHistory] = useState(() => new TabHistory<T>());
-  const [currentEntry, setCurrentEntry] = useState<
-    HistoryEntry<T> | undefined
-  >();
+export function useHistory(initialState: SkeleNode, key: string) {
+  const managers = useRef<Record<string, HistoryManager<SkeleNode>>>({});
 
-  // Get the history for current tab
-  const history = tabHistory.getHistory(tabId);
+  // Get or create manager for this key
+  if (!managers.current[key]) {
+    managers.current[key] = new HistoryManager<SkeleNode>();
+  }
+  const manager = managers.current[key];
 
-  const pushState = useCallback(
-    (state: T, description: string, continuityKey?: string) => {
-      history.push(state, description, continuityKey);
-      setCurrentEntry(history.getCurrentState());
-    },
-    [history]
-  );
-
-  const undo = useCallback(() => {
-    const entry = history.undo();
-    setCurrentEntry(entry);
-    return entry?.state;
-  }, [history]);
-
-  const redo = useCallback(() => {
-    const entry = history.redo();
-    setCurrentEntry(entry);
-    return entry?.state;
-  }, [history]);
-
-  // Reset current entry when tab changes
+  // Initialize with initial state if empty
   useEffect(() => {
-    setCurrentEntry(history.getCurrentState());
-  }, [tabId, history]);
-
-  // Initialize history for new tabs
-  useEffect(() => {
-    if (!history.getCurrentState()) {
-      pushState(initialState, 'Initial state');
+    if (!manager.getCurrentState() && initialState) {
+      manager.pushState(initialState, 'Initial state');
     }
-  }, [history, initialState, pushState]);
+  }, [manager, initialState]);
 
   return {
-    currentState: currentEntry?.state,
-    description: currentEntry?.description,
-    pushState,
-    undo,
-    redo,
-    clearHistory: history.clear,
-    canUndo: history.canUndo(),
-    canRedo: history.canRedo(),
-    getCurrentIndex: () => history.getCurrentIndex(),
-    getHistoryEntries: () => history.getHistoryEntries(),
-    jumpToState: (index: number) => history.jumpToState(index),
+    currentState: manager.getCurrentState()?.state,
+    description: manager.getCurrentState()?.description,
+    pushState: useCallback(
+      (state: SkeleNode, description: string, continuityKey?: string) => {
+        manager.pushState(state, description, continuityKey);
+      },
+      [manager]
+    ),
+    undo: useCallback(() => manager.undo(), [manager]),
+    redo: useCallback(() => manager.redo(), [manager]),
+    clear: useCallback(() => manager.clear(), [manager]),
+    canUndo: manager.canUndo(),
+    canRedo: manager.canRedo(),
+    getCurrentIndex: useCallback(() => manager.getCurrentIndex(), [manager]),
+    getHistoryEntries: useCallback(() => manager.getEntries(), [manager]),
+    jumpToState: useCallback(
+      (index: number) => manager.jumpToState(index),
+      [manager]
+    ),
   };
 }

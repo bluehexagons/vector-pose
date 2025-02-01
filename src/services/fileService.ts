@@ -1,12 +1,6 @@
-import type {SkeleData} from 'src/utils/SkeleNode';
-import type {FileEntry} from '../shared/types';
+import type {FabData, FileEntry} from '../shared/types';
 import {FAB_EXTENSIONS, IMAGE_EXTENSIONS, SEARCH_DIRS} from '../shared/types';
-
-export interface FabData {
-  skele: SkeleData;
-  name?: string;
-  description?: string;
-}
+import {validate as validateFab} from '../validation/fabSchema';
 
 export async function scanDirectory(
   baseDir: string,
@@ -78,13 +72,20 @@ export async function loadFabFile(filePath: string) {
 
 export async function saveFabFile(filePath: string, fabData: FabData) {
   try {
+    const validationResult = validateFab(fabData);
+    if (!validationResult.success) {
+      console.error('Invalid FAB data:', validationResult.error.format());
+      return false;
+    }
+
     await window.native.fs.writeFile(
       filePath,
-      JSON.stringify(fabData, null, 2)
+      JSON.stringify(fabData, null, 2),
+      'utf8'
     );
     return true;
   } catch (err) {
-    console.error('Failed to save file:', err);
+    console.error('Failed to save FAB file:', err);
     return false;
   }
 }

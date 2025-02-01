@@ -62,6 +62,9 @@ export class SkeleNode {
     },
   };
 
+  private nodeCache = new Map<string, SkeleNode>();
+  private nodeCacheGeneration = 0;
+
   add(node: SkeleNode) {
     if (node === this) {
       throw new Error('Cannot add node to itself');
@@ -110,7 +113,8 @@ export class SkeleNode {
   }
 
   clearNodeCache() {
-    this.root.nodeLookupCache.clear();
+    this.nodeCache.clear();
+    this.nodeCacheGeneration++;
   }
 
   includes(node: SkeleNode) {
@@ -228,17 +232,16 @@ export class SkeleNode {
     return this.root.findId(nodeId);
   }
 
-  findId(nodeId: string): SkeleNode {
-    if (this.nodeLookupCache.has(nodeId)) {
-      return this.nodeLookupCache.get(nodeId)!;
+  findId(nodeId: string, generation?: number): SkeleNode {
+    if (generation === this.nodeCacheGeneration && this.nodeCache.has(nodeId)) {
+      return this.nodeCache.get(nodeId)!;
     }
 
     for (const node of this.walk()) {
-      if (node.id !== nodeId) {
-        continue;
+      if (node.id === nodeId) {
+        this.nodeCache.set(nodeId, node);
+        return node;
       }
-      this.nodeLookupCache.set(nodeId, node);
-      return node;
     }
 
     return null as never;
@@ -303,6 +306,61 @@ export class SkeleNode {
     for (const child of this.children) {
       const clonedChild = child.clone(node);
       node.children.push(clonedChild);
+    }
+
+    return node;
+  }
+
+  /**
+   * Creates a shallow clone for performance-critical operations
+   * Only copies essential properties needed for state updates
+   */
+  shallowClone(parent: SkeleNode | null = null): SkeleNode {
+    const node = new SkeleNode();
+    node.id = this.id;
+    node.rotation = this.rotation;
+    node.mag = this.mag;
+    node.parent = parent;
+    node.root = parent?.root ?? node;
+    // Don't clone children or other properties
+    return node;
+  }
+
+  /**
+   * Creates a partial clone that only includes nodes along a specified path
+   * Useful for operations that only affect a small part of the tree
+   */
+  partialClone(targetId: string, parent: SkeleNode | null = null): SkeleNode {
+    const node = new SkeleNode();
+    // Copy basic properties
+    node.id = this.id;
+    node.uri = this.uri;
+    node.mag = this.mag;
+    node.rotation = this.rotation;
+    node.props = this.props;
+    node.sort = this.sort;
+    node.hidden = this.hidden;
+    vec2.copy(node.transform, this.transform);
+
+    node.parent = parent;
+    node.root = parent?.root ?? node;
+
+    // Only clone children that are in path to target
+    if (this.id === targetId) {
+      // Clone all children if this is the target
+      for (const child of this.children) {
+        const clonedChild = child.clone(node);
+        node.children.push(clonedChild);
+      }
+    } else {
+      // Otherwise only clone children that contain the target
+      for (const child of this.children) {
+        if (child.findId(targetId)) {
+          const clonedChild = child.partialClone(targetId, node);
+          node.children.push(clonedChild);
+          break;
+        }
+      }
     }
 
     return node;
