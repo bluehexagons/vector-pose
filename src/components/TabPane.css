@@ -2,13 +2,14 @@
   grid-column: left-start / right-end;
   grid-row: header-start / header-end;
   display: flex;
-  gap: 10px;
+  gap: 4px; // Reduced gap for more compact tabs
   justify-items: center;
   align-items: center;
   height: var(--header-height);
   overflow: hidden;
   position: relative;
   user-select: none;
+  padding: 0;
 }
 
 .tab-pane::after {
@@ -27,9 +28,66 @@
   margin: 0;
   margin-bottom: 1px;
   display: flex;
-  gap: 10px;
-  overflow-x: auto;
+  gap: 4px; // Reduced gap between tabs
+  overflow-x: auto; // Change back to auto for consistent behavior
+  scrollbar-width: none; // Hide Firefox scrollbar
   height: 100%;
+  padding-bottom: 2px; // Prevent scrollbar from eating into tab bottom border
+  -ms-overflow-style: none; // Hide IE/Edge scrollbar
+  flex: 1; /* Allow list to take up available space */
+  white-space: nowrap; /* Prevent wrapping */
+  min-width: 0; /* Allow flex shrinking */
+  overflow-y: hidden; /* Prevent vertical scrolling */
+}
+
+/* Hide default webkit scrollbar */
+.tab-pane ul::-webkit-scrollbar {
+  display: none;
+}
+
+/* Add scroll buttons */
+.tab-pane {
+  position: relative;
+}
+
+.tab-scroll-button {
+  position: sticky; /* Change to sticky positioning */
+  top: 0;
+  bottom: 2px; // Account for bottom border
+  width: 24px;
+  background: var(--bg-secondary);
+  border: none;
+  color: var(--text-primary);
+  opacity: 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 1;
+  height: calc(100% - 4px);
+}
+
+.tab-scroll-button:hover {
+  opacity: 1;
+  background: var(--bg-hover);
+}
+
+.tab-scroll-button.left {
+  left: 0;
+  padding-left: var(--spacing-sm);
+  background: linear-gradient(to right, var(--bg-secondary) 70%, transparent);
+}
+
+.tab-scroll-button.right {
+  right: 0; /* Position against the right edge */
+  padding-right: var(--spacing-sm);
+  background: linear-gradient(to left, var(--bg-secondary) 70%, transparent);
+}
+
+.tab-pane:hover .tab-scroll-button {
+  opacity: 0.8;
 }
 
 .tab {
@@ -37,12 +95,15 @@
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  height: 100%;
+  height: calc(100% - 2px); // Account for bottom padding
+  min-width: 100px; // Ensure minimum tab width
+  max-width: 200px; // Prevent tabs from becoming too wide
   background: var(--bg-hover);
   border: 1px solid var(--border-dim);
   border-bottom: 2px solid transparent;
   border-radius: var(--border-radius);
   cursor: pointer;
+  flex-shrink: 0; /* Prevent tabs from shrinking */
 }
 
 .tab.active {
@@ -52,6 +113,9 @@
 
 .tab-name {
   white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 150px; // Prevent very long tab names from expanding tabs
 }
 
 .tab-close {
@@ -67,6 +131,7 @@
   opacity: 1;
 }
 
+/* Move new tab button styling */
 .new-tab {
   padding: 0 12px;
   height: 80%;
@@ -74,6 +139,9 @@
   border: none;
   color: var(--text-primary);
   cursor: pointer;
+  margin-right: var(--spacing-sm); /* Add margin to separate from edge */
+  position: sticky; /* Make it stick to the right */
+  right: 0;
 }
 
 .new-tab:hover {
