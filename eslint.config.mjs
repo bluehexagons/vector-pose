@@ -1,6 +1,7 @@
 import {fixupConfigRules} from '@eslint/compat';
 import {FlatCompat} from '@eslint/eslintrc';
 import js from '@eslint/js';
+// eslint-disable-next-line import/no-unresolved
 import tsParser from '@typescript-eslint/parser';
 import globals from 'globals';
 import path from 'node:path';
@@ -28,6 +29,11 @@ export default [
     )
   ),
   {
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -41,6 +47,7 @@ export default [
       '@typescript-eslint/no-non-null-assertion': 0,
       '@typescript-eslint/no-unused-vars': 1,
       'react/react-in-jsx-scope': 0,
+      'react/prop-types': 0,
     },
 
     ignores: [],
