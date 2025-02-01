@@ -528,15 +528,15 @@ export const AppRoot = () => {
     });
   };
 
-  const keyBindings: Record<string, string> = {
-    'ctrl+z': 'undo',
-    'ctrl+shift+z': 'redo',
-    'ctrl+y': 'redo',
-    delete: 'delete',
-    backspace: 'delete',
-    p: 'createParent',
-    c: 'createChild',
-    h: 'toggleVisibility',
+  const keyBindings: Record<string, {action: string; contexts: string[]}> = {
+    'ctrl+z': {action: 'undo', contexts: ['node', 'editor']},
+    'ctrl+shift+z': {action: 'redo', contexts: ['node', 'editor']},
+    'ctrl+y': {action: 'redo', contexts: ['node', 'editor']},
+    delete: {action: 'delete', contexts: ['node']},
+    backspace: {action: 'delete', contexts: ['node']},
+    p: {action: 'createParent', contexts: ['node']},
+    c: {action: 'createChild', contexts: ['node']},
+    h: {action: 'toggleVisibility', contexts: ['node']},
   };
 
   useEffect(() => {
@@ -560,26 +560,28 @@ export const AppRoot = () => {
         .filter(Boolean)
         .join('+');
 
-      const actionName = keyBindings[comboName];
+      const {action, contexts} = keyBindings[comboName] || {};
 
-      if (!actionName) {
+      if (!action) {
         return;
       }
 
       // Get the target node for the action
       const targetNode = lastActiveNode?.node || activeNode?.node;
 
-      if (!targetNode) return;
+      const context = targetNode ? 'node' : 'editor';
+      if (!contexts.includes(context)) return;
 
       e.preventDefault();
-      console.log('action', actionName, skele);
+
+      const currentNode = targetNode ? skele.findId(targetNode.id) : null;
 
       const actionParams = {
-        node: targetNode,
+        node: currentNode, // Use node from current skele state
         updateNode: updateSkele,
       };
 
-      switch (actionName) {
+      switch (action) {
         case 'undo':
           const undoState = history.undo();
           if (undoState) {
@@ -609,7 +611,7 @@ export const AppRoot = () => {
 
     window.addEventListener('keydown', handleKeyboard);
     return () => window.removeEventListener('keydown', handleKeyboard);
-  }, [activeTab, history, activeNode, lastActiveNode]);
+  }, [activeTab, skele, history, activeNode, lastActiveNode]);
 
   return (
     <div
