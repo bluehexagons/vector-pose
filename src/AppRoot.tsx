@@ -608,7 +608,7 @@ export const AppRoot = () => {
     []
   );
   const onResizeRight = useCallback(
-    (delta: number) => setRightWidth(w => Math.max(100, w + delta)),
+    (delta: number) => setRightWidth(w => Math.max(100, w - delta)),
     []
   );
 
