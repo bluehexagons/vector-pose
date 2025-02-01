@@ -15,6 +15,65 @@ export interface NodeActionContext {
   onToggleShrunken?: () => void;
 }
 
+interface NodeActionParams {
+  node: SkeleNode;
+  updateNode: (
+    node: SkeleNode,
+    description?: string,
+    continuityKey?: string
+  ) => void;
+}
+
+export const nodeActions = {
+  delete: ({node, updateNode}: NodeActionParams) => {
+    const clone = node.root.clone();
+    const nodeToDelete = clone.findId(node.id);
+    if (nodeToDelete) {
+      const parent = nodeToDelete.parent;
+      nodeToDelete.remove();
+      updateNode(clone, `Deleted node ${nodeToDelete.id} from ${parent.id}`);
+    }
+  },
+
+  createChild: ({node, updateNode}: NodeActionParams) => {
+    const clone = node.root.clone();
+    const targetNode = clone.findId(node.id);
+    const newNode = new SkeleNode();
+    targetNode.add(newNode);
+    updateNode(
+      clone,
+      `Created node ${newNode.id} and added to ${targetNode.id}`
+    );
+  },
+
+  createParent: ({node, updateNode}: NodeActionParams) => {
+    const clone = node.root.clone();
+    const targetNode = clone.findId(node.id);
+    if (targetNode?.parent) {
+      const newParent = new SkeleNode();
+      const parent = targetNode.parent;
+      parent.add(newParent);
+      newParent.add(targetNode);
+      updateNode(
+        clone,
+        `Added node ${targetNode.id} to new parent node ${newParent.id}, added to ${parent.id}`
+      );
+    }
+  },
+
+  toggleVisibility: ({node, updateNode}: NodeActionParams) => {
+    const clone = node.root.clone();
+    const targetNode = clone.findId(node.id);
+    if (targetNode) {
+      targetNode.hidden = !targetNode.hidden;
+      updateNode(
+        clone,
+        `Set node ${targetNode.id} to ${targetNode.hidden ? 'HIDE' : 'SHOW'}`
+      );
+    }
+  },
+};
+
 export function getNodeActions({
   node,
   updateNode,
@@ -47,52 +106,17 @@ export function getNodeActions({
     {
       label: node.hidden ? 'Show' : 'Hide',
       icon: node.hidden ? icons.visibility : icons.hidden,
-      action: () => {
-        const clone = node.root.clone();
-        const targetNode = clone.findId(node.id);
-        if (targetNode) {
-          targetNode.hidden = !targetNode.hidden;
-          updateNode(
-            clone,
-            `Set node ${targetNode.id} to ${
-              targetNode.hidden ? 'HIDE' : 'SHOW'
-            } (was ${!targetNode.hidden})`,
-            `visibility_${node.id}`
-          );
-        }
-      },
+      action: () => nodeActions.toggleVisibility({node, updateNode}),
     },
     {
       label: 'Create Child',
       icon: icons.addParent,
-      action: () => {
-        const clone = node.root.clone();
-        const targetNode = clone.findId(node.id);
-        const newNode = new SkeleNode();
-        targetNode.add(newNode);
-        updateNode(
-          clone,
-          `Created node ${newNode.id} and added to ${targetNode.id}`
-        );
-      },
+      action: () => nodeActions.createChild({node, updateNode}),
     },
     {
       label: 'Create Parent',
       icon: icons.addParent,
-      action: () => {
-        const clone = node.root.clone();
-        const targetNode = clone.findId(node.id);
-        if (targetNode?.parent) {
-          const newParent = new SkeleNode();
-          const parent = targetNode.parent;
-          parent.add(newParent);
-          newParent.add(targetNode);
-          updateNode(
-            clone,
-            `Added node ${targetNode.id} to new parent node ${newParent.id}, added to ${parent.id}`
-          );
-        }
-      },
+      action: () => nodeActions.createParent({node, updateNode}),
     },
     {
       label: 'Move to Top',
@@ -137,18 +161,7 @@ export function getNodeActions({
     {
       label: 'Delete',
       icon: icons.delete,
-      action: () => {
-        const clone = node.root.clone();
-        const nodeToDelete = clone.findId(node.id);
-        if (nodeToDelete) {
-          const parent = nodeToDelete.parent;
-          nodeToDelete.remove();
-          updateNode(
-            clone,
-            `Deleted node ${nodeToDelete.id} from ${parent.id}`
-          );
-        }
-      },
+      action: () => nodeActions.delete({node, updateNode}),
     }
   );
 

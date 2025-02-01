@@ -27,7 +27,7 @@ import {FileEntry, UiNode} from './shared/types';
 import {toDegrees, toRadians} from './utils/Equa';
 import type {ImagePropsRef} from './utils/Renderer';
 import {SkeleNode} from './utils/SkeleNode';
-import {getNodeActions} from './utils/nodeActions';
+import {getNodeActions, nodeActions} from './utils/nodeActions';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 0;
@@ -533,16 +533,21 @@ export const AppRoot = () => {
     'ctrl+shift+z': 'redo',
     'ctrl+y': 'redo',
     delete: 'delete',
+    backspace: 'delete',
     p: 'createParent',
     c: 'createChild',
+    h: 'toggleVisibility',
   };
 
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
       if (!activeTab) return;
 
-      if ((e.target as HTMLElement).tagName === 'INPUT') {
-        console.log('in input');
+      // Don't trigger shortcuts when typing in inputs
+      if (
+        (e.target as HTMLElement).tagName === 'INPUT' ||
+        (e.target as HTMLElement).tagName === 'TEXTAREA'
+      ) {
         return;
       }
 
@@ -550,41 +555,61 @@ export const AppRoot = () => {
         e.altKey ? 'alt' : '',
         e.ctrlKey ? 'ctrl' : '',
         e.shiftKey ? 'shift' : '',
-        e.key.toLocaleLowerCase(),
+        e.key.toLowerCase(),
       ]
         .filter(Boolean)
         .join('+');
+
       const actionName = keyBindings[comboName];
 
-      if (actionName) {
-        e.preventDefault();
+      if (!actionName) {
+        return;
       }
 
-      if (actionName === 'undo') {
-        const undoState = history.undo();
-        if (undoState) {
-          updateTab(undoState, activeTab.filePath);
-        }
-      } else if (actionName === 'redo') {
-        const redoState = history.redo();
-        if (redoState) {
-          updateTab(redoState, activeTab.filePath);
-        }
-      } else if (actionName === 'delete') {
-        // run delete action
-        console.log('del', e);
-      } else if (actionName === 'createParent') {
-        // create new parent
-        console.log('parent');
-      } else if (actionName === 'createChild') {
-        // append child
-        console.log('child');
+      // Get the target node for the action
+      const targetNode = lastActiveNode?.node || activeNode?.node;
+
+      if (!targetNode) return;
+
+      e.preventDefault();
+      console.log('action', actionName, skele);
+
+      const actionParams = {
+        node: targetNode,
+        updateNode: updateSkele,
+      };
+
+      switch (actionName) {
+        case 'undo':
+          const undoState = history.undo();
+          if (undoState) {
+            updateTab(undoState, activeTab.filePath);
+          }
+          break;
+        case 'redo':
+          const redoState = history.redo();
+          if (redoState) {
+            updateTab(redoState, activeTab.filePath);
+          }
+          break;
+        case 'delete':
+          nodeActions.delete(actionParams);
+          break;
+        case 'createParent':
+          nodeActions.createParent(actionParams);
+          break;
+        case 'createChild':
+          nodeActions.createChild(actionParams);
+          break;
+        case 'toggleVisibility':
+          nodeActions.toggleVisibility(actionParams);
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyboard);
     return () => window.removeEventListener('keydown', handleKeyboard);
-  }, [activeTab, history]);
+  }, [activeTab, history, activeNode, lastActiveNode]);
 
   return (
     <div
