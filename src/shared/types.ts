@@ -167,6 +167,9 @@ export interface TabData {
   renderedInfo: RenderInfo[];
   renderedNodes: SkeleNode[];
   rotation: number;
+  activeNode?: UiNode;
+  lastActiveNode?: UiNode;
+  fabData?: FabData;
 }
 
 declare global {

@@ -1,5 +1,5 @@
 import {useCallback, useState} from 'react';
-import type {FabData, TabData} from '../shared/types';
+import type {FabData, TabData, UiNode} from '../shared/types';
 import type {ImagePropsRef} from '../utils/Renderer';
 import {SkeleNode} from '../utils/SkeleNode';
 
@@ -14,6 +14,8 @@ const renderSkele = (skele: SkeleNode) => ({
     : [],
 });
 
+let atomicCounter = 0;
+
 const createEmptyTab = (
   defaultSkele?: SkeleNode,
   fabData?: FabData,
@@ -25,7 +27,7 @@ const createEmptyTab = (
       angle: 0,
       mag: 1,
       children: [{angle: 0, mag: 0}],
-      id: SkeleNode.randomLetters(), // Explicitly set a new ID
+      id: `#ROOT_${++atomicCounter}`,
     });
 
   return {
@@ -143,6 +145,33 @@ export function useTabs() {
     );
   }, []);
 
+  const setActiveNode = useCallback((tabId: string, node?: UiNode) => {
+    setTabs(current =>
+      current.map(tab =>
+        tab.skele.id === tabId
+          ? {
+              ...tab,
+              activeNode: node,
+              lastActiveNode: tab.activeNode,
+            }
+          : tab
+      )
+    );
+  }, []);
+
+  const setLastActiveNode = useCallback((tabId: string, node?: UiNode) => {
+    setTabs(current =>
+      current.map(tab =>
+        tab.skele.id === tabId
+          ? {
+              ...tab,
+              lastActiveNode: node,
+            }
+          : tab
+      )
+    );
+  }, []);
+
   const activeTab = tabs.find(tab => tab.skele.id === activeTabId);
 
   return {
@@ -156,5 +185,7 @@ export function useTabs() {
     setActiveTabId,
     setTabs,
     setRotation, // Add new rotation setter
+    setActiveNode,
+    setLastActiveNode,
   };
 }

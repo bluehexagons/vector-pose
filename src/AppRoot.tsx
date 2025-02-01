@@ -55,7 +55,11 @@ export const AppRoot = () => {
     selectTab,
     setTabs,
     setRotation,
+    setActiveNode,
+    setLastActiveNode,
   } = useTabs();
+
+  const {activeNode, lastActiveNode} = activeTab;
 
   const spriteHolderRef = useRef<HTMLDivElement>(null);
 
@@ -157,15 +161,9 @@ export const AppRoot = () => {
 
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
 
-  const [lastActiveNode, setLastActiveNode] = useState<UiNode | undefined>(
-    undefined
-  );
-
-  const [activeNode, setActiveNode] = useState<UiNode | undefined>(undefined);
-
   const focusNode = (node: UiNode) => {
-    setLastActiveNode(node);
-    setActiveNode(undefined);
+    setLastActiveNode(activeTabId, node);
+    setActiveNode(activeTabId, undefined);
   };
 
   const appendNewNode = () => {
@@ -186,12 +184,12 @@ export const AppRoot = () => {
 
   // Modify handleEditorMouseUp to match new dragStart type
   const handleEditorMouseUp = () => {
-    if (!dragStart || !activeNode) {
+    if (!dragStart || !activeTab.activeNode) {
       return;
     }
 
-    setLastActiveNode(activeNode);
-    setActiveNode(undefined);
+    setLastActiveNode(activeTabId, activeTab.activeNode);
+    setActiveNode(activeTabId, undefined);
   };
 
   const handleNodeSelection = (
@@ -207,8 +205,8 @@ export const AppRoot = () => {
     );
 
     setDragStart({worldPos, clickOffset});
-    setActiveNode({node: node.node});
-    setLastActiveNode(undefined);
+    setActiveNode(activeTabId, {node: node.node});
+    setLastActiveNode(activeTabId, undefined);
     e.preventDefault();
   };
 
@@ -567,7 +565,8 @@ export const AppRoot = () => {
       }
 
       // Get the target node for the action
-      const targetNode = lastActiveNode?.node || activeNode?.node;
+      const targetNode =
+        activeTab.lastActiveNode?.node || activeTab.activeNode?.node;
 
       const context = targetNode ? 'node' : 'editor';
       if (!contexts.includes(context)) return;
@@ -682,8 +681,8 @@ export const AppRoot = () => {
           <EditorPane
             renderedInfo={activeTab?.renderedInfo ?? []}
             renderedNodes={activeTab?.renderedNodes ?? []}
-            activeNode={activeNode}
-            lastActiveNode={lastActiveNode}
+            activeNode={activeTab.activeNode}
+            lastActiveNode={activeTab.lastActiveNode}
             focusNode={focusNode}
             gameDirectory={gameDirectory}
             onMouseDown={handleEditorMouseDown}
@@ -703,8 +702,8 @@ export const AppRoot = () => {
         <div className="pane right-pane" style={{width: rightWidth}}>
           <LayersPane
             renderedNodes={activeTab?.skele.children ?? []}
-            activeNode={activeNode}
-            lastActiveNode={lastActiveNode}
+            activeNode={activeTab.activeNode}
+            lastActiveNode={activeTab.lastActiveNode}
             focusNode={focusNode}
             onNodeUpdate={updateSkele}
             skele={activeTab?.skele ?? new SkeleNode()}
