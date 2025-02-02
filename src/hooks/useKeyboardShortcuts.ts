@@ -2,7 +2,6 @@ import {useCallback, useEffect} from 'react';
 import type {TabData} from '../shared/types';
 import {nodeActions} from '../utils/nodeActions';
 import {SkeleNode} from '../utils/SkeleNode';
-import {HistoryEntry} from '../utils/HistoryManager';
 
 export interface History {
   undo: () => {state: SkeleNode} | null;

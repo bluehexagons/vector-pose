@@ -11,12 +11,16 @@ A vector-based skeletal rigging tool built with Electron and React.
 - Custom file format (.fab.json) for saving poses and animations
 - Keyboard shortcuts for common operations
 
+## Installation
+
+Windows releases can be found on the [Releases](https://github.com/bluehexagons/vector-pose/releases) page.
+
 ## Prerequisites
 
 - Node.js 18.0 or higher
 - npm 8.0 or higher
 
-## Installation
+## Development
 
 Clone the repository and install dependencies:
 
@@ -26,7 +30,7 @@ cd vector-pose
 npm install
 ```
 
-## Development
+Useful scripts:
 
 ```bash
 # Start the application in development mode
@@ -50,7 +54,7 @@ npm run lint
 - `/src` - Source code
   - `/components` - React components
   - `/hooks` - Custom React hooks
-  - `/services` - Business logic and services
+  - `/services` - Logic and services
   - `/shared` - Shared types and utilities
   - `/utils` - Utility functions and helpers
 
@@ -63,12 +67,29 @@ vector-pose uses the .fab file format for storing pose and animation data. Files
 - Sprite references
 - Animation keyframes
 
+## Directory Structure
+
+For now, uses a hardcoded directory structure. See the `example` directory.
+
+Should target the renderer directory of the game.
+
+- `/data/fabs/` - fab data
+- `/gfx/` - graphics data (gfx: uri)
+- `/gfx/sprite/` - sprite data (sprite: uri)
+
 ## Keyboard Shortcuts
 
-- Ctrl+Z: Undo
-- Ctrl+Y/Ctrl+Shift+Z: Redo
-- Delete: Remove selected node
-- (...)
+Global shortcuts:
+
+- ctrl+z: Undo
+- ctrl+y, ctrl+shift+z: Redo
+
+Node controls:
+
+- delete, backspace: Remove node and children
+- p: Reparent node
+- c: Create new child node
+- h: Toggle node visibility
 
 ## Contributing
 

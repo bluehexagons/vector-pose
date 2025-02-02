@@ -1,6 +1,5 @@
+import {z} from 'zod';
 import type {ImagePropsRef} from '../utils/Renderer';
-import {SafeParseReturnType, z} from 'zod';
-import type {FabData} from '../shared/types';
 
 interface SkeleDataType {
   angle?: number;
