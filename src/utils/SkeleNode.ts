@@ -424,7 +424,7 @@ export class SkeleNode {
 
   /** Gets the effective node to move - for sprites, returns their parent */
   getMovableNode(): SkeleNode {
-    return this.uri ? this.parent : this;
+    return this.uri && this.parent ? this.parent : this;
   }
 
   /**

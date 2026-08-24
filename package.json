@@ -2,6 +2,7 @@
   "name": "vector-pose",
   "productName": "vector-pose",
   "version": "1.0.1",
+  "private": true,
   "description": "skeletal rigging software built using Electron",
   "main": ".vite/build/main.js",
   "scripts": {
@@ -9,50 +10,62 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint ./src"
+    "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives .",
+    "lint:fix": "oxlint --type-aware --fix .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run format:check && npm run lint && npm run typecheck"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^7.6.0",
-    "@electron-forge/maker-deb": "^7.6.0",
-    "@electron-forge/maker-rpm": "^7.6.0",
-    "@electron-forge/maker-squirrel": "^7.6.0",
-    "@electron-forge/maker-zip": "^7.6.0",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.6.0",
-    "@electron-forge/plugin-fuses": "^7.6.0",
-    "@electron-forge/plugin-vite": "^7.6.0",
-    "@electron-forge/publisher-github": "^7.6.1",
+    "@electron-forge/cli": "^7.11.2",
+    "@electron-forge/maker-deb": "^7.11.2",
+    "@electron-forge/maker-rpm": "^7.11.2",
+    "@electron-forge/maker-squirrel": "^7.11.2",
+    "@electron-forge/maker-zip": "^7.11.2",
+    "@electron-forge/plugin-fuses": "^7.11.2",
+    "@electron-forge/plugin-vite": "^7.11.2",
+    "@electron-forge/publisher-github": "^7.11.2",
     "@electron/fuses": "^1.8.0",
-    "@eslint/compat": "^1.2.6",
-    "@eslint/eslintrc": "^3.2.0",
-    "@eslint/js": "^9.19.0",
     "@types/electron-squirrel-startup": "^1.0.2",
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
-    "@typescript-eslint/eslint-plugin": "^8.22.0",
-    "@typescript-eslint/parser": "^8.22.0",
-    "electron": "^34.0.2",
-    "eslint": "^9.19.0",
-    "eslint-plugin-import": "^2.25.0",
-    "eslint-plugin-react": "^7.37.4",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "globals": "^15.14.0",
-    "ts-node": "^10.0.0",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.11"
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "electron": "^43.4.1",
+    "oxfmt": "^0.64.0",
+    "oxlint": "^1.79.0",
+    "oxlint-tsgolint": "^7.0.2001",
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
   },
   "keywords": [],
   "author": {
     "name": "bluehexagons",
     "email": "bluehexagons@users.noreply.github.com"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=10.9.0"
+  },
+  "packageManager": "npm@12.0.2",
+  "allowScripts": {
+    "electron-winstaller@5.4.4": true
+  },
+  "overrides": {
+    "@electron/packager": "^18.4.4",
+    "@electron/rebuild": "^4.2.0",
+    "extract-zip": "npm:@electron-internal/extract-zip@^1.0.1",
+    "tmp": "^0.2.7"
+  },
   "dependencies": {
     "@bluehexagons/easing": "^0.4.2",
     "electron-squirrel-startup": "^1.0.1",
-    "gl-matrix": "^3.4.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "update-electron-app": "^3.1.1",
-    "zod": "^3.24.1"
+    "gl-matrix": "^3.4.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "update-electron-app": "^3.3.0",
+    "zod": "^4.4.3"
   }
 }

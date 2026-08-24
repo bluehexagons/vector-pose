@@ -1,5 +1,5 @@
 import type {dialog} from 'electron';
-import type {RenderInfo, SkeleData, SkeleNode} from 'src/utils/SkeleNode';
+import type {RenderInfo, SkeleData, SkeleNode} from '../utils/SkeleNode';
 
 export interface UiNode {
   node: SkeleNode;

@@ -2,7 +2,7 @@
   grid-column: left-start / right-end;
   grid-row: header-start / header-end;
   display: flex;
-  gap: 4px; // Reduced gap for more compact tabs
+  gap: 4px; /* Reduced gap for more compact tabs */
   justify-items: center;
   align-items: center;
   height: var(--header-height);
@@ -32,7 +32,7 @@
   margin: 0;
   display: flex;
   gap: 4px;
-  overflow-x: auto; // Change back to auto for consistent behavior
+  overflow-x: auto; /* Change back to auto for consistent behavior */
   scrollbar-width: thin; /* Show thin scrollbar in Firefox */
   height: 100%;
   -ms-overflow-style: -ms-autohiding-scrollbar; /* Auto-hiding scrollbar in IE/Edge */
@@ -121,9 +121,9 @@
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  height: calc(100% - 1px); // Account for bottom padding
-  min-width: 100px; // Ensure minimum tab width
-  max-width: 200px; // Prevent tabs from becoming too wide
+  height: calc(100% - 1px); /* Account for bottom padding */
+  min-width: 100px; /* Ensure minimum tab width */
+  max-width: 200px; /* Prevent tabs from becoming too wide */
   background: var(--bg-hover);
   border: 1px solid var(--border-dim);
   border-bottom: 2px solid transparent;
@@ -148,7 +148,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 150px; // Prevent very long tab names from expanding tabs
+  max-width: 150px; /* Prevent very long tab names from expanding tabs */
 }
 
 .tab:hover .tab-close {

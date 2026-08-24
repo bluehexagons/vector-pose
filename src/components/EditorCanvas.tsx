@@ -29,7 +29,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   onCanvasMouseMove,
   onCanvasMouseUp,
   onContextMenu,
-  rotation = 0,
+  rotation,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Start zoomed out a bit more

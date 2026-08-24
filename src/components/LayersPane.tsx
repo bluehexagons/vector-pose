@@ -15,7 +15,7 @@ interface LayersPaneProps {
   ) => void;
   skele: SkeleNode;
   onAddNode: () => void;
-  focusNode: (node: UiNode) => void;
+  focusNode: (node?: UiNode) => void;
 }
 
 export const LayersPane: React.FC<LayersPaneProps> = ({

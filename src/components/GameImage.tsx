@@ -20,6 +20,9 @@ export const GameImage: React.FC<GameImageProps> = ({
   const [imageSrc, setImageSrc] = useState('');
 
   useEffect(() => {
+    let blobUrl: string | undefined;
+    let canceled = false;
+
     const loadImage = async () => {
       try {
         const relativePath = uri;
@@ -28,8 +31,12 @@ export const GameImage: React.FC<GameImageProps> = ({
           relativePath
         );
         const buffer = await window.native.fs.readFile(fullPath);
-        const blob = new Blob([buffer], {type: 'image/png'});
-        const blobUrl = URL.createObjectURL(blob);
+        const blob = new Blob([Uint8Array.from(buffer)], {type: 'image/png'});
+        blobUrl = URL.createObjectURL(blob);
+        if (canceled) {
+          URL.revokeObjectURL(blobUrl);
+          return;
+        }
         setImageSrc(blobUrl);
         onLoad?.();
       } catch (err) {
@@ -38,15 +45,15 @@ export const GameImage: React.FC<GameImageProps> = ({
       }
     };
 
-    loadImage();
+    void loadImage();
 
     return () => {
-      if (imageSrc) {
-        URL.revokeObjectURL(imageSrc);
+      canceled = true;
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uri, gameDirectory]);
+  }, [gameDirectory, onError, onLoad, uri]);
 
   if (!imageSrc) {
     return null;

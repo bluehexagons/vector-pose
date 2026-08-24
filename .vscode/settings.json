@@ -1,9 +1,8 @@
 {
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.oxc": "always"
   },
-  "eslint.validate": ["typescript"],
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "emmet.showAbbreviationSuggestions": true,

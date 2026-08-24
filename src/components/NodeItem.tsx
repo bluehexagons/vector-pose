@@ -10,9 +10,9 @@ import {NumberInput} from './NumberInput';
 
 interface NodeItemProps {
   node: SkeleNode;
-  activeNode: SkeleNode;
-  lastActiveNode: SkeleNode;
-  focusNode: (node: UiNode) => void;
+  activeNode?: SkeleNode;
+  lastActiveNode?: SkeleNode;
+  focusNode: (node?: UiNode) => void;
   index: number;
   depth?: number;
   onNodeUpdate: (
@@ -73,8 +73,8 @@ export const NodeItem: React.FC<NodeItemProps> = ({
       isHeader
         ? 'drag-over-above'
         : isContent
-        ? 'drag-over-content'
-        : 'drag-over-below'
+          ? 'drag-over-content'
+          : 'drag-over-below'
     );
   };
 
@@ -174,8 +174,8 @@ export const NodeItem: React.FC<NodeItemProps> = ({
           node.id === activeNode?.id
             ? 'active'
             : node.id === lastActiveNode?.id
-            ? 'last-active'
-            : ''
+              ? 'last-active'
+              : ''
         } ${node.hidden ? 'hidden' : ''}`}
       >
         <div className="node-header" draggable onDragStart={handleDragStart}>
@@ -209,12 +209,17 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   draggable={false}
                   title="Set node ID, used to reference in animations"
                   onChange={evt => {
+                    const clone = skele.clone();
+                    const updatedNode = clone.findIdFromRoot(node.id);
+                    if (!updatedNode) return;
+
                     const oldId = node.id;
-                    node.id = evt.target.value || null;
+                    updatedNode.id =
+                      evt.target.value || updatedNode.generateId();
                     onNodeUpdate(
-                      skele.clone(),
-                      `Updated node ${node.id} ID (was ${oldId})`,
-                      `update_id_${node.id}`
+                      clone,
+                      `Updated node ${updatedNode.id} ID (was ${oldId})`,
+                      `update_id_${oldId}`
                     );
                   }}
                 />
@@ -226,11 +231,15 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   allowUndefined
                   title="The sort value overrides the normal z sorting for this specific node, and not children"
                   onChange={val => {
+                    const clone = skele.clone();
+                    const updatedNode = clone.findIdFromRoot(node.id);
+                    if (!updatedNode) return;
+
                     const oldSort = node.sort;
-                    node.sort = val;
+                    updatedNode.sort = val ?? 0;
                     onNodeUpdate(
-                      skele.clone(),
-                      `Updated node ${node.id} sort to ${node.sort} (was ${oldSort})`,
+                      clone,
+                      `Updated node ${node.id} sort to ${updatedNode.sort} (was ${oldSort})`,
                       `update_sort_${node.id}`
                     );
                   }}
@@ -243,13 +252,17 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   draggable={false}
                   title="Enter the angle that this node turns by"
                   onChange={v => {
+                    const clone = skele.clone();
+                    const updatedNode = clone.findIdFromRoot(node.id);
+                    if (!updatedNode) return;
+
                     const oldRotation = node.rotation;
-                    node.rotation = toRadians(v);
-                    node.updateTransform();
+                    updatedNode.rotation = toRadians(v);
+                    updatedNode.updateTransform();
                     onNodeUpdate(
-                      skele.clone(),
+                      clone,
                       `Updated node ${node.id} angle to ${toDegrees(
-                        node.rotation
+                        updatedNode.rotation
                       ).toFixed(2)} (was ${toDegrees(oldRotation).toFixed(2)})`,
                       `update_rotation_${node.id}`
                     );
@@ -263,12 +276,16 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   step={0.1}
                   title="Enter the magnitude (length or size) of this node"
                   onChange={val => {
+                    const clone = skele.clone();
+                    const updatedNode = clone.findIdFromRoot(node.id);
+                    if (!updatedNode) return;
+
                     const oldMag = node.mag;
-                    node.mag = val ?? 0;
-                    node.updateTransform();
+                    updatedNode.mag = val ?? 0;
+                    updatedNode.updateTransform();
                     onNodeUpdate(
-                      skele.clone(),
-                      `Updated node ${node.id} magnitude to ${node.mag} (was ${oldMag})`,
+                      clone,
+                      `Updated node ${node.id} magnitude to ${updatedNode.mag} (was ${oldMag})`,
                       `update_mag_${node.id}`
                     );
                   }}
@@ -283,11 +300,15 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                   draggable={false}
                   title="The URI marks a sprite node and points to the image location"
                   onChange={evt => {
+                    const clone = skele.clone();
+                    const updatedNode = clone.findIdFromRoot(node.id);
+                    if (!updatedNode) return;
+
                     const oldUri = node.uri;
-                    node.uri = evt.target.value || null;
+                    updatedNode.uri = evt.target.value || null;
                     onNodeUpdate(
-                      skele.clone(),
-                      `Updated node ${node.id} URI to ${node.uri} (was ${oldUri})`,
+                      clone,
+                      `Updated node ${node.id} URI to ${updatedNode.uri} (was ${oldUri})`,
                       `update_uri_${node.id}`
                     );
                   }}

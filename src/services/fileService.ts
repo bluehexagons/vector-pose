@@ -22,8 +22,9 @@ export async function scanDirectory(
         entries.push(...(await scanDirectory(baseDir, relativePath)));
       } else {
         const ext = await window.native.path.extname(file.name);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (IMAGE_EXTENSIONS.includes(ext as any)) {
+        if (
+          IMAGE_EXTENSIONS.includes(ext as (typeof IMAGE_EXTENSIONS)[number])
+        ) {
           entries.push({path: file.path, relativePath, type: 'image'});
         } else if (FAB_EXTENSIONS.some(fabExt => file.name.endsWith(fabExt))) {
           entries.push({path: file.path, relativePath, type: 'fab'});
@@ -127,7 +128,7 @@ export async function selectFiles() {
             (await window.native.path.extname(filePath)) === '.json'
               ? 'fab'
               : 'image',
-        } as FileEntry)
+        }) as FileEntry
     )
   );
 }

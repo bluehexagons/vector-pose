@@ -28,7 +28,7 @@ export const nodeActions = {
   delete: ({node, updateNode}: NodeActionParams) => {
     const clone = node.root.clone();
     const nodeToDelete = clone.findId(node.id);
-    if (nodeToDelete) {
+    if (nodeToDelete?.parent) {
       const parent = nodeToDelete.parent;
       nodeToDelete.remove();
       updateNode(clone, `Deleted node ${nodeToDelete.id} from ${parent.id}`);

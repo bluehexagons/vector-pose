@@ -70,11 +70,6 @@ export function useKeyboardShortcuts({
         : null;
       if (binding.contexts.includes('node') && !currentNode) return;
 
-      const actionParams = {
-        node: currentNode,
-        updateNode: updateSkele,
-      };
-
       switch (binding.action) {
         case 'undo': {
           const undoState = history.undo();
@@ -89,9 +84,14 @@ export function useKeyboardShortcuts({
         case 'delete':
         case 'createParent':
         case 'createChild':
-        case 'toggleVisibility':
-          nodeActions[binding.action](actionParams);
+        case 'toggleVisibility': {
+          if (!currentNode) return;
+          nodeActions[binding.action]({
+            node: currentNode,
+            updateNode: updateSkele,
+          });
           break;
+        }
       }
     },
     [activeTab, history, updateSkele, updateTab]

@@ -9,16 +9,15 @@ import './EditorPane.css';
 import {NodeGraphLayer} from './NodeGraphLayer';
 import {SpriteLayer, SpriteLayerProps} from './SpriteLayer';
 
-interface EditorPaneProps
-  extends Pick<
-    SpriteLayerProps,
-    'renderedInfo' | 'gameDirectory' | 'spriteHolderRef' | 'onTransformStart'
-  > {
+interface EditorPaneProps extends Pick<
+  SpriteLayerProps,
+  'renderedInfo' | 'gameDirectory' | 'spriteHolderRef' | 'onTransformStart'
+> {
   renderedNodes: SkeleNode[];
   activeNode?: {node: SkeleNode};
   lastActiveNode?: {node: SkeleNode};
   onMouseDown: (e: React.MouseEvent, viewport: Viewport) => void;
-  spriteHolderRef: React.RefObject<HTMLDivElement>;
+  spriteHolderRef: React.RefObject<HTMLDivElement | null>;
   onMouseMove?: (e: React.MouseEvent, viewport: Viewport) => void;
   onMouseUp?: (e: React.MouseEvent, viewport: Viewport) => void;
   rotation: number;
@@ -27,7 +26,7 @@ interface EditorPaneProps
     e: React.MouseEvent,
     viewport: Viewport
   ) => MenuAction[];
-  focusNode: (node: UiNode) => void;
+  focusNode: (node?: UiNode) => void;
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = ({

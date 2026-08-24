@@ -169,7 +169,7 @@ export function useTabs() {
     );
   }, []);
 
-  const activeTab = tabs.find(tab => tab.skele.id === activeTabId);
+  const activeTab = tabs.find(tab => tab.skele.id === activeTabId) ?? tabs[0];
 
   return {
     tabs,

@@ -11,7 +11,7 @@ export interface SpriteLayerProps {
   lastActiveNode?: UiNode;
   gameDirectory: string;
   viewport: Viewport;
-  spriteHolderRef: React.RefObject<HTMLDivElement>;
+  spriteHolderRef: React.RefObject<HTMLDivElement | null>;
   onTransformStart?: (
     nodeId: string,
     type: 'rotate' | 'scale',

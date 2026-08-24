@@ -1,11 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './NumberInput.css';
 
-interface NumberInputProps
-  extends Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    'value' | 'onChange'
-  > {
+interface NumberInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'value' | 'onChange'
+> {
   value: number | undefined;
   onChange: (value: number | undefined) => void;
   allowUndefined?: boolean;

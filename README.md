@@ -17,8 +17,8 @@ Windows releases can be found on the [Releases](https://github.com/bluehexagons/
 
 ## Prerequisites
 
-- Node.js 18.0 or higher
-- npm 8.0 or higher
+- Node.js 22.12 or higher
+- npm 10.9 or higher
 
 ## Development
 
@@ -47,6 +47,15 @@ npm run publish
 
 # Run linting
 npm run lint
+
+# Apply safe lint fixes
+npm run lint:fix
+
+# Check formatting, linting, and types
+npm run check
+
+# Apply formatting
+npm run format
 ```
 
 ## Project Structure
@@ -99,4 +108,4 @@ Node controls:
 
 ## License
 
-MIT License - See LICENSE file for details
+Apache License 2.0 - See LICENSE file for details

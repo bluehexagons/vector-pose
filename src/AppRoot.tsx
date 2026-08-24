@@ -35,9 +35,6 @@ const INITIAL_ROTATION = 0;
 const INITIAL_OBJECT_POSITION = vec2.fromValues(0, 0);
 const INITIAL_VIEW_ROTATION = 270;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const emptyArray: any[] = [];
-
 const deduper = (props: ImagePropsRef) => props;
 
 const createDefaultSkele = () =>
@@ -77,7 +74,7 @@ export const AppRoot = () => {
     clickOffset: vec2;
   }>();
 
-  const [time, setTime] = useState(1);
+  const time = 1;
 
   const skele = activeTab.skele;
   const history = useHistory(skele, skele.id);
@@ -131,8 +128,7 @@ export const AppRoot = () => {
     if (skele && !skele.initialized) {
       updateSkele(skele.clone());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [skele]);
+  }, [skele, updateSkele]);
 
   const findClosestNode = useCallback(
     (worldX: number, worldY: number, targetSize: number) => {
@@ -169,7 +165,7 @@ export const AppRoot = () => {
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
 
   const focusNode = useCallback(
-    (node: UiNode) => {
+    (node?: UiNode) => {
       setLastActiveNode(activeTabId, node);
       setActiveNode(activeTabId, undefined);
     },
@@ -358,10 +354,10 @@ export const AppRoot = () => {
 
   useEffect(() => {
     if (gameDirectory) {
-      loadDirectoryContent(gameDirectory);
+      // oxlint-disable-next-line react/set-state-in-effect -- Loading a directory asynchronously updates the file list.
+      void loadDirectoryContent(gameDirectory);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameDirectory]);
+  }, [gameDirectory, loadDirectoryContent]);
 
   const [leftWidth, setLeftWidth] = useState(300);
   const [rightWidth, setRightWidth] = useState(300);
@@ -388,7 +384,7 @@ export const AppRoot = () => {
 
     const success = await saveFabFile(filePath, fabData);
     if (success) {
-      loadDirectoryContent(gameDirectory);
+      void loadDirectoryContent(gameDirectory);
       setTabs(current =>
         current.map(tab =>
           tab.skele.id === activeTabId
@@ -508,7 +504,7 @@ export const AppRoot = () => {
         const newNode = newSkele.findId(transforming.nodeId);
         if (!newNode) return;
 
-        let newVal;
+        let newVal = newNode.mag;
 
         if (transforming.type === 'rotate') {
           // Calculate relative vectors from center to points
@@ -656,7 +652,7 @@ export const AppRoot = () => {
         <div className="pane left-pane" style={leftPanelStyle}>
           <FileExplorerPane
             availableFiles={availableFiles}
-            activeFile={activeNode?.node.uri}
+            activeFile={activeNode?.node.uri ?? undefined}
             gameDirectory={gameDirectory}
             onFileClick={handleFileClick}
             onFileSelect={handleFileSelect}
@@ -668,8 +664,8 @@ export const AppRoot = () => {
 
         <div className="pane middle-pane">
           <EditorPane
-            renderedInfo={activeTab?.renderedInfo ?? emptyArray}
-            renderedNodes={activeTab?.renderedNodes ?? emptyArray}
+            renderedInfo={activeTab.renderedInfo}
+            renderedNodes={activeTab.renderedNodes}
             activeNode={activeTab.activeNode}
             lastActiveNode={activeTab.lastActiveNode}
             focusNode={focusNode}
@@ -688,7 +684,7 @@ export const AppRoot = () => {
 
         <div className="pane right-pane" style={rightPanelStyle}>
           <LayersPane
-            renderedNodes={activeTab?.skele.children ?? emptyArray}
+            renderedNodes={activeTab.skele.children}
             activeNode={activeTab.activeNode}
             lastActiveNode={activeTab.lastActiveNode}
             focusNode={focusNode}

@@ -24,17 +24,15 @@ export const NodeGraphLayer: React.FC<NodeGraphLayerProps> = ({
             node.id === activeNode?.node.id
               ? 'active'
               : node.id === lastActiveNode?.node.id
-              ? 'last-active'
-              : ''
+                ? 'last-active'
+                : ''
           }`}
           style={{
             left: `${
-              (node.uri ? node.parent : node).state.mid.transform[0] *
-              viewport.scale
+              node.getMovableNode().state.mid.transform[0] * viewport.scale
             }px`,
             top: `${
-              (node.uri ? node.parent : node).state.mid.transform[1] *
-              viewport.scale
+              node.getMovableNode().state.mid.transform[1] * viewport.scale
             }px`,
             marginTop: node.uri ? '28px' : '0',
             transform: 'translate(-50%, -50%)',
