@@ -4,7 +4,7 @@ import {SkeleNode} from '../utils/SkeleNode';
 import './LayersPane.css';
 import {NodeItem} from './NodeItem';
 
-interface LayersPaneProps {
+export interface LayersPaneProps {
   renderedNodes: SkeleNode[];
   activeNode?: {node: SkeleNode};
   lastActiveNode?: {node: SkeleNode};

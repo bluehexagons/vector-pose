@@ -215,6 +215,7 @@ export interface FabData {
 export interface TabData {
   name: string;
   description: string;
+  drawings: VectorDrawing[];
   filePath?: string;
   skele: SkeleNode;
   isModified?: boolean;

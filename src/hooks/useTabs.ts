@@ -34,6 +34,7 @@ const createEmptyTab = (
     ...renderSkele(skele),
     name: fabData?.name ?? 'Untitled',
     description: fabData?.description ?? '',
+    drawings: fabData?.drawings ?? [],
     skele,
     isModified: false,
     rotation: 270, // Add default rotation

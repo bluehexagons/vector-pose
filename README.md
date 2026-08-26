@@ -8,6 +8,7 @@ trying the tool without installing it.
 
 - Vector-based skeletal rigging system
 - Skeletal vector paths with fills, strokes, curves, and winding rules
+- Drawing inspector for editing paint, layers, and point-based path commands
 - Real-time preview and manipulation
 - Node-based hierarchy system
 - Undo/redo functionality
@@ -143,6 +144,12 @@ dash lengths are measured in world units and zoom with the drawing. `sort`
 orders drawings together with sprite nodes; `hidden` disables a drawing. A
 drawing with a missing point reference is omitted instead of rendering a
 partially connected path.
+
+Use the **Drawings** tab in the right sidebar to create, duplicate, reorder,
+hide, or delete drawings. Expanding a drawing exposes its paint and stroke
+settings and its ordered path commands. Point fields autocomplete skeletal node
+IDs and highlight references that do not exist in the current rig. Changes are
+rendered immediately and included in save and export operations.
 
 Three bundled examples are under `example/data/fabs/vector`:
 

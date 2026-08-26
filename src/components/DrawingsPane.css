@@ -1,0 +1,236 @@
+.drawings-pane {
+  padding: var(--spacing-xs);
+}
+
+.drawings-pane .pane-header > div {
+  min-width: 0;
+}
+
+.drawings-pane .pane-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.add-drawing {
+  flex: 0 0 auto;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+}
+
+.drawings-empty {
+  margin: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border: 1px dashed var(--border-dim);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.drawings-empty button {
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.drawing-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding-bottom: 48px;
+}
+
+.drawing-editor {
+  overflow: hidden;
+  border: 1px solid var(--border-dim);
+  border-radius: var(--border-radius-sm);
+  background: var(--bg-secondary);
+}
+
+.drawing-editor.hidden {
+  opacity: 0.65;
+}
+
+.drawing-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 34px;
+  padding: 2px var(--spacing-xs);
+  border-bottom: 1px solid var(--border-dim);
+  background: var(--bg-tertiary);
+}
+
+.drawing-editor-header button,
+.command-toolbar button {
+  min-width: 24px;
+  padding: 2px 5px;
+  border: 0;
+  border-radius: var(--border-radius-sm);
+  box-shadow: none;
+  color: var(--text-secondary);
+  background: transparent;
+}
+
+.drawing-editor-header button:hover,
+.command-toolbar button:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.drawing-editor-header button:disabled,
+.command-toolbar button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.drawing-collapse,
+.drawing-visibility {
+  flex: 0 0 auto;
+}
+
+.drawing-visibility {
+  color: var(--accent-secondary) !important;
+}
+
+.drawing-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 var(--spacing-xs);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.9em;
+}
+
+.drawing-header-actions {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.drawing-editor-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+}
+
+.drawing-editor fieldset {
+  min-width: 0;
+  margin: var(--spacing-xs) 0;
+  padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-sm);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--border-radius-sm);
+}
+
+.drawing-editor legend {
+  padding: 0 var(--spacing-xs);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.drawing-field {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.drawing-field-pair {
+  grid-template-columns: 42px minmax(0, 1fr) 52px minmax(0, 1fr);
+}
+
+.drawing-field label,
+.command-point-field span {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.drawing-field input,
+.drawing-field select,
+.drawing-command input,
+.drawing-command select,
+.add-command-row select {
+  width: 100%;
+  min-width: 0;
+  padding: var(--spacing-xs);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
+.commands-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--spacing-sm);
+}
+
+.commands-header h3 {
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.commands-header span {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.drawing-commands {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.drawing-command {
+  padding: var(--spacing-xs);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--border-radius-sm);
+  background: var(--bg-tertiary);
+}
+
+.command-toolbar {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) repeat(3, 24px);
+  align-items: center;
+  gap: 2px;
+}
+
+.command-number {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.command-points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.command-point-field {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.drawing-command input.invalid-reference {
+  border-color: #d45b5b;
+  background: color-mix(in srgb, #d45b5b 12%, var(--bg-primary));
+}
+
+.add-command-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--spacing-xs);
+}
+
+.add-command-row button {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  white-space: nowrap;
+}

@@ -6,8 +6,8 @@ import {Viewport} from './components/EditorCanvas';
 import {EditorPane} from './components/EditorPane';
 import {FileExplorerPane} from './components/FileExplorerPane';
 import {HeaderPane} from './components/HeaderPane';
-import {LayersPane} from './components/LayersPane';
 import {Resizer} from './components/Resizer';
+import {RightSidebar} from './components/RightSidebar';
 import {TabPane} from './components/TabPane';
 import {useHistory} from './hooks/useHistory';
 import {useKeyboardShortcuts} from './hooks/useKeyboardShortcuts';
@@ -26,8 +26,9 @@ import {
   selectFiles,
   showSaveDialog,
 } from './services/fileService';
-import {FabData, FileEntry, TabData, UiNode} from './shared/types';
+import {FileEntry, UiNode, VectorDrawing} from './shared/types';
 import {toDegrees, toRadians} from './utils/Equa';
+import {serializeFabData} from './utils/fabData';
 import type {ImagePropsRef} from './utils/Renderer';
 import {SkeleNode} from './utils/SkeleNode';
 import {getNodeActions} from './utils/nodeActions';
@@ -45,22 +46,6 @@ const createDefaultSkele = () =>
 const preventDefault = (e: React.SyntheticEvent) => e.preventDefault();
 
 let dragCounter = 0;
-
-const serializeFabData = (tab: TabData): FabData => {
-  const skele = tab.skele.toData();
-
-  // The root transform is the editor's camera orientation, not part of the
-  // saved pose.
-  skele.angle = 0;
-  skele.mag = 1;
-
-  return {
-    name: tab.name,
-    description: tab.description,
-    drawings: tab.fabData?.drawings,
-    skele,
-  };
-};
 
 export const AppRoot = () => {
   const browserWorkspace = isBrowserWorkspace();
@@ -452,6 +437,19 @@ export const AppRoot = () => {
     [activeTabId, setTabs]
   );
 
+  const handleDrawingsChange = useCallback(
+    (drawings: VectorDrawing[]) => {
+      setTabs(current =>
+        current.map(tab =>
+          tab.skele.id === activeTabId
+            ? {...tab, drawings, isModified: true}
+            : tab
+        )
+      );
+    },
+    [activeTabId, setTabs]
+  );
+
   // Replace transforming state with ref
   const transformingRef = useRef<{
     nodeId: string;
@@ -693,7 +691,7 @@ export const AppRoot = () => {
           <EditorPane
             renderedInfo={activeTab.renderedInfo}
             renderedNodes={activeTab.renderedNodes}
-            drawings={activeTab.fabData?.drawings}
+            drawings={activeTab.drawings}
             skele={activeTab.skele}
             activeNode={activeTab.activeNode}
             lastActiveNode={activeTab.lastActiveNode}
@@ -712,7 +710,7 @@ export const AppRoot = () => {
         <Resizer onResize={onResizeRight} />
 
         <div className="pane right-pane" style={rightPanelStyle}>
-          <LayersPane
+          <RightSidebar
             renderedNodes={activeTab.skele.children}
             activeNode={activeTab.activeNode}
             lastActiveNode={activeTab.lastActiveNode}
@@ -720,6 +718,8 @@ export const AppRoot = () => {
             onNodeUpdate={updateSkele}
             skele={activeTab.skele}
             onAddNode={appendNewNode}
+            drawings={activeTab.drawings}
+            onDrawingsChange={handleDrawingsChange}
           />
         </div>
       </div>

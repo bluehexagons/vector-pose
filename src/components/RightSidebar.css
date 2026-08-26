@@ -1,0 +1,51 @@
+.right-sidebar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.right-sidebar-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: var(--spacing-xs);
+  gap: var(--spacing-xs);
+  border-bottom: 1px solid var(--border-dim);
+  background: var(--bg-primary);
+}
+
+.right-sidebar-tabs button {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-muted);
+  background: transparent;
+  box-shadow: none;
+}
+
+.right-sidebar-tabs button.active {
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+  background: var(--bg-tertiary);
+}
+
+.sidebar-count {
+  display: inline-block;
+  min-width: 1.4em;
+  margin-left: var(--spacing-xs);
+  padding: 0 0.35em;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+  font-size: var(--font-size-xs);
+}
+
+.right-sidebar-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.right-sidebar-content > .layers-pane,
+.right-sidebar-content > .drawings-pane {
+  overflow: visible;
+}
