@@ -10,6 +10,7 @@ interface FileExplorerPaneProps {
   onFileClick: (file: FileEntry) => void;
   onFileSelect: () => void;
   onDirectorySelect: () => void;
+  onBrowserWorkspaceReset: () => void;
   browserWorkspace?: boolean;
 }
 
@@ -20,6 +21,7 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
   onFileClick,
   onFileSelect,
   onDirectorySelect,
+  onBrowserWorkspaceReset,
   browserWorkspace = false,
 }) => {
   const [search, setSearch] = useState('');
@@ -120,6 +122,16 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
             title="Choose a workspace containing data/fabs and gfx folders."
           >
             Change workspace…
+          </button>
+        )}
+        {browserWorkspace && (
+          <button
+            type="button"
+            className="file-explorer-reset"
+            onClick={onBrowserWorkspaceReset}
+            title="Remove imported and saved browser files, then restore the bundled examples."
+          >
+            Clear browser data…
           </button>
         )}
         <div className="game-directory" title={gameDirectory}>

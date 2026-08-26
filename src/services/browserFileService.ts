@@ -2,10 +2,15 @@ import type {FabData, FileEntry} from '../shared/types';
 import {FAB_EXTENSIONS, IMAGE_EXTENSIONS} from '../shared/types';
 
 const DATABASE_NAME = 'vector-pose-workspace';
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 const FILE_STORE = 'files';
 const BROWSER_FAB_DIRECTORY = './data/fabs/browser';
 const BROWSER_SPRITE_DIRECTORY = './gfx/sprite/browser';
+
+const VERSION_TWO_RESET_PATHS = [
+  './data/fabs/strawberry/test.fab.json',
+  './gfx/sprite/strawberry/strawberry-mascot.png',
+];
 
 interface StoredWorkspaceFile {
   path: string;
@@ -25,9 +30,12 @@ function openDatabase(): Promise<IDBDatabase> {
   databasePromise ??= new Promise((resolve, reject) => {
     const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
 
-    request.addEventListener('upgradeneeded', () => {
+    request.addEventListener('upgradeneeded', event => {
       if (!request.result.objectStoreNames.contains(FILE_STORE)) {
         request.result.createObjectStore(FILE_STORE, {keyPath: 'path'});
+      } else if (event.oldVersion < 2) {
+        const fileStore = request.transaction?.objectStore(FILE_STORE);
+        VERSION_TWO_RESET_PATHS.forEach(path => fileStore?.delete(path));
       }
     });
     request.addEventListener('success', () => resolve(request.result));
@@ -146,6 +154,16 @@ export async function loadBrowserFiles(): Promise<FileEntry[]> {
         : undefined;
     })
     .filter((file): file is FileEntry => Boolean(file));
+}
+
+export async function resetBrowserWorkspace(): Promise<void> {
+  const database = await openDatabase();
+  const transaction = database.transaction(FILE_STORE, 'readwrite');
+  transaction.objectStore(FILE_STORE).clear();
+  await transactionDone(transaction);
+
+  examplesPromise = undefined;
+  await ensureExamples();
 }
 
 export async function readBrowserFile(path: string): Promise<Blob> {

@@ -7,8 +7,11 @@ import {
   importBrowserFiles,
   loadBrowserFiles,
   readBrowserFile,
+  resetBrowserWorkspace,
   writeBrowserFab,
 } from './browserFileService';
+
+export {resetBrowserWorkspace};
 
 export const isBrowserWorkspace = () => !window.native;
 

@@ -162,6 +162,16 @@
   font-size: var(--font-size-xs);
 }
 
+.file-explorer-actions > .file-explorer-reset {
+  color: #d9a0a0;
+}
+
+.file-explorer-actions > .file-explorer-reset:hover {
+  border-color: #9c5555;
+  color: #f2b4b4;
+  background: color-mix(in srgb, #9c5555 18%, var(--bg-secondary));
+}
+
 .game-directory {
   grid-column: 1 / -1;
   display: flex;

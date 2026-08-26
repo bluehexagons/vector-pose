@@ -23,6 +23,7 @@ import {
   loadDirectoryFiles,
   exportFabFile,
   isBrowserWorkspace,
+  resetBrowserWorkspace,
   saveFabFile,
   selectDirectory,
   selectFiles,
@@ -383,6 +384,26 @@ export const AppRoot = () => {
     }
     return false;
   }, [browserWorkspace, loadDirectoryContent]);
+
+  const handleBrowserWorkspaceReset = useCallback(async () => {
+    if (!browserWorkspace) return;
+    if (
+      !window.confirm(
+        'Clear all vector-pose data stored in this browser?\n\n' +
+          'This removes imported images, browser-saved projects, and unsaved changes in open tabs. Bundled examples will be restored. This cannot be undone.'
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await resetBrowserWorkspace();
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to clear browser workspace:', error);
+      window.alert('Could not clear the browser workspace. Please try again.');
+    }
+  }, [browserWorkspace]);
 
   const handleFileClick = useCallback(
     async (file: FileEntry) => {
@@ -840,6 +861,7 @@ export const AppRoot = () => {
             onFileClick={handleFileClick}
             onFileSelect={handleFileSelect}
             onDirectorySelect={handleDirectorySelect}
+            onBrowserWorkspaceReset={handleBrowserWorkspaceReset}
             browserWorkspace={browserWorkspace}
           />
         </div>

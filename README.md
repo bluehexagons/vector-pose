@@ -196,8 +196,9 @@ Should target the renderer directory of the game.
 The Electron app reads this structure from a selected local directory. The
 browser edition maintains the same logical structure in IndexedDB and never
 requests access to a local directory. Browser storage belongs to the current
-site and browser profile, so download important prefab files before clearing
-site data.
+site and browser profile. Use **Clear browser data…** in the Files pane to
+remove browser-saved and imported files and restore the current bundled
+examples; download important prefab files first.
 
 ## Keyboard Shortcuts
 
