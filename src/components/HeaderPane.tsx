@@ -20,6 +20,7 @@ export const HeaderPane = ({
   currentHistoryIndex,
   onHistorySelect,
   onShowWelcome,
+  onShowSettings,
 }: {
   activeTab?: TabData;
   onSave: () => Promise<void>;
@@ -36,6 +37,7 @@ export const HeaderPane = ({
   currentHistoryIndex: number;
   onHistorySelect: (index: number) => void;
   onShowWelcome: () => void;
+  onShowSettings: () => void;
 }) => {
   return (
     <div className="header-pane">
@@ -66,6 +68,11 @@ export const HeaderPane = ({
         <li className="header-menu-item">
           <button onClick={onShowWelcome} title="Open the welcome screen">
             Welcome
+          </button>
+        </li>
+        <li className="header-menu-item">
+          <button onClick={onShowSettings} title="Open editor settings">
+            Settings
           </button>
         </li>
         <li className="header-menu-item">

@@ -183,6 +183,11 @@ pieces to exercise sprite attachment, nesting, scaling, sorting, and rotation.
 Clear **Show this screen on startup** if you prefer to launch directly into the
 editor; the **Welcome** header button always brings it back.
 
+Open **Settings** from the header to adjust the default canvas zoom, grid and
+navigation guidance, node annotation density, startup behavior, and inspector
+selection. The same screen can reset interface preferences and, in the browser
+edition, clear stored workspace data after confirmation.
+
 ## Directory Structure
 
 For now, uses a hardcoded directory structure. See the `example` directory.

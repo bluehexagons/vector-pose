@@ -7,6 +7,7 @@ import {ContextMenu, MenuAction} from './ContextMenu';
 import {EditorCanvas, Viewport} from './EditorCanvas';
 import './EditorPane.css';
 import {NodeGraphLayer} from './NodeGraphLayer';
+import type {NodeLabelMode} from './SettingsScreen';
 import {SpriteLayer, SpriteLayerProps} from './SpriteLayer';
 
 interface EditorPaneProps extends Pick<
@@ -35,6 +36,10 @@ interface EditorPaneProps extends Pick<
   onAddNode: () => void;
   onShowDrawings: () => void;
   onShowWelcome: () => void;
+  defaultCanvasZoom: number;
+  showCanvasGrid: boolean;
+  showCanvasNavigationHint: boolean;
+  nodeLabelMode: NodeLabelMode;
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = ({
@@ -51,6 +56,10 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   onAddNode,
   onShowDrawings,
   onShowWelcome,
+  defaultCanvasZoom,
+  showCanvasGrid,
+  showCanvasNavigationHint,
+  nodeLabelMode,
   ...spriteLayerProps
 }) => {
   const [contextMenu, setContextMenu] = useState<{
@@ -101,11 +110,15 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   return (
     <div className="editor-pane">
       <EditorCanvas
+        key={defaultCanvasZoom}
         onCanvasMouseDown={onMouseDown}
         onCanvasMouseMove={onMouseMove}
         onCanvasMouseUp={onMouseUp}
         rotation={rotation}
         onContextMenu={handleContextMenu}
+        defaultScale={defaultCanvasZoom}
+        showGrid={showCanvasGrid}
+        showNavigationHint={showCanvasNavigationHint}
       >
         {viewport => (
           <>
@@ -124,6 +137,7 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
                 activeNode={activeNode}
                 lastActiveNode={lastActiveNode}
                 viewport={viewport}
+                labelMode={nodeLabelMode}
               />
             </div>
             {contextMenu && (

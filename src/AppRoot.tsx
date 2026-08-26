@@ -8,6 +8,7 @@ import {FileExplorerPane} from './components/FileExplorerPane';
 import {HeaderPane} from './components/HeaderPane';
 import {Resizer} from './components/Resizer';
 import {RightSidebar, SidebarPane} from './components/RightSidebar';
+import {NodeLabelMode, SettingsScreen} from './components/SettingsScreen';
 import {StarterExampleId, StartupScreen} from './components/StartupScreen';
 import {TabPane} from './components/TabPane';
 import {useHistory} from './hooks/useHistory';
@@ -50,8 +51,30 @@ const SHOW_STARTUP_STORAGE_KEY = 'showStartupScreen';
 const LEFT_PANEL_WIDTH_STORAGE_KEY = 'leftPanelWidth';
 const RIGHT_PANEL_WIDTH_STORAGE_KEY = 'rightPanelWidth';
 const RIGHT_SIDEBAR_PANE_STORAGE_KEY = 'rightSidebarPane';
+const CANVAS_ZOOM_STORAGE_KEY = 'defaultCanvasZoom';
+const CANVAS_GRID_STORAGE_KEY = 'showCanvasGrid';
+const CANVAS_HINT_STORAGE_KEY = 'showCanvasNavigationHint';
+const NODE_LABEL_MODE_STORAGE_KEY = 'nodeLabelMode';
 const DEFAULT_PANEL_WIDTH = 300;
 const MIN_PANEL_WIDTH = 220;
+const DEFAULT_CANVAS_ZOOM = 0.9;
+
+const storedBoolean = (key: string, fallback: boolean) => {
+  const value = localStorage.getItem(key);
+  return value === null ? fallback : value !== 'false';
+};
+
+const storedCanvasZoom = () => {
+  const value = Number(localStorage.getItem(CANVAS_ZOOM_STORAGE_KEY));
+  return [0.5, 0.75, 0.9, 1, 1.25, 1.5].includes(value)
+    ? value
+    : DEFAULT_CANVAS_ZOOM;
+};
+
+const storedNodeLabelMode = (): NodeLabelMode => {
+  const value = localStorage.getItem(NODE_LABEL_MODE_STORAGE_KEY);
+  return value === 'all' || value === 'markers' ? value : 'selected';
+};
 
 const clampPanelWidth = (width: number) =>
   Math.min(window.innerWidth * 0.45, Math.max(MIN_PANEL_WIDTH, width));
@@ -86,6 +109,16 @@ export const AppRoot = () => {
     () => localStorage.getItem(SHOW_STARTUP_STORAGE_KEY) !== 'false'
   );
   const [startupScreenOpen, setStartupScreenOpen] = useState(showOnStartup);
+  const [settingsScreenOpen, setSettingsScreenOpen] = useState(false);
+  const [defaultCanvasZoom, setDefaultCanvasZoom] = useState(storedCanvasZoom);
+  const [showCanvasGrid, setShowCanvasGrid] = useState(() =>
+    storedBoolean(CANVAS_GRID_STORAGE_KEY, true)
+  );
+  const [showCanvasNavigationHint, setShowCanvasNavigationHint] = useState(() =>
+    storedBoolean(CANVAS_HINT_STORAGE_KEY, true)
+  );
+  const [nodeLabelMode, setNodeLabelMode] =
+    useState<NodeLabelMode>(storedNodeLabelMode);
   const [rightSidebarPane, setRightSidebarPane] = useState<SidebarPane>(() =>
     localStorage.getItem(RIGHT_SIDEBAR_PANE_STORAGE_KEY) === 'drawings'
       ? 'drawings'
@@ -492,6 +525,11 @@ export const AppRoot = () => {
 
   useEffect(() => {
     const handleGlobalNewProject = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && settingsScreenOpen) {
+        event.preventDefault();
+        setSettingsScreenOpen(false);
+        return;
+      }
       if (event.key === 'Escape' && startupScreenOpen) {
         event.preventDefault();
         setStartupScreenOpen(false);
@@ -515,7 +553,7 @@ export const AppRoot = () => {
     };
     window.addEventListener('keydown', handleGlobalNewProject);
     return () => window.removeEventListener('keydown', handleGlobalNewProject);
-  }, [handleStartNewProject, startupScreenOpen]);
+  }, [handleStartNewProject, settingsScreenOpen, startupScreenOpen]);
 
   useEffect(() => {
     if (gameDirectory) {
@@ -542,6 +580,36 @@ export const AppRoot = () => {
   useEffect(() => {
     localStorage.setItem(RIGHT_SIDEBAR_PANE_STORAGE_KEY, rightSidebarPane);
   }, [rightSidebarPane]);
+
+  useEffect(() => {
+    localStorage.setItem(CANVAS_ZOOM_STORAGE_KEY, String(defaultCanvasZoom));
+  }, [defaultCanvasZoom]);
+
+  useEffect(() => {
+    localStorage.setItem(CANVAS_GRID_STORAGE_KEY, String(showCanvasGrid));
+  }, [showCanvasGrid]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      CANVAS_HINT_STORAGE_KEY,
+      String(showCanvasNavigationHint)
+    );
+  }, [showCanvasNavigationHint]);
+
+  useEffect(() => {
+    localStorage.setItem(NODE_LABEL_MODE_STORAGE_KEY, nodeLabelMode);
+  }, [nodeLabelMode]);
+
+  const handleResetInterface = useCallback(() => {
+    handleShowOnStartupChange(true);
+    setDefaultCanvasZoom(DEFAULT_CANVAS_ZOOM);
+    setShowCanvasGrid(true);
+    setShowCanvasNavigationHint(true);
+    setNodeLabelMode('selected');
+    setRightSidebarPane('nodes');
+    setLeftWidth(DEFAULT_PANEL_WIDTH);
+    setRightWidth(DEFAULT_PANEL_WIDTH);
+  }, [handleShowOnStartupChange]);
 
   const handleSaveAs = useCallback(async () => {
     if (!activeTab) return;
@@ -849,6 +917,7 @@ export const AppRoot = () => {
           currentHistoryIndex={history.getCurrentIndex()}
           onHistorySelect={onHistorySelect}
           onShowWelcome={() => setStartupScreenOpen(true)}
+          onShowSettings={() => setSettingsScreenOpen(true)}
         />
       </div>
 
@@ -891,6 +960,10 @@ export const AppRoot = () => {
             onAddNode={appendNewNode}
             onShowDrawings={handleStartDrawing}
             onShowWelcome={() => setStartupScreenOpen(true)}
+            defaultCanvasZoom={defaultCanvasZoom}
+            showCanvasGrid={showCanvasGrid}
+            showCanvasNavigationHint={showCanvasNavigationHint}
+            nodeLabelMode={nodeLabelMode}
           />
         </div>
 
@@ -942,6 +1015,26 @@ export const AppRoot = () => {
           onChooseWorkspace={handleStartupDirectorySelect}
           onOpenExample={handleOpenStarterExample}
           onClose={() => setStartupScreenOpen(false)}
+        />
+      )}
+      {settingsScreenOpen && (
+        <SettingsScreen
+          browserWorkspace={browserWorkspace}
+          showOnStartup={showOnStartup}
+          defaultCanvasZoom={defaultCanvasZoom}
+          showCanvasGrid={showCanvasGrid}
+          showCanvasNavigationHint={showCanvasNavigationHint}
+          nodeLabelMode={nodeLabelMode}
+          inspectorPane={rightSidebarPane}
+          onShowOnStartupChange={handleShowOnStartupChange}
+          onDefaultCanvasZoomChange={setDefaultCanvasZoom}
+          onShowCanvasGridChange={setShowCanvasGrid}
+          onShowCanvasNavigationHintChange={setShowCanvasNavigationHint}
+          onNodeLabelModeChange={setNodeLabelMode}
+          onInspectorPaneChange={setRightSidebarPane}
+          onResetInterface={handleResetInterface}
+          onClearBrowserData={handleBrowserWorkspaceReset}
+          onClose={() => setSettingsScreenOpen(false)}
         />
       )}
     </div>

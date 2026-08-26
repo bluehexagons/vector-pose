@@ -3,7 +3,6 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 // Base scale factor: at scale 1.0, a 1x1 unit square will be this many pixels
 export const BASE_SCALE = 200;
-const INITIAL_CANVAS_SCALE = 0.9;
 
 export interface Viewport {
   scale: number;
@@ -21,6 +20,9 @@ interface EditorCanvasProps {
   onCanvasMouseUp?: (e: React.MouseEvent, viewport: Viewport) => void;
   onContextMenu?: (e: React.MouseEvent, viewport: Viewport) => void;
   rotation: number;
+  defaultScale: number;
+  showGrid: boolean;
+  showNavigationHint: boolean;
 }
 
 export const EditorCanvas: React.FC<EditorCanvasProps> = ({
@@ -31,10 +33,13 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   onCanvasMouseUp,
   onContextMenu,
   rotation,
+  defaultScale,
+  showGrid,
+  showNavigationHint,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   // Keep typical starter artwork readable without cropping larger rigs.
-  const [scale, setScale] = useState(INITIAL_CANVAS_SCALE);
+  const [scale, setScale] = useState(defaultScale);
   const [offset, setOffset] = useState<vec2>(vec2.fromValues(0, 0));
   const [isDragging, setIsDragging] = useState(false);
   const [lastPos, setLastPos] = useState<vec2>();
@@ -118,9 +123,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   );
 
   const resetViewport = useCallback(() => {
-    setScale(INITIAL_CANVAS_SCALE);
+    setScale(defaultScale);
     centerViewport();
-  }, [centerViewport]);
+  }, [centerViewport, defaultScale]);
 
   const handleWheel = useCallback(
     (e: WheelEvent) => {
@@ -194,7 +199,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   return (
     <div
       ref={containerRef}
-      className="editor-canvas"
+      className={`editor-canvas ${showGrid ? '' : 'canvas-grid-hidden'}`}
       tabIndex={0}
       aria-label="Pose editor canvas"
       onMouseDown={handleMouseDown}
@@ -273,9 +278,11 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           ◎
         </button>
       </div>
-      <div className="canvas-navigation-hint">
-        Wheel to zoom <span>·</span> Middle-drag to pan
-      </div>
+      {showNavigationHint && (
+        <div className="canvas-navigation-hint">
+          Wheel to zoom <span>·</span> Middle-drag to pan
+        </div>
+      )}
     </div>
   );
 };

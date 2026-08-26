@@ -44,6 +44,10 @@
   background-size: 20px 20px;
 }
 
+.editor-canvas.canvas-grid-hidden {
+  background-image: none;
+}
+
 .editor-canvas:focus-visible {
   outline: 1px solid color-mix(in srgb, var(--accent-primary) 55%, transparent);
   outline-offset: -1px;
@@ -266,4 +270,12 @@
 .node-label.active .node-label-name,
 .node-label.last-active .node-label-name {
   opacity: 1;
+}
+
+.node-graph.node-label-mode-markers .node-label-name {
+  display: none;
+}
+
+.node-graph.node-label-mode-all .node-label-name {
+  opacity: 0.88;
 }

@@ -1,12 +1,14 @@
 import type {UiNode} from '../shared/types';
 import type {SkeleNode} from '../utils/SkeleNode';
 import type {Viewport} from './EditorCanvas';
+import type {NodeLabelMode} from './SettingsScreen';
 
 interface NodeGraphLayerProps {
   renderedNodes: SkeleNode[];
   activeNode?: UiNode;
   lastActiveNode?: UiNode;
   viewport: Viewport;
+  labelMode: NodeLabelMode;
 }
 
 export const NodeGraphLayer: React.FC<NodeGraphLayerProps> = ({
@@ -14,9 +16,10 @@ export const NodeGraphLayer: React.FC<NodeGraphLayerProps> = ({
   activeNode,
   lastActiveNode,
   viewport,
+  labelMode,
 }) => {
   return (
-    <div className="node-graph">
+    <div className={`node-graph node-label-mode-${labelMode}`}>
       {renderedNodes.map((node, index) => (
         <div
           key={node.id || index}
