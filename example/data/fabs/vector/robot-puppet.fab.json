@@ -1,0 +1,215 @@
+{
+  "name": "Robot puppet",
+  "description": "A compact layered character rig. The body and face are point groups while the arms and legs follow articulated shoulder, elbow, hip, and knee chains.",
+  "drawings": [
+    {
+      "id": "robot-arms",
+      "sort": -2,
+      "fill": "none",
+      "stroke": "#69c5c4",
+      "strokeWidth": 0.085,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "body_center"},
+        {"type": "line", "point": "left_shoulder"},
+        {"type": "line", "point": "left_elbow"},
+        {"type": "line", "point": "left_claw"},
+        {"type": "move", "point": "body_center"},
+        {"type": "line", "point": "right_shoulder"},
+        {"type": "line", "point": "right_elbow"},
+        {"type": "line", "point": "right_claw"}
+      ]
+    },
+    {
+      "id": "robot-legs",
+      "sort": -2,
+      "fill": "none",
+      "stroke": "#3f8fa5",
+      "strokeWidth": 0.1,
+      "strokeLinecap": "square",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "left_hip"},
+        {"type": "line", "point": "left_knee"},
+        {"type": "line", "point": "left_foot"},
+        {"type": "move", "point": "right_hip"},
+        {"type": "line", "point": "right_knee"},
+        {"type": "line", "point": "right_foot"}
+      ]
+    },
+    {
+      "id": "robot-body",
+      "sort": -1,
+      "fill": "#3b93aa",
+      "stroke": "#163d49",
+      "strokeWidth": 0.035,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "body_top_left"},
+        {"type": "line", "point": "body_top_right"},
+        {"type": "line", "point": "body_bottom_right"},
+        {"type": "line", "point": "body_bottom_left"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "chest-panel",
+      "fill": "#173f4c",
+      "stroke": "#7de0d3",
+      "strokeWidth": 0.018,
+      "strokeLinejoin": "bevel",
+      "commands": [
+        {"type": "move", "point": "panel_top"},
+        {"type": "line", "point": "panel_right"},
+        {"type": "line", "point": "panel_bottom"},
+        {"type": "line", "point": "panel_left"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "robot-head",
+      "fill": "#77d2c5",
+      "stroke": "#173f49",
+      "strokeWidth": 0.035,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "head_top_left"},
+        {"type": "line", "point": "head_top_right"},
+        {"type": "line", "point": "head_right"},
+        {"type": "line", "point": "head_bottom_right"},
+        {"type": "line", "point": "head_bottom_left"},
+        {"type": "line", "point": "head_left"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "robot-face",
+      "sort": 1,
+      "fill": "none",
+      "stroke": "#173942",
+      "strokeWidth": 0.035,
+      "strokeLinecap": "round",
+      "commands": [
+        {"type": "move", "point": "eye_left"},
+        {"type": "line", "point": "eye_left_end"},
+        {"type": "move", "point": "eye_right"},
+        {"type": "line", "point": "eye_right_end"},
+        {"type": "move", "point": "mouth_left"},
+        {
+          "type": "quadratic",
+          "control": "mouth_control",
+          "point": "mouth_right"
+        }
+      ]
+    }
+  ],
+  "skele": {
+    "angle": 0,
+    "mag": 1,
+    "id": "robot-root",
+    "children": [
+      {
+        "angle": 0,
+        "mag": 0,
+        "id": "body_center",
+        "children": [
+          {
+            "angle": 90,
+            "mag": 0,
+            "id": "body_points",
+            "children": [
+              {"angle": -140, "mag": 0.15, "id": "body_top_left"},
+              {"angle": -40, "mag": 0.15, "id": "body_top_right"},
+              {"angle": 42, "mag": 0.17, "id": "body_bottom_right"},
+              {"angle": 138, "mag": 0.17, "id": "body_bottom_left"},
+              {"angle": -90, "mag": 0.07, "id": "panel_top"},
+              {"angle": 0, "mag": 0.075, "id": "panel_right"},
+              {"angle": 90, "mag": 0.07, "id": "panel_bottom"},
+              {"angle": 180, "mag": 0.075, "id": "panel_left"}
+            ]
+          },
+          {
+            "angle": 0,
+            "mag": 0.185,
+            "id": "head_center",
+            "children": [
+              {
+                "angle": 90,
+                "mag": 0,
+                "id": "head_points",
+                "children": [
+                  {"angle": -140, "mag": 0.105, "id": "head_top_left"},
+                  {"angle": -40, "mag": 0.105, "id": "head_top_right"},
+                  {"angle": 0, "mag": 0.12, "id": "head_right"},
+                  {"angle": 40, "mag": 0.105, "id": "head_bottom_right"},
+                  {"angle": 140, "mag": 0.105, "id": "head_bottom_left"},
+                  {"angle": 180, "mag": 0.12, "id": "head_left"},
+                  {"angle": 205, "mag": 0.055, "id": "eye_left"},
+                  {"angle": 185, "mag": 0.055, "id": "eye_left_end"},
+                  {"angle": -25, "mag": 0.055, "id": "eye_right"},
+                  {"angle": -5, "mag": 0.055, "id": "eye_right_end"},
+                  {"angle": 140, "mag": 0.05, "id": "mouth_left"},
+                  {"angle": 90, "mag": 0.06, "id": "mouth_control"},
+                  {"angle": 40, "mag": 0.05, "id": "mouth_right"}
+                ]
+              }
+            ]
+          },
+          {
+            "angle": -90,
+            "mag": 0.15,
+            "id": "left_shoulder",
+            "children": [
+              {
+                "angle": -30,
+                "mag": 0.12,
+                "id": "left_elbow",
+                "children": [{"angle": 30, "mag": 0.09, "id": "left_claw"}]
+              }
+            ]
+          },
+          {
+            "angle": 90,
+            "mag": 0.15,
+            "id": "right_shoulder",
+            "children": [
+              {
+                "angle": 30,
+                "mag": 0.12,
+                "id": "right_elbow",
+                "children": [{"angle": -30, "mag": 0.09, "id": "right_claw"}]
+              }
+            ]
+          },
+          {
+            "angle": -160,
+            "mag": 0.105,
+            "id": "left_hip",
+            "children": [
+              {
+                "angle": -20,
+                "mag": 0.14,
+                "id": "left_knee",
+                "children": [{"angle": 5, "mag": 0.13, "id": "left_foot"}]
+              }
+            ]
+          },
+          {
+            "angle": 160,
+            "mag": 0.105,
+            "id": "right_hip",
+            "children": [
+              {
+                "angle": 20,
+                "mag": 0.14,
+                "id": "right_knee",
+                "children": [{"angle": -5, "mag": 0.13, "id": "right_foot"}]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,257 @@
+{
+  "name": "Shape studies",
+  "description": "A friendly sampler of straight lines, cubic curves, open strokes, layered shapes, and a reversed inner contour. Expand each drawing and drag its named points to see the geometry update.",
+  "drawings": [
+    {
+      "id": "triangle",
+      "fill": "#54cbbb",
+      "stroke": "#173f45",
+      "strokeWidth": 0.025,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "triangle_top"},
+        {"type": "line", "point": "triangle_right"},
+        {"type": "line", "point": "triangle_left"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "five-point-star",
+      "fill": "#ffc857",
+      "stroke": "#765116",
+      "strokeWidth": 0.025,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "star_1"},
+        {"type": "line", "point": "star_2"},
+        {"type": "line", "point": "star_3"},
+        {"type": "line", "point": "star_4"},
+        {"type": "line", "point": "star_5"},
+        {"type": "line", "point": "star_6"},
+        {"type": "line", "point": "star_7"},
+        {"type": "line", "point": "star_8"},
+        {"type": "line", "point": "star_9"},
+        {"type": "line", "point": "star_10"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "cubic-blob",
+      "fill": "#ee7093",
+      "stroke": "#6b2640",
+      "strokeWidth": 0.025,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "blob_top"},
+        {
+          "type": "cubic",
+          "control1": "blob_top_right",
+          "control2": "blob_right_top",
+          "point": "blob_right"
+        },
+        {
+          "type": "cubic",
+          "control1": "blob_right_bottom",
+          "control2": "blob_bottom_right",
+          "point": "blob_bottom"
+        },
+        {
+          "type": "cubic",
+          "control1": "blob_bottom_left",
+          "control2": "blob_left_bottom",
+          "point": "blob_left"
+        },
+        {
+          "type": "cubic",
+          "control1": "blob_left_top",
+          "control2": "blob_top_left",
+          "point": "blob_top"
+        },
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "reversed-contour-ring",
+      "fill": "#8a76e8",
+      "fillRule": "nonzero",
+      "stroke": "#392c74",
+      "strokeWidth": 0.025,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "ring_outer_tl"},
+        {"type": "line", "point": "ring_outer_tr"},
+        {"type": "line", "point": "ring_outer_br"},
+        {"type": "line", "point": "ring_outer_bl"},
+        {"type": "close"},
+        {"type": "move", "point": "ring_inner_tl"},
+        {"type": "line", "point": "ring_inner_bl"},
+        {"type": "line", "point": "ring_inner_br"},
+        {"type": "line", "point": "ring_inner_tr"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "little-house",
+      "fill": "#5c91df",
+      "stroke": "#213d69",
+      "strokeWidth": 0.025,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "house_roof"},
+        {"type": "line", "point": "house_right_top"},
+        {"type": "line", "point": "house_right_bottom"},
+        {"type": "line", "point": "house_left_bottom"},
+        {"type": "line", "point": "house_left_top"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "curved-ground",
+      "fill": "none",
+      "stroke": "#88a5ad",
+      "strokeWidth": 0.035,
+      "strokeLinecap": "round",
+      "strokeDasharray": [0.06, 0.045],
+      "commands": [
+        {"type": "move", "point": "ground_left"},
+        {
+          "type": "quadratic",
+          "control": "ground_control",
+          "point": "ground_right"
+        }
+      ]
+    }
+  ],
+  "skele": {
+    "angle": 0,
+    "mag": 1,
+    "id": "shape-studies-root",
+    "children": [
+      {
+        "angle": -61.4,
+        "mag": 0.313,
+        "id": "triangle_group",
+        "children": [
+          {
+            "angle": 151.4,
+            "mag": 0,
+            "id": "triangle_points",
+            "children": [
+              {"angle": -90, "mag": 0.105, "id": "triangle_top"},
+              {"angle": 35, "mag": 0.11, "id": "triangle_right"},
+              {"angle": 145, "mag": 0.11, "id": "triangle_left"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": 0,
+        "mag": 0.16,
+        "id": "star_group",
+        "children": [
+          {
+            "angle": 90,
+            "mag": 0,
+            "id": "star_points",
+            "children": [
+              {"angle": -90, "mag": 0.115, "id": "star_1"},
+              {"angle": -54, "mag": 0.047, "id": "star_2"},
+              {"angle": -18, "mag": 0.115, "id": "star_3"},
+              {"angle": 18, "mag": 0.047, "id": "star_4"},
+              {"angle": 54, "mag": 0.115, "id": "star_5"},
+              {"angle": 90, "mag": 0.047, "id": "star_6"},
+              {"angle": 126, "mag": 0.115, "id": "star_7"},
+              {"angle": 162, "mag": 0.047, "id": "star_8"},
+              {"angle": 198, "mag": 0.115, "id": "star_9"},
+              {"angle": 234, "mag": 0.047, "id": "star_10"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": 63,
+        "mag": 0.308,
+        "id": "blob_group",
+        "children": [
+          {
+            "angle": 27,
+            "mag": 0,
+            "id": "blob_points",
+            "children": [
+              {"angle": -90, "mag": 0.105, "id": "blob_top"},
+              {"angle": -72, "mag": 0.105, "id": "blob_top_right"},
+              {"angle": -25, "mag": 0.115, "id": "blob_right_top"},
+              {"angle": 0, "mag": 0.105, "id": "blob_right"},
+              {"angle": 25, "mag": 0.12, "id": "blob_right_bottom"},
+              {"angle": 68, "mag": 0.1, "id": "blob_bottom_right"},
+              {"angle": 90, "mag": 0.095, "id": "blob_bottom"},
+              {"angle": 115, "mag": 0.11, "id": "blob_bottom_left"},
+              {"angle": 160, "mag": 0.105, "id": "blob_left_bottom"},
+              {"angle": 180, "mag": 0.095, "id": "blob_left"},
+              {"angle": 205, "mag": 0.11, "id": "blob_left_top"},
+              {"angle": 250, "mag": 0.1, "id": "blob_top_left"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": -135,
+        "mag": 0.2475,
+        "id": "ring_group",
+        "children": [
+          {
+            "angle": 225,
+            "mag": 0,
+            "id": "ring_points",
+            "children": [
+              {"angle": -135, "mag": 0.12, "id": "ring_outer_tl"},
+              {"angle": -45, "mag": 0.12, "id": "ring_outer_tr"},
+              {"angle": 45, "mag": 0.12, "id": "ring_outer_br"},
+              {"angle": 135, "mag": 0.12, "id": "ring_outer_bl"},
+              {"angle": -135, "mag": 0.052, "id": "ring_inner_tl"},
+              {"angle": -45, "mag": 0.052, "id": "ring_inner_tr"},
+              {"angle": 45, "mag": 0.052, "id": "ring_inner_br"},
+              {"angle": 135, "mag": 0.052, "id": "ring_inner_bl"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": 135,
+        "mag": 0.2475,
+        "id": "house_group",
+        "children": [
+          {
+            "angle": -45,
+            "mag": 0,
+            "id": "house_points",
+            "children": [
+              {"angle": -90, "mag": 0.13, "id": "house_roof"},
+              {"angle": -35, "mag": 0.105, "id": "house_right_top"},
+              {"angle": 45, "mag": 0.12, "id": "house_right_bottom"},
+              {"angle": 135, "mag": 0.12, "id": "house_left_bottom"},
+              {"angle": 215, "mag": 0.105, "id": "house_left_top"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": -180,
+        "mag": 0.31,
+        "id": "ground_group",
+        "children": [
+          {
+            "angle": 270,
+            "mag": 0,
+            "id": "ground_points",
+            "children": [
+              {"angle": 180, "mag": 0.27, "id": "ground_left"},
+              {"angle": 90, "mag": 0.055, "id": "ground_control"},
+              {"angle": 0, "mag": 0.27, "id": "ground_right"}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

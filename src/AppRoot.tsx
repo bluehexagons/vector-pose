@@ -8,6 +8,7 @@ import {FileExplorerPane} from './components/FileExplorerPane';
 import {HeaderPane} from './components/HeaderPane';
 import {Resizer} from './components/Resizer';
 import {RightSidebar} from './components/RightSidebar';
+import {StarterExampleId, StartupScreen} from './components/StartupScreen';
 import {TabPane} from './components/TabPane';
 import {useHistory} from './hooks/useHistory';
 import {useKeyboardShortcuts} from './hooks/useKeyboardShortcuts';
@@ -16,6 +17,7 @@ import {
   createImageNode,
   findExistingTab,
   loadFabContent,
+  loadFabDataContent,
 } from './services/contentService';
 import {
   loadDirectoryFiles,
@@ -26,17 +28,31 @@ import {
   selectFiles,
   showSaveDialog,
 } from './services/fileService';
-import {FileEntry, UiNode, VectorDrawing} from './shared/types';
+import {FabData, FileEntry, UiNode, VectorDrawing} from './shared/types';
 import {toDegrees, toRadians} from './utils/Equa';
 import {serializeFabData} from './utils/fabData';
 import type {ImagePropsRef} from './utils/Renderer';
 import {SkeleNode} from './utils/SkeleNode';
 import {getNodeActions} from './utils/nodeActions';
+import gestureFigure from '../example/data/fabs/vector/gesture-figure.fab.json';
+import nestedMotion from '../example/data/fabs/vector/nested-control-motion.fab.json';
+import robotPuppet from '../example/data/fabs/vector/robot-puppet.fab.json';
+import shapeStudies from '../example/data/fabs/vector/shape-studies.fab.json';
+import windingRules from '../example/data/fabs/vector/winding-rules.fab.json';
 
 const INITIAL_SIZE = 1;
 const INITIAL_ROTATION = 0;
 const INITIAL_OBJECT_POSITION = vec2.fromValues(0, 0);
 const INITIAL_VIEW_ROTATION = 270;
+const SHOW_STARTUP_STORAGE_KEY = 'showStartupScreen';
+
+const starterExamples: Record<StarterExampleId, FabData> = {
+  'shape-studies': shapeStudies as FabData,
+  'gesture-figure': gestureFigure as FabData,
+  'robot-puppet': robotPuppet as FabData,
+  'winding-rules': windingRules as FabData,
+  'nested-motion': nestedMotion as FabData,
+};
 
 const deduper = (props: ImagePropsRef) => props;
 
@@ -49,6 +65,10 @@ let dragCounter = 0;
 
 export const AppRoot = () => {
   const browserWorkspace = isBrowserWorkspace();
+  const [showOnStartup, setShowOnStartup] = useState(
+    () => localStorage.getItem(SHOW_STARTUP_STORAGE_KEY) !== 'false'
+  );
+  const [startupScreenOpen, setStartupScreenOpen] = useState(showOnStartup);
   const {
     tabs,
     activeTab,
@@ -172,6 +192,21 @@ export const AppRoot = () => {
     tickSkele(skele);
     addNewTab(skele);
   }, [addNewTab, tickSkele]);
+
+  const handleStartNewProject = useCallback(() => {
+    const hasOnlyFreshTab =
+      tabs.length === 1 &&
+      !activeTab.filePath &&
+      !activeTab.isModified &&
+      activeTab.drawings.length === 0;
+    if (!hasOnlyFreshTab) handleNewTab();
+    setStartupScreenOpen(false);
+  }, [activeTab, handleNewTab, tabs.length]);
+
+  const handleShowOnStartupChange = useCallback((show: boolean) => {
+    setShowOnStartup(show);
+    localStorage.setItem(SHOW_STARTUP_STORAGE_KEY, String(show));
+  }, []);
 
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
 
@@ -303,13 +338,15 @@ export const AppRoot = () => {
   }, []);
 
   const handleDirectorySelect = useCallback(async () => {
-    if (browserWorkspace) return;
+    if (browserWorkspace) return false;
     const newDir = await selectDirectory();
     if (newDir) {
       setGameDirectory(newDir);
       localStorage.setItem('gameDirectory', newDir);
       await loadDirectoryContent(newDir);
+      return true;
     }
+    return false;
   }, [browserWorkspace, loadDirectoryContent]);
 
   const handleFileClick = useCallback(
@@ -364,6 +401,60 @@ export const AppRoot = () => {
     const newFiles = await selectFiles();
     setAvailableFiles(prev => [...prev, ...newFiles]);
   }, []);
+
+  const handleStartupFileSelect = useCallback(async () => {
+    const newFiles = await selectFiles();
+    if (newFiles.length === 0) return;
+    setAvailableFiles(prev => [...prev, ...newFiles]);
+    const project = newFiles.find(file => file.type === 'fab');
+    if (project) await handleFileClick(project);
+    setStartupScreenOpen(false);
+  }, [handleFileClick]);
+
+  const handleStartupDirectorySelect = useCallback(async () => {
+    if (await handleDirectorySelect()) setStartupScreenOpen(false);
+  }, [handleDirectorySelect]);
+
+  const handleOpenStarterExample = useCallback(
+    (exampleId: StarterExampleId) => {
+      const result = loadFabDataContent(
+        starterExamples[exampleId],
+        toRadians(INITIAL_VIEW_ROTATION)
+      );
+      if (!result) return;
+      tickSkele(result.skele);
+      updateTab(result.skele, undefined, result.fabData, false);
+      setStartupScreenOpen(false);
+    },
+    [tickSkele, updateTab]
+  );
+
+  useEffect(() => {
+    const handleGlobalNewProject = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && startupScreenOpen) {
+        event.preventDefault();
+        setStartupScreenOpen(false);
+        return;
+      }
+      if (
+        !(event.ctrlKey || event.metaKey) ||
+        event.key.toLowerCase() !== 'n'
+      ) {
+        return;
+      }
+      if (
+        event.target instanceof HTMLElement &&
+        (event.target.matches('input, textarea') ||
+          event.target.isContentEditable)
+      ) {
+        return;
+      }
+      event.preventDefault();
+      handleStartNewProject();
+    };
+    window.addEventListener('keydown', handleGlobalNewProject);
+    return () => window.removeEventListener('keydown', handleGlobalNewProject);
+  }, [handleStartNewProject, startupScreenOpen]);
 
   useEffect(() => {
     if (gameDirectory) {
@@ -669,6 +760,7 @@ export const AppRoot = () => {
           historyEntries={history.getHistoryEntries()}
           currentHistoryIndex={history.getCurrentIndex()}
           onHistorySelect={onHistorySelect}
+          onShowWelcome={() => setStartupScreenOpen(true)}
         />
       </div>
 
@@ -729,6 +821,19 @@ export const AppRoot = () => {
 
         <div>{history?.description}</div>
       </footer>
+
+      {startupScreenOpen && (
+        <StartupScreen
+          browserWorkspace={browserWorkspace}
+          showOnStartup={showOnStartup}
+          onShowOnStartupChange={handleShowOnStartupChange}
+          onNewProject={handleStartNewProject}
+          onOpenFiles={handleStartupFileSelect}
+          onChooseWorkspace={handleStartupDirectorySelect}
+          onOpenExample={handleOpenStarterExample}
+          onClose={() => setStartupScreenOpen(false)}
+        />
+      )}
     </div>
   );
 };

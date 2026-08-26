@@ -11,6 +11,12 @@ export async function loadFabContent(
   const fabData = await loadFabFile(file.path);
   if (!fabData?.skele) return null;
 
+  return loadFabDataContent(fabData, initialRotation);
+}
+
+export function loadFabDataContent(fabData: FabData, initialRotation: number) {
+  if (!fabData.skele) return null;
+
   const newSkele = SkeleNode.fromData(fabData.skele);
   newSkele.rotation = initialRotation;
   newSkele.mag = 1;

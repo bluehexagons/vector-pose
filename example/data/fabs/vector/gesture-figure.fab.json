@@ -1,0 +1,211 @@
+{
+  "name": "Gesture figure",
+  "description": "A simple humanoid rig organized from pelvis to spine, head, arms, and legs. Drag the end joints or rotate shoulder, elbow, hip, and knee nodes to try different poses.",
+  "drawings": [
+    {
+      "id": "torso-shape",
+      "sort": -1,
+      "fill": "#687bd8",
+      "fillOpacity": 0.85,
+      "stroke": "#293361",
+      "strokeWidth": 0.025,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "left_shoulder"},
+        {"type": "line", "point": "right_shoulder"},
+        {"type": "line", "point": "right_hip"},
+        {"type": "line", "point": "left_hip"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "spine-guide",
+      "fill": "none",
+      "stroke": "#d9e1ff",
+      "strokeWidth": 0.035,
+      "strokeLinecap": "round",
+      "commands": [
+        {"type": "move", "point": "pelvis"},
+        {"type": "line", "point": "chest"},
+        {"type": "line", "point": "neck"}
+      ]
+    },
+    {
+      "id": "left-arm",
+      "fill": "none",
+      "stroke": "#aebcff",
+      "strokeWidth": 0.055,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "chest"},
+        {"type": "line", "point": "left_shoulder"},
+        {"type": "line", "point": "left_elbow"},
+        {"type": "line", "point": "left_hand"}
+      ]
+    },
+    {
+      "id": "right-arm",
+      "fill": "none",
+      "stroke": "#aebcff",
+      "strokeWidth": 0.055,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "chest"},
+        {"type": "line", "point": "right_shoulder"},
+        {"type": "line", "point": "right_elbow"},
+        {"type": "line", "point": "right_hand"}
+      ]
+    },
+    {
+      "id": "left-leg",
+      "fill": "none",
+      "stroke": "#8798ec",
+      "strokeWidth": 0.065,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "pelvis"},
+        {"type": "line", "point": "left_hip"},
+        {"type": "line", "point": "left_knee"},
+        {"type": "line", "point": "left_ankle"}
+      ]
+    },
+    {
+      "id": "right-leg",
+      "fill": "none",
+      "stroke": "#8798ec",
+      "strokeWidth": 0.065,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "pelvis"},
+        {"type": "line", "point": "right_hip"},
+        {"type": "line", "point": "right_knee"},
+        {"type": "line", "point": "right_ankle"}
+      ]
+    },
+    {
+      "id": "head",
+      "sort": 1,
+      "fill": "#ffc96b",
+      "stroke": "#785123",
+      "strokeWidth": 0.025,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "head_top"},
+        {"type": "line", "point": "head_upper_right"},
+        {"type": "line", "point": "head_lower_right"},
+        {"type": "line", "point": "head_bottom"},
+        {"type": "line", "point": "head_lower_left"},
+        {"type": "line", "point": "head_upper_left"},
+        {"type": "close"}
+      ]
+    }
+  ],
+  "skele": {
+    "angle": 0,
+    "mag": 1,
+    "id": "gesture-root",
+    "children": [
+      {
+        "angle": -180,
+        "mag": 0.06,
+        "id": "pelvis",
+        "children": [
+          {
+            "angle": 180,
+            "mag": 0.12,
+            "id": "chest",
+            "children": [
+              {
+                "angle": 0,
+                "mag": 0.05,
+                "id": "neck",
+                "children": [
+                  {
+                    "angle": 0,
+                    "mag": 0.055,
+                    "id": "head_center",
+                    "children": [
+                      {
+                        "angle": 90,
+                        "mag": 0,
+                        "id": "head_points",
+                        "children": [
+                          {"angle": -90, "mag": 0.08, "id": "head_top"},
+                          {
+                            "angle": -30,
+                            "mag": 0.075,
+                            "id": "head_upper_right"
+                          },
+                          {"angle": 30, "mag": 0.075, "id": "head_lower_right"},
+                          {"angle": 90, "mag": 0.08, "id": "head_bottom"},
+                          {"angle": 150, "mag": 0.075, "id": "head_lower_left"},
+                          {"angle": 210, "mag": 0.075, "id": "head_upper_left"}
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "angle": -90,
+                "mag": 0.1,
+                "id": "left_shoulder",
+                "children": [
+                  {
+                    "angle": -35,
+                    "mag": 0.1,
+                    "id": "left_elbow",
+                    "children": [{"angle": 0, "mag": 0.085, "id": "left_hand"}]
+                  }
+                ]
+              },
+              {
+                "angle": 90,
+                "mag": 0.1,
+                "id": "right_shoulder",
+                "children": [
+                  {
+                    "angle": 35,
+                    "mag": 0.1,
+                    "id": "right_elbow",
+                    "children": [{"angle": 0, "mag": 0.085, "id": "right_hand"}]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "angle": 20,
+            "mag": 0.06,
+            "id": "left_hip",
+            "children": [
+              {
+                "angle": -10,
+                "mag": 0.13,
+                "id": "left_knee",
+                "children": [{"angle": -5, "mag": 0.13, "id": "left_ankle"}]
+              }
+            ]
+          },
+          {
+            "angle": -20,
+            "mag": 0.06,
+            "id": "right_hip",
+            "children": [
+              {
+                "angle": 10,
+                "mag": 0.13,
+                "id": "right_knee",
+                "children": [{"angle": 5, "mag": 0.13, "id": "right_ankle"}]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

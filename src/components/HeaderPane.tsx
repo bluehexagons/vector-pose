@@ -19,6 +19,7 @@ export const HeaderPane = ({
   historyEntries,
   currentHistoryIndex,
   onHistorySelect,
+  onShowWelcome,
 }: {
   activeTab?: TabData;
   onSave: () => Promise<void>;
@@ -34,6 +35,7 @@ export const HeaderPane = ({
   historyEntries: HistoryEntry<SkeleNode>[];
   currentHistoryIndex: number;
   onHistorySelect: (index: number) => void;
+  onShowWelcome: () => void;
 }) => {
   return (
     <div className="header-pane">
@@ -69,6 +71,11 @@ export const HeaderPane = ({
         </h1>
       </div>
       <ul className="header-menu">
+        <li className="header-menu-item">
+          <button onClick={onShowWelcome} title="Open the welcome screen">
+            Welcome
+          </button>
+        </li>
         <li className="header-menu-item">
           <HistoryDropdown
             entries={historyEntries}
