@@ -59,27 +59,44 @@ export const TabPane: React.FC<TabPaneProps> = ({
       >
         ‹
       </button>
-      <ul ref={tabListRef} onWheel={handleWheel}>
+      <ul
+        ref={tabListRef}
+        role="tablist"
+        aria-label="Open projects"
+        onWheel={handleWheel}
+      >
         {tabs.map(tab => (
           <li
             key={tab.skele.id}
             className={`tab ${tab.skele.id === activeTabId ? 'active' : ''}`}
-            onClick={() => onSelectTab(tab.skele.id)}
+            role="presentation"
+            onMouseDown={event => {
+              if (event.button === 1) {
+                event.preventDefault();
+                onCloseTab(tab.skele.id);
+              }
+            }}
             title={tab.filePath ? `${tab.name} (${tab.filePath})` : tab.name}
           >
-            <span className="tab-name">
-              {tab.name}
-              {tab?.isModified && (
-                <span
-                  style={{color: 'var(--text-muted)'}}
-                  title="This object has been modified."
-                >
-                  *
+            <button
+              type="button"
+              className="tab-select"
+              role="tab"
+              aria-selected={tab.skele.id === activeTabId}
+              onClick={() => onSelectTab(tab.skele.id)}
+            >
+              <span className="tab-name">{tab.name}</span>
+              {tab.isModified && (
+                <span className="tab-modified" title="Unsaved changes">
+                  ●
                 </span>
               )}
-            </span>
+            </button>
             <button
+              type="button"
               className="tab-close"
+              aria-label={`Close ${tab.name}`}
+              title={`Close ${tab.name}`}
               onClick={e => {
                 e.stopPropagation();
                 onCloseTab(tab.skele.id);
@@ -97,7 +114,13 @@ export const TabPane: React.FC<TabPaneProps> = ({
       >
         ›
       </button>
-      <button className="new-tab" onClick={onNewTab} title="New tab">
+      <button
+        type="button"
+        className="new-tab"
+        onClick={onNewTab}
+        title="New project (Ctrl/Cmd+N)"
+        aria-label="New project"
+      >
         +
       </button>
     </div>

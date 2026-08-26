@@ -208,6 +208,20 @@ export const AppRoot = () => {
     localStorage.setItem(SHOW_STARTUP_STORAGE_KEY, String(show));
   }, []);
 
+  const handleCloseTab = useCallback(
+    (tabId: string) => {
+      const tab = tabs.find(item => item.skele.id === tabId);
+      if (
+        tab?.isModified &&
+        !window.confirm(`Close “${tab.name}” and discard unsaved changes?`)
+      ) {
+        return;
+      }
+      closeTab(tabId);
+    },
+    [closeTab, tabs]
+  );
+
   const [availableFiles, setAvailableFiles] = useState<FileEntry[]>([]);
 
   const focusNode = useCallback(
@@ -740,7 +754,7 @@ export const AppRoot = () => {
           tabs={tabs}
           activeTabId={activeTabId}
           onNewTab={handleNewTab}
-          onCloseTab={closeTab}
+          onCloseTab={handleCloseTab}
           onSelectTab={selectTab}
         />
       </div>
@@ -777,7 +791,7 @@ export const AppRoot = () => {
           />
         </div>
 
-        <Resizer onResize={onResizeLeft} />
+        <Resizer onResize={onResizeLeft} onReset={() => setLeftWidth(300)} />
 
         <div className="pane middle-pane">
           <EditorPane
@@ -799,7 +813,7 @@ export const AppRoot = () => {
           />
         </div>
 
-        <Resizer onResize={onResizeRight} />
+        <Resizer onResize={onResizeRight} onReset={() => setRightWidth(300)} />
 
         <div className="pane right-pane" style={rightPanelStyle}>
           <RightSidebar

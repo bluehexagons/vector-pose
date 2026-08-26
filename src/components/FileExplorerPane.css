@@ -1,15 +1,109 @@
 .file-explorer-pane {
   grid-column: left-start / left-end;
   grid-row: content-start / content-end;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
   overflow-x: hidden;
   padding: var(--spacing-sm);
 }
 
+.file-explorer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  padding: 0 var(--spacing-xs) var(--spacing-sm);
+  border-bottom: 1px solid var(--border-bright);
+}
+
+.file-explorer-header h2 {
+  margin: 0;
+  font-size: 1em;
+}
+
+.file-explorer-header span {
+  min-width: 24px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.file-search {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px;
+  margin: var(--spacing-sm) 0;
+  padding: 0 var(--spacing-xs);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-muted);
+  background: var(--bg-primary);
+}
+
+.file-search:focus-within {
+  border-color: var(--accent-primary);
+}
+
+.file-search input {
+  width: 100%;
+  min-width: 0;
+  padding: 6px 2px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.file-search button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  color: var(--text-muted);
+  background: transparent;
+  box-shadow: none;
+}
+
 .file-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+.file-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: var(--spacing-lg) var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-sm);
+  border: 1px dashed var(--border-dim);
+  border-radius: var(--border-radius-md);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.file-empty-state > span {
+  margin-bottom: var(--spacing-sm);
+  font-size: 25px;
+}
+
+.file-empty-state strong {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.file-empty-state small {
+  max-width: 190px;
+  margin-top: var(--spacing-xs);
+  line-height: 1.4;
 }
 
 .file-list-item {
@@ -50,20 +144,37 @@
   user-select: none;
 }
 
-.game-directory,
-.open-file {
-  margin-top: var(--spacing-md);
-  padding-top: var(--spacing-md);
+.file-explorer-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xs);
+  padding-top: var(--spacing-sm);
   border-top: 1px solid var(--border-bright);
 }
 
+.file-explorer-actions > button:only-of-type {
+  grid-column: 1 / -1;
+}
+
+.file-explorer-actions > button {
+  min-width: 0;
+  padding: 6px var(--spacing-xs);
+  font-size: var(--font-size-xs);
+}
+
 .game-directory {
-  white-space: wrap;
-  word-break: break-word;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 5px var(--spacing-xs) 0;
+  color: var(--text-muted);
   overflow: hidden;
 }
 
-.change-directory {
-  margin: var(--spacing-md) 0;
-  width: 100%;
+.game-directory small {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

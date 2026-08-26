@@ -7,6 +7,7 @@ interface FileTreeViewProps {
   onFileClick: (file: FileTreeNode) => void;
   activeFile?: string;
   level?: number;
+  expandAll?: boolean;
 }
 
 export const FileTreeView: React.FC<FileTreeViewProps> = ({
@@ -14,6 +15,7 @@ export const FileTreeView: React.FC<FileTreeViewProps> = ({
   onFileClick,
   activeFile,
   level = 0,
+  expandAll = false,
 }) => {
   const [expandedDirs, setExpandedDirs] = useState<{[key: string]: boolean}>(
     {}
@@ -42,18 +44,20 @@ export const FileTreeView: React.FC<FileTreeViewProps> = ({
                 }
               >
                 <span className="folder-icon">
-                  {expandedDirs[node.path] ? '📂' : '📁'}
+                  {expandAll || expandedDirs[node.path] ? '📂' : '📁'}
                 </span>
                 {node.name}
               </div>
-              {expandedDirs[node.path] && node.children.length > 0 && (
-                <FileTreeView
-                  nodes={node.children}
-                  onFileClick={onFileClick}
-                  activeFile={activeFile}
-                  level={level + 1}
-                />
-              )}
+              {(expandAll || expandedDirs[node.path]) &&
+                node.children.length > 0 && (
+                  <FileTreeView
+                    nodes={node.children}
+                    onFileClick={onFileClick}
+                    activeFile={activeFile}
+                    level={level + 1}
+                    expandAll={expandAll}
+                  />
+                )}
             </>
           ) : (
             <div

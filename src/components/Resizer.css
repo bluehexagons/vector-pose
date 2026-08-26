@@ -1,9 +1,14 @@
 .resizer {
-  width: var(--gap);
+  flex: 0 0 9px;
+  width: 9px;
   cursor: col-resize;
   display: flex;
   justify-content: center;
   align-items: stretch;
+}
+
+.resizer:focus-visible {
+  outline: none;
 }
 
 .resizer-handle {
@@ -21,10 +26,12 @@
   margin: var(--spacing-xs) auto;
 }
 
-.resizer:hover .resizer-handle:after {
+.resizer:hover .resizer-handle:after,
+.resizer:focus-visible .resizer-handle:after {
   background: var(--border-bright);
 }
 
-.resizer:active .resizer-handle:after {
+.resizer:active .resizer-handle:after,
+.resizer.dragging .resizer-handle:after {
   background: var(--text-muted);
 }

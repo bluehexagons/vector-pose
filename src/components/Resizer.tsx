@@ -3,9 +3,10 @@ import './Resizer.css';
 
 interface ResizerProps {
   onResize: (delta: number) => void;
+  onReset?: () => void;
 }
 
-export const Resizer: React.FC<ResizerProps> = ({onResize}) => {
+export const Resizer: React.FC<ResizerProps> = ({onResize, onReset}) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
 
@@ -43,7 +44,22 @@ export const Resizer: React.FC<ResizerProps> = ({onResize}) => {
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   return (
-    <div className="resizer" onMouseDown={handleMouseDown}>
+    <div
+      className={`resizer ${isDragging ? 'dragging' : ''}`}
+      role="separator"
+      aria-orientation="vertical"
+      aria-label="Resize side panel"
+      tabIndex={0}
+      title="Drag to resize. Double-click to reset."
+      onMouseDown={handleMouseDown}
+      onDoubleClick={onReset}
+      onKeyDown={event => {
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+          event.preventDefault();
+          onResize(event.key === 'ArrowLeft' ? -12 : 12);
+        }
+      }}
+    >
       <div className="resizer-handle" />
     </div>
   );
