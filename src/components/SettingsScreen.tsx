@@ -2,6 +2,7 @@ import type {SidebarPane} from './RightSidebar';
 import './SettingsScreen.css';
 
 export type NodeLabelMode = 'selected' | 'markers' | 'all';
+export type ImageRenderingMode = 'smooth' | 'pixelated';
 
 const zoomOptions = [0.5, 0.75, 0.9, 1, 1.25, 1.5];
 
@@ -12,13 +13,21 @@ export const SettingsScreen = ({
   showCanvasGrid,
   showCanvasNavigationHint,
   nodeLabelMode,
+  imageRenderingMode,
   inspectorPane,
+  gameDirectory,
+  reopenLastWorkspace,
+  warnBeforeClosing,
   onShowOnStartupChange,
   onDefaultCanvasZoomChange,
   onShowCanvasGridChange,
   onShowCanvasNavigationHintChange,
   onNodeLabelModeChange,
+  onImageRenderingModeChange,
   onInspectorPaneChange,
+  onReopenLastWorkspaceChange,
+  onWarnBeforeClosingChange,
+  onChooseWorkspace,
   onResetInterface,
   onClearBrowserData,
   onClose,
@@ -29,13 +38,21 @@ export const SettingsScreen = ({
   showCanvasGrid: boolean;
   showCanvasNavigationHint: boolean;
   nodeLabelMode: NodeLabelMode;
+  imageRenderingMode: ImageRenderingMode;
   inspectorPane: SidebarPane;
+  gameDirectory: string;
+  reopenLastWorkspace: boolean;
+  warnBeforeClosing: boolean;
   onShowOnStartupChange: (show: boolean) => void;
   onDefaultCanvasZoomChange: (zoom: number) => void;
   onShowCanvasGridChange: (show: boolean) => void;
   onShowCanvasNavigationHintChange: (show: boolean) => void;
   onNodeLabelModeChange: (mode: NodeLabelMode) => void;
+  onImageRenderingModeChange: (mode: ImageRenderingMode) => void;
   onInspectorPaneChange: (pane: SidebarPane) => void;
+  onReopenLastWorkspaceChange: (reopen: boolean) => void;
+  onWarnBeforeClosingChange: (warn: boolean) => void;
+  onChooseWorkspace: () => void;
   onResetInterface: () => void;
   onClearBrowserData: () => void;
   onClose: () => void;
@@ -64,9 +81,13 @@ export const SettingsScreen = ({
         </button>
       </header>
 
-      <div className="settings-content">
+      <div
+        className={`settings-content ${
+          browserWorkspace ? 'browser-settings' : 'desktop-settings'
+        }`}
+      >
         <section
-          className="settings-section"
+          className="settings-section settings-general-section"
           aria-labelledby="general-settings"
         >
           <div className="settings-section-heading">
@@ -106,7 +127,10 @@ export const SettingsScreen = ({
           </label>
         </section>
 
-        <section className="settings-section" aria-labelledby="canvas-settings">
+        <section
+          className="settings-section settings-canvas-section"
+          aria-labelledby="canvas-settings"
+        >
           <div className="settings-section-heading">
             <span aria-hidden="true">⌗</span>
             <div>
@@ -151,6 +175,24 @@ export const SettingsScreen = ({
             </select>
           </label>
 
+          <label className="settings-row">
+            <span className="settings-copy">
+              <strong>Image scaling</strong>
+              <small>Choose smooth artwork or crisp pixel-art edges.</small>
+            </span>
+            <select
+              value={imageRenderingMode}
+              onChange={event =>
+                onImageRenderingModeChange(
+                  event.target.value as ImageRenderingMode
+                )
+              }
+            >
+              <option value="smooth">Smooth</option>
+              <option value="pixelated">Pixelated</option>
+            </select>
+          </label>
+
           <label className="settings-row settings-toggle-row">
             <span className="settings-copy">
               <strong>Canvas grid</strong>
@@ -178,8 +220,63 @@ export const SettingsScreen = ({
           </label>
         </section>
 
+        {!browserWorkspace && (
+          <section
+            className="settings-section settings-desktop-section"
+            aria-labelledby="desktop-settings"
+          >
+            <div className="settings-section-heading">
+              <span aria-hidden="true">▣</span>
+              <div>
+                <h2 id="desktop-settings">Desktop app</h2>
+                <p>Control local-project behavior in Electron.</p>
+              </div>
+            </div>
+
+            <div className="settings-action-row">
+              <span className="settings-copy settings-path-copy">
+                <strong>Game workspace</strong>
+                <small title={gameDirectory}>
+                  {gameDirectory || 'No workspace selected'}
+                </small>
+              </span>
+              <button type="button" onClick={onChooseWorkspace}>
+                Choose…
+              </button>
+            </div>
+
+            <label className="settings-row settings-toggle-row">
+              <span className="settings-copy">
+                <strong>Reopen last workspace</strong>
+                <small>Load the selected game directory on next launch.</small>
+              </span>
+              <input
+                type="checkbox"
+                checked={reopenLastWorkspace}
+                onChange={event =>
+                  onReopenLastWorkspaceChange(event.target.checked)
+                }
+              />
+            </label>
+
+            <label className="settings-row settings-toggle-row">
+              <span className="settings-copy">
+                <strong>Warn before closing</strong>
+                <small>Protect unsaved changes when exiting the app.</small>
+              </span>
+              <input
+                type="checkbox"
+                checked={warnBeforeClosing}
+                onChange={event =>
+                  onWarnBeforeClosingChange(event.target.checked)
+                }
+              />
+            </label>
+          </section>
+        )}
+
         <section
-          className="settings-section"
+          className="settings-section settings-workspace-section"
           aria-labelledby="workspace-settings"
         >
           <div className="settings-section-heading">

@@ -4,6 +4,7 @@ import type {RenderInfo, SkeleNode} from '../utils/SkeleNode';
 import {buildVectorPath} from '../utils/vectorDrawing';
 import type {Viewport} from './EditorCanvas';
 import {GameImage} from './GameImage';
+import type {ImageRenderingMode} from './SettingsScreen';
 import './SpriteLayer.css';
 
 export interface SpriteLayerProps {
@@ -15,6 +16,7 @@ export interface SpriteLayerProps {
   drawings?: VectorDrawing[];
   skele: SkeleNode;
   spriteHolderRef: React.RefObject<HTMLDivElement | null>;
+  imageRenderingMode: ImageRenderingMode;
   onTransformStart?: (
     nodeId: string,
     type: 'rotate' | 'scale',
@@ -32,6 +34,7 @@ export const SpriteLayer: React.FC<SpriteLayerProps> = ({
   drawings = [],
   skele,
   spriteHolderRef,
+  imageRenderingMode,
   onTransformStart,
 }) => {
   const layers = [
@@ -119,6 +122,8 @@ export const SpriteLayer: React.FC<SpriteLayerProps> = ({
                   className="sprite-image"
                   style={{
                     opacity: node.node.hidden ? 0.5 : 1,
+                    imageRendering:
+                      imageRenderingMode === 'pixelated' ? 'pixelated' : 'auto',
                   }}
                 />
                 {isActive && (

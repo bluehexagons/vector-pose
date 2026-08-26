@@ -84,9 +84,28 @@
   overflow: auto;
 }
 
-.settings-section:nth-child(2) {
+.settings-general-section {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.settings-canvas-section {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1;
+}
+
+.settings-desktop-section {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.settings-workspace-section {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.settings-content.browser-settings .settings-workspace-section {
+  grid-column: 1;
 }
 
 .settings-section {
@@ -164,6 +183,16 @@
   line-height: 1.35;
 }
 
+.settings-path-copy {
+  min-width: 0;
+}
+
+.settings-path-copy small {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .settings-row select {
   width: 150px;
   padding: 6px 28px 6px 8px;
@@ -237,7 +266,11 @@
     padding: 12px;
   }
 
-  .settings-section:nth-child(2) {
+  .settings-general-section,
+  .settings-canvas-section,
+  .settings-desktop-section,
+  .settings-workspace-section,
+  .settings-content.browser-settings .settings-workspace-section {
     grid-column: auto;
     grid-row: auto;
   }

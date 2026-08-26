@@ -18,6 +18,7 @@ interface EditorPaneProps extends Pick<
   | 'onTransformStart'
   | 'drawings'
   | 'skele'
+  | 'imageRenderingMode'
 > {
   renderedNodes: SkeleNode[];
   activeNode?: {node: SkeleNode};

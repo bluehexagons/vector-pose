@@ -185,8 +185,11 @@ editor; the **Welcome** header button always brings it back.
 
 Open **Settings** from the header to adjust the default canvas zoom, grid and
 navigation guidance, node annotation density, startup behavior, and inspector
-selection. The same screen can reset interface preferences and, in the browser
-edition, clear stored workspace data after confirmation.
+selection. Image scaling can switch between smooth artwork and crisp pixel-art
+edges. In Electron, Settings also shows the current game workspace, can reopen
+it on launch, and can warn before closing tabs with unsaved changes. The same
+screen can reset interface preferences and, in the browser edition, clear
+stored workspace data after confirmation.
 
 ## Directory Structure
 

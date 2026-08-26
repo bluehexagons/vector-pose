@@ -8,7 +8,11 @@ import {FileExplorerPane} from './components/FileExplorerPane';
 import {HeaderPane} from './components/HeaderPane';
 import {Resizer} from './components/Resizer';
 import {RightSidebar, SidebarPane} from './components/RightSidebar';
-import {NodeLabelMode, SettingsScreen} from './components/SettingsScreen';
+import {
+  ImageRenderingMode,
+  NodeLabelMode,
+  SettingsScreen,
+} from './components/SettingsScreen';
 import {StarterExampleId, StartupScreen} from './components/StartupScreen';
 import {TabPane} from './components/TabPane';
 import {useHistory} from './hooks/useHistory';
@@ -55,6 +59,9 @@ const CANVAS_ZOOM_STORAGE_KEY = 'defaultCanvasZoom';
 const CANVAS_GRID_STORAGE_KEY = 'showCanvasGrid';
 const CANVAS_HINT_STORAGE_KEY = 'showCanvasNavigationHint';
 const NODE_LABEL_MODE_STORAGE_KEY = 'nodeLabelMode';
+const IMAGE_RENDERING_STORAGE_KEY = 'imageRenderingMode';
+const REOPEN_WORKSPACE_STORAGE_KEY = 'reopenLastWorkspace';
+const WARN_BEFORE_CLOSE_STORAGE_KEY = 'warnBeforeClosing';
 const DEFAULT_PANEL_WIDTH = 300;
 const MIN_PANEL_WIDTH = 220;
 const DEFAULT_CANVAS_ZOOM = 0.9;
@@ -75,6 +82,11 @@ const storedNodeLabelMode = (): NodeLabelMode => {
   const value = localStorage.getItem(NODE_LABEL_MODE_STORAGE_KEY);
   return value === 'all' || value === 'markers' ? value : 'selected';
 };
+
+const storedImageRenderingMode = (): ImageRenderingMode =>
+  localStorage.getItem(IMAGE_RENDERING_STORAGE_KEY) === 'pixelated'
+    ? 'pixelated'
+    : 'smooth';
 
 const clampPanelWidth = (width: number) =>
   Math.min(window.innerWidth * 0.45, Math.max(MIN_PANEL_WIDTH, width));
@@ -119,6 +131,14 @@ export const AppRoot = () => {
   );
   const [nodeLabelMode, setNodeLabelMode] =
     useState<NodeLabelMode>(storedNodeLabelMode);
+  const [imageRenderingMode, setImageRenderingMode] =
+    useState<ImageRenderingMode>(storedImageRenderingMode);
+  const [reopenLastWorkspace, setReopenLastWorkspace] = useState(() =>
+    storedBoolean(REOPEN_WORKSPACE_STORAGE_KEY, true)
+  );
+  const [warnBeforeClosing, setWarnBeforeClosing] = useState(() =>
+    storedBoolean(WARN_BEFORE_CLOSE_STORAGE_KEY, true)
+  );
   const [rightSidebarPane, setRightSidebarPane] = useState<SidebarPane>(() =>
     localStorage.getItem(RIGHT_SIDEBAR_PANE_STORAGE_KEY) === 'drawings'
       ? 'drawings'
@@ -146,7 +166,9 @@ export const AppRoot = () => {
   const [gameDirectory, setGameDirectory] = useState(() =>
     browserWorkspace
       ? 'Browser workspace'
-      : localStorage.getItem('gameDirectory') || './'
+      : reopenLastWorkspace
+        ? localStorage.getItem('gameDirectory') || './'
+        : ''
   );
 
   // Add clickOffset to dragStart state
@@ -411,12 +433,27 @@ export const AppRoot = () => {
     const newDir = await selectDirectory();
     if (newDir) {
       setGameDirectory(newDir);
-      localStorage.setItem('gameDirectory', newDir);
+      if (reopenLastWorkspace) {
+        localStorage.setItem('gameDirectory', newDir);
+      }
       await loadDirectoryContent(newDir);
       return true;
     }
     return false;
-  }, [browserWorkspace, loadDirectoryContent]);
+  }, [browserWorkspace, loadDirectoryContent, reopenLastWorkspace]);
+
+  const handleReopenLastWorkspaceChange = useCallback(
+    (reopen: boolean) => {
+      setReopenLastWorkspace(reopen);
+      if (browserWorkspace) return;
+      if (reopen && gameDirectory) {
+        localStorage.setItem('gameDirectory', gameDirectory);
+      } else {
+        localStorage.removeItem('gameDirectory');
+      }
+    },
+    [browserWorkspace, gameDirectory]
+  );
 
   const handleBrowserWorkspaceReset = useCallback(async () => {
     if (!browserWorkspace) return;
@@ -600,16 +637,54 @@ export const AppRoot = () => {
     localStorage.setItem(NODE_LABEL_MODE_STORAGE_KEY, nodeLabelMode);
   }, [nodeLabelMode]);
 
+  useEffect(() => {
+    localStorage.setItem(IMAGE_RENDERING_STORAGE_KEY, imageRenderingMode);
+  }, [imageRenderingMode]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      REOPEN_WORKSPACE_STORAGE_KEY,
+      String(reopenLastWorkspace)
+    );
+  }, [reopenLastWorkspace]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      WARN_BEFORE_CLOSE_STORAGE_KEY,
+      String(warnBeforeClosing)
+    );
+  }, [warnBeforeClosing]);
+
+  useEffect(() => {
+    if (
+      browserWorkspace ||
+      !warnBeforeClosing ||
+      !tabs.some(tab => tab.isModified)
+    ) {
+      return;
+    }
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [browserWorkspace, tabs, warnBeforeClosing]);
+
   const handleResetInterface = useCallback(() => {
     handleShowOnStartupChange(true);
     setDefaultCanvasZoom(DEFAULT_CANVAS_ZOOM);
     setShowCanvasGrid(true);
     setShowCanvasNavigationHint(true);
     setNodeLabelMode('selected');
+    setImageRenderingMode('smooth');
+    handleReopenLastWorkspaceChange(true);
+    setWarnBeforeClosing(true);
     setRightSidebarPane('nodes');
     setLeftWidth(DEFAULT_PANEL_WIDTH);
     setRightWidth(DEFAULT_PANEL_WIDTH);
-  }, [handleShowOnStartupChange]);
+  }, [handleReopenLastWorkspaceChange, handleShowOnStartupChange]);
 
   const handleSaveAs = useCallback(async () => {
     if (!activeTab) return;
@@ -964,6 +1039,7 @@ export const AppRoot = () => {
             showCanvasGrid={showCanvasGrid}
             showCanvasNavigationHint={showCanvasNavigationHint}
             nodeLabelMode={nodeLabelMode}
+            imageRenderingMode={imageRenderingMode}
           />
         </div>
 
@@ -1025,13 +1101,21 @@ export const AppRoot = () => {
           showCanvasGrid={showCanvasGrid}
           showCanvasNavigationHint={showCanvasNavigationHint}
           nodeLabelMode={nodeLabelMode}
+          imageRenderingMode={imageRenderingMode}
           inspectorPane={rightSidebarPane}
+          gameDirectory={gameDirectory}
+          reopenLastWorkspace={reopenLastWorkspace}
+          warnBeforeClosing={warnBeforeClosing}
           onShowOnStartupChange={handleShowOnStartupChange}
           onDefaultCanvasZoomChange={setDefaultCanvasZoom}
           onShowCanvasGridChange={setShowCanvasGrid}
           onShowCanvasNavigationHintChange={setShowCanvasNavigationHint}
           onNodeLabelModeChange={setNodeLabelMode}
+          onImageRenderingModeChange={setImageRenderingMode}
           onInspectorPaneChange={setRightSidebarPane}
+          onReopenLastWorkspaceChange={handleReopenLastWorkspaceChange}
+          onWarnBeforeClosingChange={setWarnBeforeClosing}
+          onChooseWorkspace={() => void handleDirectorySelect()}
           onResetInterface={handleResetInterface}
           onClearBrowserData={handleBrowserWorkspaceReset}
           onClose={() => setSettingsScreenOpen(false)}
