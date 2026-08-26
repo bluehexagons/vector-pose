@@ -48,6 +48,9 @@ npm run publish
 # Run linting
 npm run lint
 
+# Run utility tests
+npm test
+
 # Apply safe lint fixes
 npm run lint:fix
 

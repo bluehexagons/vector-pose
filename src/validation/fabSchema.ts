@@ -23,7 +23,7 @@ interface SkeleDataType {
 const SkeleDataSchema: z.ZodType<SkeleDataType> = z.lazy(() =>
   z.object({
     angle: z.number().finite(),
-    mag: z.number().finite(),
+    mag: z.number().finite().nonnegative(),
     id: z.string().optional(),
     uri: z.string().optional(),
     props: ImagePropsSchema.optional(),

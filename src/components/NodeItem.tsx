@@ -299,7 +299,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                     if (!updatedNode) return;
 
                     const oldMag = node.mag;
-                    updatedNode.mag = val ?? 0;
+                    updatedNode.mag = Math.max(0, val ?? 0);
                     updatedNode.updateTransform();
                     onNodeUpdate(
                       clone,

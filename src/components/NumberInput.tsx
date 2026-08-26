@@ -28,7 +28,12 @@ export const NumberInput: React.FC<NumberInputProps> = ({
 
   useEffect(() => {
     // Only update display if external value changed significantly
-    if (Math.abs((value ?? 0) - (lastValueRef.current ?? 0)) > 0.001) {
+    const valueChanged =
+      value !== lastValueRef.current &&
+      (value === undefined ||
+        lastValueRef.current === undefined ||
+        Math.abs(value - lastValueRef.current) > 0.001);
+    if (valueChanged) {
       setDisplayValue(value?.toFixed(precision) ?? '');
       lastValueRef.current = value;
     }

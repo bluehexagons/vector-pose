@@ -87,7 +87,19 @@ ipcMain.handle('path:relative', (_event, from: string, to: string) => {
 ipcMain.handle(
   'fs:resolveGamePath',
   (_event, gameDir: string, relativePath: string) => {
-    return path.resolve(gameDir, relativePath);
+    const resolvedGameDir = path.resolve(gameDir);
+    const resolvedPath = path.resolve(resolvedGameDir, relativePath);
+    const relativeToGameDir = path.relative(resolvedGameDir, resolvedPath);
+
+    if (
+      relativeToGameDir === '..' ||
+      relativeToGameDir.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relativeToGameDir)
+    ) {
+      throw new Error('Resolved path is outside the selected game directory');
+    }
+
+    return resolvedPath;
   }
 );
 
@@ -148,4 +160,7 @@ const init = async () => {
   // code. You can also put them in separate files and import them here.
 };
 
-void init();
+void init().catch(error => {
+  console.error('Failed to initialize application:', error);
+  app.quit();
+});
