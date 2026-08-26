@@ -32,6 +32,9 @@ interface EditorPaneProps extends Pick<
     viewport: Viewport
   ) => MenuAction[];
   focusNode: (node?: UiNode) => void;
+  onAddNode: () => void;
+  onShowDrawings: () => void;
+  onShowWelcome: () => void;
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = ({
@@ -45,6 +48,9 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   onTransformStart,
   onContextMenu,
   focusNode,
+  onAddNode,
+  onShowDrawings,
+  onShowWelcome,
   ...spriteLayerProps
 }) => {
   const [contextMenu, setContextMenu] = useState<{
@@ -87,6 +93,11 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
     }
   };
 
+  const isBlankProject =
+    (spriteLayerProps.drawings?.length ?? 0) === 0 &&
+    !spriteLayerProps.renderedInfo.some(info => info.uri) &&
+    renderedNodes.length <= 1;
+
   return (
     <div className="editor-pane">
       <EditorCanvas
@@ -125,6 +136,34 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
           </>
         )}
       </EditorCanvas>
+      {isBlankProject && (
+        <div className="editor-empty-state">
+          <div className="editor-empty-graphic" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <h2>Build your first pose</h2>
+          <p>
+            Add joints to form a rig, then connect vector paths to those points.
+          </p>
+          <div className="editor-empty-actions">
+            <button type="button" onClick={onAddNode}>
+              + Add joint
+            </button>
+            <button type="button" onClick={onShowDrawings}>
+              Create drawing
+            </button>
+          </div>
+          <button
+            type="button"
+            className="editor-empty-examples"
+            onClick={onShowWelcome}
+          >
+            Or explore an example →
+          </button>
+        </div>
+      )}
     </div>
   );
 };

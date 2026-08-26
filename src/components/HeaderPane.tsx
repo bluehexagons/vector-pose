@@ -40,35 +40,27 @@ export const HeaderPane = ({
   return (
     <div className="header-pane">
       <div className="header-left">
-        <h1 className="header-title">
-          Name:
+        <label className="header-title">
+          <span>Project</span>
           {activeTab && (
             <input
               type="text"
               className="tab-name-input"
-              style={{marginLeft: 'var(--spacing-xs)'}}
               value={activeTab.name}
               onChange={e => onNameChange(e.target.value)}
-              title="Set the name of the opened fab"
+              aria-label="Project name"
+              title="Rename this project"
             />
           )}
-          {activeTab?.isModified && (
-            <span
-              style={{
-                paddingLeft: 'var(--spacing-xs)',
-                display: 'inline-block',
-                width: '42px',
-                textAlign: 'left',
-                cursor: 'default',
-                fontStyle: 'italic',
-                color: 'var(--text-muted)',
-              }}
-              title="This object has been modified."
-            >
-              (modified)
-            </span>
-          )}
-        </h1>
+        </label>
+        {activeTab?.isModified && (
+          <span
+            className="modified-indicator"
+            title="This project has unsaved changes"
+          >
+            Unsaved
+          </span>
+        )}
       </div>
       <ul className="header-menu">
         <li className="header-menu-item">
@@ -126,6 +118,9 @@ export const HeaderPane = ({
         </li>
         <li className="header-menu-item">
           <button
+            className={
+              activeTab?.isModified ? 'save-button modified' : 'save-button'
+            }
             onClick={onSave}
             title={
               activeTab?.filePath

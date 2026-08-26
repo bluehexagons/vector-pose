@@ -38,19 +38,17 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [lastPos, setLastPos] = useState<vec2>();
 
+  const centerViewport = useCallback(() => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setOffset(vec2.fromValues(rect.width / 2, rect.height / 2));
+  }, []);
+
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const centerViewport = () => {
-      const rect = container.getBoundingClientRect();
-      setOffset(vec2.fromValues(rect.width / 2, rect.height / 2));
-    };
-
     centerViewport();
     window.addEventListener('resize', centerViewport);
     return () => window.removeEventListener('resize', centerViewport);
-  }, []);
+  }, [centerViewport]);
 
   const pageToWorld = useCallback(
     (pageX: number, pageY: number) => {
@@ -97,41 +95,48 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     [offset, pageToWorld, rotation, scale, worldToPage]
   );
 
-  const handleWheel = useCallback(
-    (e: WheelEvent) => {
-      e.preventDefault();
-
-      const delta = e.deltaY > 0 ? 0.9 : 1.1;
-      const newScale = scale * delta;
-
-      // Keep scale within reasonable bounds
-      // These bounds are in terms of BASE_SCALE
-      if (newScale < 0.15 || newScale > 8) return;
-
-      // Calculate mouse position relative to container
+  const zoomBy = useCallback(
+    (factor: number, anchor?: vec2) => {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      const mousePos = vec2.fromValues(
-        e.clientX - rect.left,
-        e.clientY - rect.top
+      const nextScale = Math.min(8, Math.max(0.15, scale * factor));
+      if (nextScale === scale) return;
+
+      const zoomAnchor =
+        anchor ?? vec2.fromValues(rect.width / 2, rect.height / 2);
+      const ratio = nextScale / scale;
+      const nextOffset = vec2.fromValues(
+        zoomAnchor[0] - (zoomAnchor[0] - offset[0]) * ratio,
+        zoomAnchor[1] - (zoomAnchor[1] - offset[1]) * ratio
       );
-
-      // Adjust offset to zoom toward mouse position
-      const newOffset = vec2.create();
-      vec2.subtract(newOffset, mousePos, offset);
-      vec2.scale(newOffset, newOffset, 1 - delta);
-      vec2.add(newOffset, offset, newOffset);
-
-      setScale(newScale);
-      setOffset(newOffset);
-      onViewportChange?.(viewport);
+      setScale(nextScale);
+      setOffset(nextOffset);
     },
-    [scale, offset, onViewportChange, viewport]
+    [offset, scale]
+  );
+
+  const resetViewport = useCallback(() => {
+    setScale(0.5);
+    centerViewport();
+  }, [centerViewport]);
+
+  const handleWheel = useCallback(
+    (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      zoomBy(
+        e.deltaY > 0 ? 0.9 : 1.1,
+        vec2.fromValues(e.clientX - rect.left, e.clientY - rect.top)
+      );
+    },
+    [zoomBy]
   );
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
+      containerRef.current?.focus({preventScroll: true});
       if (e.button === 1) {
         setIsDragging(true);
         setLastPos(vec2.fromValues(e.clientX, e.clientY));
@@ -183,17 +188,37 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     return () => container.removeEventListener('wheel', handleWheel);
   }, [handleWheel]);
 
+  const gridSize = Math.max(4, 20 * scale);
+
   return (
     <div
       ref={containerRef}
       className="editor-canvas"
+      tabIndex={0}
+      aria-label="Pose editor canvas"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onContextMenu={e => onContextMenu?.(e, viewport)}
+      onKeyDown={event => {
+        if (event.key === '+' || event.key === '=') {
+          event.preventDefault();
+          zoomBy(1.2);
+        } else if (event.key === '-' || event.key === '_') {
+          event.preventDefault();
+          zoomBy(1 / 1.2);
+        } else if (event.key === '0') {
+          event.preventDefault();
+          resetViewport();
+        }
+      }}
       style={{
         cursor: isDragging ? 'grabbing' : 'default',
+        backgroundSize: `${gridSize}px ${gridSize}px`,
+        backgroundPosition: `${offset[0] % gridSize}px ${
+          offset[1] % gridSize
+        }px`,
       }}
     >
       <div
@@ -207,6 +232,48 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
         }}
       >
         {children(viewport)}
+      </div>
+      <div
+        className="canvas-controls"
+        aria-label="Canvas view controls"
+        onMouseDown={event => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={() => zoomBy(1 / 1.2)}
+          title="Zoom out (-)"
+          aria-label="Zoom out"
+        >
+          −
+        </button>
+        <button
+          type="button"
+          className="canvas-zoom-value"
+          onClick={resetViewport}
+          title="Reset zoom and center (0)"
+        >
+          {Math.round(scale * 100)}%
+        </button>
+        <button
+          type="button"
+          onClick={() => zoomBy(1.2)}
+          title="Zoom in (+)"
+          aria-label="Zoom in"
+        >
+          +
+        </button>
+        <span className="canvas-control-divider" />
+        <button
+          type="button"
+          onClick={centerViewport}
+          title="Center canvas"
+          aria-label="Center canvas"
+        >
+          ◎
+        </button>
+      </div>
+      <div className="canvas-navigation-hint">
+        Wheel to zoom <span>·</span> Middle-drag to pan
       </div>
     </div>
   );

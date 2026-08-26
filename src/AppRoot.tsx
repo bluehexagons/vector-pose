@@ -7,7 +7,7 @@ import {EditorPane} from './components/EditorPane';
 import {FileExplorerPane} from './components/FileExplorerPane';
 import {HeaderPane} from './components/HeaderPane';
 import {Resizer} from './components/Resizer';
-import {RightSidebar} from './components/RightSidebar';
+import {RightSidebar, SidebarPane} from './components/RightSidebar';
 import {StarterExampleId, StartupScreen} from './components/StartupScreen';
 import {TabPane} from './components/TabPane';
 import {useHistory} from './hooks/useHistory';
@@ -30,6 +30,7 @@ import {
 } from './services/fileService';
 import {FabData, FileEntry, UiNode, VectorDrawing} from './shared/types';
 import {toDegrees, toRadians} from './utils/Equa';
+import {createDefaultDrawing} from './utils/drawingEditor';
 import {serializeFabData} from './utils/fabData';
 import type {ImagePropsRef} from './utils/Renderer';
 import {SkeleNode} from './utils/SkeleNode';
@@ -479,6 +480,8 @@ export const AppRoot = () => {
 
   const [leftWidth, setLeftWidth] = useState(300);
   const [rightWidth, setRightWidth] = useState(300);
+  const [rightSidebarPane, setRightSidebarPane] =
+    useState<SidebarPane>('nodes');
 
   const handleSaveAs = useCallback(async () => {
     if (!activeTab) return;
@@ -554,6 +557,17 @@ export const AppRoot = () => {
     },
     [activeTabId, setTabs]
   );
+
+  const handleStartDrawing = useCallback(() => {
+    if (activeTab.drawings.length === 0) {
+      const allPointIds = Array.from(skele.walk()).map(node => node.id);
+      const pointIds = allPointIds.slice(1);
+      handleDrawingsChange([
+        createDefaultDrawing([], pointIds.length > 0 ? pointIds : allPointIds),
+      ]);
+    }
+    setRightSidebarPane('drawings');
+  }, [activeTab.drawings.length, handleDrawingsChange, skele]);
 
   // Replace transforming state with ref
   const transformingRef = useRef<{
@@ -810,6 +824,9 @@ export const AppRoot = () => {
             rotation={activeTab.rotation}
             onTransformStart={handleTransformStart}
             onContextMenu={handleEditorContextMenu}
+            onAddNode={appendNewNode}
+            onShowDrawings={handleStartDrawing}
+            onShowWelcome={() => setStartupScreenOpen(true)}
           />
         </div>
 
@@ -826,14 +843,26 @@ export const AppRoot = () => {
             onAddNode={appendNewNode}
             drawings={activeTab.drawings}
             onDrawingsChange={handleDrawingsChange}
+            activePane={rightSidebarPane}
+            onActivePaneChange={setRightSidebarPane}
           />
         </div>
       </div>
 
       <footer className="footer">
-        <div>{activeTab?.filePath ? activeTab.filePath : 'No file open'}</div>
-
-        <div>{history?.description}</div>
+        <div
+          className={`footer-save-status ${activeTab.isModified ? 'modified' : ''}`}
+        >
+          {activeTab.isModified
+            ? 'Unsaved changes'
+            : activeTab.filePath
+              ? 'Saved'
+              : 'Ready'}
+        </div>
+        <div className="footer-file-path">
+          {activeTab.filePath ?? `${activeTab.name} · not saved yet`}
+        </div>
+        <div className="footer-history">{history?.description}</div>
       </footer>
 
       {startupScreenOpen && (
