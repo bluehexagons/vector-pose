@@ -17,6 +17,38 @@ export interface FileEntry {
   type: 'fab' | 'image';
 }
 
+export type VectorPathCommand =
+  | {type: 'move'; point: string}
+  | {type: 'line'; point: string}
+  | {type: 'quadratic'; control: string; point: string}
+  | {
+      type: 'cubic';
+      control1: string;
+      control2: string;
+      point: string;
+    }
+  | {type: 'close'};
+
+/** A vector path whose coordinates are supplied by skeletal node positions. */
+export interface VectorDrawing {
+  id?: string;
+  commands: VectorPathCommand[];
+  fill?: string;
+  fillRule?: 'nonzero' | 'evenodd';
+  fillOpacity?: number;
+  stroke?: string;
+  strokeWidth?: number;
+  strokeOpacity?: number;
+  strokeLinecap?: 'butt' | 'round' | 'square';
+  strokeLinejoin?: 'miter' | 'round' | 'bevel';
+  strokeMiterlimit?: number;
+  strokeDasharray?: number[];
+  strokeDashoffset?: number;
+  opacity?: number;
+  sort?: number;
+  hidden?: boolean;
+}
+
 export const SEARCH_DIRS = ['./data/fabs', './gfx'] as const;
 export const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp'] as const;
 export const FAB_EXTENSIONS = ['.fab.json'] as const;
@@ -176,6 +208,7 @@ export function fileEntryToTreeNode(file: FileEntry): FileTreeNode {
 export interface FabData {
   name?: string;
   description?: string;
+  drawings?: VectorDrawing[];
   skele: SkeleData;
 }
 
