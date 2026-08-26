@@ -1,4 +1,3 @@
-import type {dialog} from 'electron';
 import type {RenderInfo, SkeleData, SkeleNode} from '../utils/SkeleNode';
 
 export interface UiNode {
@@ -196,16 +195,22 @@ export interface TabData {
 
 declare global {
   interface Window {
-    native: {
+    native?: {
       dialog: {
-        showOpenDialog: typeof dialog.showOpenDialog;
-        showSaveDialog: typeof dialog.showSaveDialog;
+        showOpenDialog: (config: unknown) => Promise<{
+          canceled: boolean;
+          filePaths: string[];
+        }>;
+        showSaveDialog: (config: unknown) => Promise<{
+          canceled: boolean;
+          filePath?: string;
+        }>;
       };
       fs: {
         readdir: (path: string) => Promise<FileSystemEntry[]>;
         readFile: {
-          (path: string, encoding: BufferEncoding): Promise<string>;
-          (path: string): Promise<Buffer>;
+          (path: string, encoding: string): Promise<string>;
+          (path: string): Promise<Uint8Array>;
         };
         resolveGamePath: (
           gameDir: string,
@@ -213,8 +218,8 @@ declare global {
         ) => Promise<string>;
         writeFile: (
           path: string,
-          data: string | Buffer,
-          encoding?: BufferEncoding
+          data: string | Uint8Array,
+          encoding?: string
         ) => Promise<void>;
       };
       path: {

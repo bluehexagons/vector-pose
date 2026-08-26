@@ -19,6 +19,8 @@ import {
 } from './services/contentService';
 import {
   loadDirectoryFiles,
+  exportFabFile,
+  isBrowserWorkspace,
   saveFabFile,
   selectDirectory,
   selectFiles,
@@ -60,6 +62,7 @@ const serializeFabData = (tab: TabData): FabData => {
 };
 
 export const AppRoot = () => {
+  const browserWorkspace = isBrowserWorkspace();
   const {
     tabs,
     activeTab,
@@ -79,8 +82,10 @@ export const AppRoot = () => {
 
   const spriteHolderRef = useRef<HTMLDivElement>(null);
 
-  const [gameDirectory, setGameDirectory] = useState(
-    () => localStorage.getItem('gameDirectory') || './'
+  const [gameDirectory, setGameDirectory] = useState(() =>
+    browserWorkspace
+      ? 'Browser workspace'
+      : localStorage.getItem('gameDirectory') || './'
   );
 
   // Add clickOffset to dragStart state
@@ -312,13 +317,14 @@ export const AppRoot = () => {
   }, []);
 
   const handleDirectorySelect = useCallback(async () => {
+    if (browserWorkspace) return;
     const newDir = await selectDirectory();
     if (newDir) {
       setGameDirectory(newDir);
       localStorage.setItem('gameDirectory', newDir);
       await loadDirectoryContent(newDir);
     }
-  }, [loadDirectoryContent]);
+  }, [browserWorkspace, loadDirectoryContent]);
 
   const handleFileClick = useCallback(
     async (file: FileEntry) => {
@@ -425,6 +431,12 @@ export const AppRoot = () => {
       );
     }
   }, [activeTab, activeTabId, handleSaveAs, setTabs]);
+
+  const handleExport = useCallback(() => {
+    if (!activeTab) return;
+    const defaultName = activeTab.name.toLowerCase().replace(/\s+/g, '_');
+    exportFabFile(defaultName, serializeFabData(activeTab));
+  }, [activeTab]);
 
   const handleNameChange = useCallback(
     (name: string) => {
@@ -645,6 +657,7 @@ export const AppRoot = () => {
           activeTab={activeTab}
           onSave={handleSave}
           onSaveAs={handleSaveAs}
+          onExport={browserWorkspace ? handleExport : undefined}
           onNameChange={handleNameChange}
           onRotateView={handleRotateView}
           viewRotation={activeTab?.rotation ?? 0}
@@ -667,6 +680,7 @@ export const AppRoot = () => {
             onFileClick={handleFileClick}
             onFileSelect={handleFileSelect}
             onDirectorySelect={handleDirectorySelect}
+            browserWorkspace={browserWorkspace}
           />
         </div>
 

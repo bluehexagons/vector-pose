@@ -23,3 +23,10 @@ void test('sprite URI conversion retains the legacy PNG form', () => {
     './gfx/sprite/character/idle/frame.png'
   );
 });
+
+void test('sprite URI conversion accepts browser workspace paths', () => {
+  assert.equal(
+    toSpriteUri('./gfx/sprite/strawberry/still/bottom/bb.png'),
+    'sprite:strawberry/still/bottom/bb'
+  );
+});

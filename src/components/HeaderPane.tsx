@@ -8,6 +8,7 @@ export const HeaderPane = ({
   activeTab,
   onSave,
   onSaveAs,
+  onExport,
   onNameChange,
   onRotateView,
   viewRotation,
@@ -22,6 +23,7 @@ export const HeaderPane = ({
   activeTab?: TabData;
   onSave: () => Promise<void>;
   onSaveAs: () => Promise<void>;
+  onExport?: () => void;
   onNameChange: (name: string) => void;
   onRotateView: (degrees: number) => void;
   viewRotation: number;
@@ -139,6 +141,13 @@ export const HeaderPane = ({
             Save As...
           </button>
         </li>
+        {onExport && (
+          <li className="header-menu-item">
+            <button onClick={onExport} title="Download this prefab as a file">
+              Download...
+            </button>
+          </li>
+        )}
       </ul>
     </div>
   );

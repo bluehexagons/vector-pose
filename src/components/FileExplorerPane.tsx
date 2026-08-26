@@ -10,6 +10,7 @@ interface FileExplorerPaneProps {
   onFileClick: (file: FileEntry) => void;
   onFileSelect: () => void;
   onDirectorySelect: () => void;
+  browserWorkspace?: boolean;
 }
 
 export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
@@ -19,6 +20,7 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
   onFileClick,
   onFileSelect,
   onDirectorySelect,
+  browserWorkspace = false,
 }) => {
   const handleTreeNodeClick = (node: FileTreeNode) => {
     if (node.type === 'directory') return;
@@ -48,24 +50,38 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
       <div className="open-file">
         <button
           onClick={onFileSelect}
-          title="Open and add a file to the tile list. (Image import incomplete)"
+          title={
+            browserWorkspace
+              ? 'Copy prefab and image files into this browser workspace.'
+              : 'Open and add files to the file list. (Image import incomplete)'
+          }
         >
-          Open/Import File (WIP)
+          {browserWorkspace ? 'Import Files' : 'Open/Import File (WIP)'}
         </button>
       </div>
 
       <div className="game-directory" title={gameDirectory}>
         <small>
-          Base Directory: <strong>{gameDirectory}</strong>
+          {browserWorkspace ? (
+            <>
+              Files are stored in <strong>this browser</strong>.
+            </>
+          ) : (
+            <>
+              Base Directory: <strong>{gameDirectory}</strong>
+            </>
+          )}
         </small>
       </div>
-      <button
-        onClick={onDirectorySelect}
-        className="change-directory"
-        title="Select a new game directory. Should be the renderer folder, with data and gfx folders."
-      >
-        <div>Choose Base Directory</div>
-      </button>
+      {!browserWorkspace && (
+        <button
+          onClick={onDirectorySelect}
+          className="change-directory"
+          title="Select a new game directory. Should be the renderer folder, with data and gfx folders."
+        >
+          <div>Choose Base Directory</div>
+        </button>
+      )}
     </div>
   );
 };

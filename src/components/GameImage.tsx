@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {loadImageFile} from '../services/fileService';
 
 interface GameImageProps {
   uri: string;
@@ -29,22 +30,7 @@ export const GameImage: React.FC<GameImageProps> = ({
 
     const loadImage = async () => {
       try {
-        const relativePath = uri;
-        const fullPath = await window.native.fs.resolveGamePath(
-          gameDirectory,
-          relativePath
-        );
-        const buffer = await window.native.fs.readFile(fullPath);
-        const extension = relativePath
-          .toLowerCase()
-          .match(/\.(png|jpe?g|webp)$/)?.[1];
-        const mimeType =
-          extension === 'jpg' || extension === 'jpeg'
-            ? 'image/jpeg'
-            : extension === 'webp'
-              ? 'image/webp'
-              : 'image/png';
-        const blob = new Blob([Uint8Array.from(buffer)], {type: mimeType});
+        const blob = await loadImageFile(gameDirectory, uri);
         blobUrl = URL.createObjectURL(blob);
         if (canceled) {
           URL.revokeObjectURL(blobUrl);

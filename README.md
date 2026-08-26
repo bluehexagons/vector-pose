@@ -1,6 +1,8 @@
 # vector-pose
 
-A vector-based skeletal rigging tool built with Electron and React.
+A vector-based skeletal rigging tool built with Electron and React. The
+Electron app is the primary editor, while a browser edition is available for
+trying the tool without installing it.
 
 ## Features
 
@@ -14,6 +16,12 @@ A vector-based skeletal rigging tool built with Electron and React.
 ## Installation
 
 Windows releases can be found on the [Releases](https://github.com/bluehexagons/vector-pose/releases) page.
+
+The browser edition is published at
+[bluehexagons.github.io/vector-pose](https://bluehexagons.github.io/vector-pose/).
+It stores its workspace in the browser, starts with the bundled examples, and
+can import images or prefab files. Use **Download...** to keep an external copy
+of browser-created prefab files.
 
 ## Prerequisites
 
@@ -38,6 +46,12 @@ npm start
 
 # Package the application
 npm run package
+
+# Build the browser edition
+npm run build:web
+
+# Preview a completed browser build
+npm run preview:web
 
 # Create distributables
 npm run make
@@ -88,6 +102,12 @@ Should target the renderer directory of the game.
 - `/data/fabs/` - fab data
 - `/gfx/` - graphics data (gfx: uri)
 - `/gfx/sprite/` - sprite data (sprite: uri)
+
+The Electron app reads this structure from a selected local directory. The
+browser edition maintains the same logical structure in IndexedDB and never
+requests access to a local directory. Browser storage belongs to the current
+site and browser profile, so download important prefab files before clearing
+site data.
 
 ## Keyboard Shortcuts
 
