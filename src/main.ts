@@ -99,7 +99,9 @@ const init = async () => {
       height: 800,
       webPreferences: {
         preload: path.join(__dirname, 'preload.js'),
-        nodeIntegration: true,
+        contextIsolation: true,
+        nodeIntegration: false,
+        sandbox: true,
       },
       show: false,
       autoHideMenuBar: true,

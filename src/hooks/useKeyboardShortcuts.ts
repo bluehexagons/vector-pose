@@ -17,6 +17,8 @@ const keyBindings: Record<string, KeyBinding> = {
   'ctrl+z': {action: 'undo', contexts: ['node', 'editor']},
   'ctrl+shift+z': {action: 'redo', contexts: ['node', 'editor']},
   'ctrl+y': {action: 'redo', contexts: ['node', 'editor']},
+  'meta+z': {action: 'undo', contexts: ['node', 'editor']},
+  'meta+shift+z': {action: 'redo', contexts: ['node', 'editor']},
   delete: {action: 'delete', contexts: ['node']},
   backspace: {action: 'delete', contexts: ['node']},
   p: {action: 'createParent', contexts: ['node']},
@@ -27,12 +29,12 @@ const keyBindings: Record<string, KeyBinding> = {
 export function useKeyboardShortcuts({
   activeTab,
   updateSkele,
-  updateTab,
+  restoreState,
   history,
 }: {
   activeTab: TabData;
   updateSkele: (base: SkeleNode, description?: string) => void;
-  updateTab: (state: SkeleNode, filePath?: string) => void;
+  restoreState: (state: SkeleNode, filePath?: string) => void;
   history: History;
 }) {
   const handleKeyboard = useCallback(
@@ -41,14 +43,15 @@ export function useKeyboardShortcuts({
 
       if (
         (e.target as HTMLElement).tagName === 'INPUT' ||
-        (e.target as HTMLElement).tagName === 'TEXTAREA'
+        (e.target as HTMLElement).tagName === 'TEXTAREA' ||
+        (e.target as HTMLElement).isContentEditable
       ) {
         return;
       }
 
       const comboName = [
         e.altKey ? 'alt' : '',
-        e.ctrlKey ? 'ctrl' : '',
+        e.ctrlKey ? 'ctrl' : e.metaKey ? 'meta' : '',
         e.shiftKey ? 'shift' : '',
         e.key.toLowerCase(),
       ]
@@ -73,12 +76,12 @@ export function useKeyboardShortcuts({
       switch (binding.action) {
         case 'undo': {
           const undoState = history.undo();
-          if (undoState) updateTab(undoState.state, activeTab.filePath);
+          if (undoState) restoreState(undoState.state, activeTab.filePath);
           break;
         }
         case 'redo': {
           const redoState = history.redo();
-          if (redoState) updateTab(redoState.state, activeTab.filePath);
+          if (redoState) restoreState(redoState.state, activeTab.filePath);
           break;
         }
         case 'delete':
@@ -94,7 +97,7 @@ export function useKeyboardShortcuts({
         }
       }
     },
-    [activeTab, history, updateSkele, updateTab]
+    [activeTab, history, restoreState, updateSkele]
   );
 
   useEffect(() => {

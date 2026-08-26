@@ -24,7 +24,7 @@ import {
   selectFiles,
   showSaveDialog,
 } from './services/fileService';
-import {FileEntry, UiNode} from './shared/types';
+import {FabData, FileEntry, TabData, UiNode} from './shared/types';
 import {toDegrees, toRadians} from './utils/Equa';
 import type {ImagePropsRef} from './utils/Renderer';
 import {SkeleNode} from './utils/SkeleNode';
@@ -42,7 +42,22 @@ const createDefaultSkele = () =>
 
 const preventDefault = (e: React.SyntheticEvent) => e.preventDefault();
 
-let atomicCounter = 0;
+let dragCounter = 0;
+
+const serializeFabData = (tab: TabData): FabData => {
+  const skele = tab.skele.toData();
+
+  // The root transform is the editor's camera orientation, not part of the
+  // saved pose.
+  skele.angle = 0;
+  skele.mag = 1;
+
+  return {
+    name: tab.name,
+    description: tab.description,
+    skele,
+  };
+};
 
 export const AppRoot = () => {
   const {
@@ -93,12 +108,17 @@ export const AppRoot = () => {
   );
 
   const updateSkele = useCallback(
-    (base: SkeleNode, description?: string, continuityKey?: string) => {
+    (
+      base: SkeleNode,
+      description?: string,
+      continuityKey?: string,
+      markModified = true
+    ) => {
       if (!activeTab) return base;
 
       const clone = base.clone(null);
       tickSkele(clone);
-      updateTab(clone, activeTab.filePath);
+      updateTab(clone, activeTab.filePath, undefined, markModified);
 
       if (description) {
         history.pushState(clone, description, continuityKey);
@@ -119,14 +139,14 @@ export const AppRoot = () => {
       // Apply rotation to skele
       const clone = skele.clone();
       clone.rotation = toRadians(normalized);
-      updateSkele(clone);
+      updateSkele(clone, undefined, undefined, false);
     },
     [activeTabId, setRotation, skele, updateSkele]
   );
 
   useEffect(() => {
     if (skele && !skele.initialized) {
-      updateSkele(skele.clone());
+      updateSkele(skele.clone(), undefined, undefined, false);
     }
   }, [skele, updateSkele]);
 
@@ -196,6 +216,7 @@ export const AppRoot = () => {
 
     setLastActiveNode(activeTabId, activeTab.activeNode);
     setActiveNode(activeTabId, undefined);
+    setDragStart(undefined);
   }, [
     activeTab.activeNode,
     activeTabId,
@@ -232,7 +253,7 @@ export const AppRoot = () => {
         0.02 * vec2.len(viewport.pageToWorld(0, 1))
       );
       if (closestNode) {
-        atomicCounter++;
+        dragCounter++;
         handleNodeSelection({node: closestNode}, e, worldPos);
       } else {
         focusNode(undefined);
@@ -278,7 +299,7 @@ export const AppRoot = () => {
           `Moved node ${activeNode.node.id} to (${targetPos[0].toFixed(
             2
           )}, ${targetPos[1].toFixed(2)})`,
-          `drag_${activeNode.node.id}_${atomicCounter}`
+          `drag_${activeNode.node.id}_${dragCounter}`
         );
       }
     },
@@ -371,16 +392,7 @@ export const AppRoot = () => {
     if (response.canceled || !response.filePath) return;
 
     const filePath = response.filePath;
-    const fabData = {
-      name: activeTab.name,
-      description: activeTab.description,
-      skele: activeTab.skele.toData(),
-      filePath,
-    };
-
-    // overwrite camera-modified values to their originals
-    fabData.skele.angle = 0;
-    fabData.skele.mag = 1;
+    const fabData = serializeFabData(activeTab);
 
     const success = await saveFabFile(filePath, fabData);
     if (success) {
@@ -388,7 +400,7 @@ export const AppRoot = () => {
       setTabs(current =>
         current.map(tab =>
           tab.skele.id === activeTabId
-            ? {...tab, filePath, isModified: false}
+            ? {...tab, filePath, fabData, isModified: false}
             : tab
         )
       );
@@ -402,14 +414,7 @@ export const AppRoot = () => {
       return handleSaveAs();
     }
 
-    const fabData = {
-      name: activeTab.name,
-      skele: activeTab.skele.toData(),
-    };
-
-    // overwrite camera-modified values to their originals
-    fabData.skele.angle = 0;
-    fabData.skele.mag = 1;
+    const fabData = serializeFabData(activeTab);
 
     const success = await saveFabFile(activeTab.filePath, fabData);
     if (success) {
@@ -568,39 +573,44 @@ export const AppRoot = () => {
     [updateSkele]
   );
 
+  const restoreHistoryState = useCallback(
+    (state: SkeleNode, filePath?: string) => {
+      const clone = state.clone();
+      tickSkele(clone);
+      updateTab(clone, filePath);
+    },
+    [tickSkele, updateTab]
+  );
+
   useKeyboardShortcuts({
     activeTab,
     updateSkele,
-    updateTab,
+    restoreState: restoreHistoryState,
     history,
   });
 
   const onUndo = useCallback(() => {
     const undoState = history.undo();
     if (undoState?.state) {
-      const clone = undoState.state.clone();
-      tickSkele(clone); // Make sure state is properly initialized
-      updateTab(clone, activeTab.filePath);
+      restoreHistoryState(undoState.state, activeTab.filePath);
     }
-  }, [activeTab.filePath, history, tickSkele, updateTab]);
+  }, [activeTab.filePath, history, restoreHistoryState]);
 
   const onRedo = useCallback(() => {
     const redoState = history.redo();
     if (redoState?.state) {
-      const clone = redoState.state.clone();
-      tickSkele(clone);
-      updateTab(clone, activeTab.filePath);
+      restoreHistoryState(redoState.state, activeTab.filePath);
     }
-  }, [activeTab.filePath, history, tickSkele, updateTab]);
+  }, [activeTab.filePath, history, restoreHistoryState]);
 
   const onHistorySelect = useCallback(
     (index: number) => {
       const entry = history.jumpToState(index);
       if (entry?.state) {
-        updateTab(entry.state, activeTab.filePath);
+        restoreHistoryState(entry.state, activeTab.filePath);
       }
     },
-    [activeTab.filePath, history, updateTab]
+    [activeTab.filePath, history, restoreHistoryState]
   );
 
   const onResizeLeft = useCallback(
@@ -652,7 +662,7 @@ export const AppRoot = () => {
         <div className="pane left-pane" style={leftPanelStyle}>
           <FileExplorerPane
             availableFiles={availableFiles}
-            activeFile={activeNode?.node.uri ?? undefined}
+            activeFile={activeTab.filePath}
             gameDirectory={gameDirectory}
             onFileClick={handleFileClick}
             onFileSelect={handleFileSelect}

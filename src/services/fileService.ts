@@ -26,7 +26,11 @@ export async function scanDirectory(
           IMAGE_EXTENSIONS.includes(ext as (typeof IMAGE_EXTENSIONS)[number])
         ) {
           entries.push({path: file.path, relativePath, type: 'image'});
-        } else if (FAB_EXTENSIONS.some(fabExt => file.name.endsWith(fabExt))) {
+        } else if (
+          FAB_EXTENSIONS.some(fabExt =>
+            file.name.toLowerCase().endsWith(fabExt)
+          )
+        ) {
           entries.push({path: file.path, relativePath, type: 'fab'});
         }
       }
@@ -64,7 +68,12 @@ export async function selectDirectory() {
 export async function loadFabFile(filePath: string) {
   try {
     const str = (await window.native.fs.readFile(filePath, 'utf-8')) as string;
-    return JSON.parse(str);
+    const validationResult = validateFab(JSON.parse(str));
+    if (!validationResult.success) {
+      console.error('Invalid FAB data:', validationResult.error.format());
+      return null;
+    }
+    return validationResult.data;
   } catch (err) {
     console.error('Failed to load fab file:', err);
     return null;
@@ -81,7 +90,7 @@ export async function saveFabFile(filePath: string, fabData: FabData) {
 
     await window.native.fs.writeFile(
       filePath,
-      JSON.stringify(fabData, null, 2),
+      JSON.stringify(validationResult.data, null, 2),
       'utf8'
     );
     return true;
@@ -124,10 +133,7 @@ export async function selectFiles() {
         ({
           path: filePath,
           relativePath: await window.native.path.basename(filePath),
-          type:
-            (await window.native.path.extname(filePath)) === '.json'
-              ? 'fab'
-              : 'image',
+          type: filePath.toLowerCase().endsWith('.fab.json') ? 'fab' : 'image',
         }) as FileEntry
     )
   );

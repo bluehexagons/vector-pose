@@ -26,13 +26,28 @@ export const GFX_PREFIX = 'gfx:';
 export const SPRITE_PREFIX = 'sprite:';
 
 export function toSpriteUri(fullPath: string): string | null {
-  let match = fullPath.match(
-    /[/\\]gfx[/\\]sprite[/\\](([^/\\]*[/\\])*[^/\\]+)\.[^.]+$/i
+  const extensionPattern = IMAGE_EXTENSIONS.join('|').replaceAll('.', '\\.');
+  const match = fullPath.match(
+    new RegExp(
+      `[/\\\\]gfx[/\\\\]sprite[/\\\\]((?:[^/\\\\]*[/\\\\])*[^/\\\\]+?)(${extensionPattern})$`,
+      'i'
+    )
   );
-  if (match?.[1]) return `${SPRITE_PREFIX}${match[1]}`;
+  if (match?.[1] && match[2]) {
+    const extension = match[2].toLowerCase();
+    return `${SPRITE_PREFIX}${match[1]}${extension === '.png' ? '' : extension}`;
+  }
 
-  match = fullPath.match(/[/\\]gfx[/\\](([^/\\]*[/\\])*[^/\\]+)\.[^.]+$/i);
-  if (match?.[1]) return `${GFX_PREFIX}${match[1]}`;
+  const gfxMatch = fullPath.match(
+    new RegExp(
+      `[/\\\\]gfx[/\\\\]((?:[^/\\\\]*[/\\\\])*[^/\\\\]+?)(${extensionPattern})$`,
+      'i'
+    )
+  );
+  if (gfxMatch?.[1] && gfxMatch[2]) {
+    const extension = gfxMatch[2].toLowerCase();
+    return `${GFX_PREFIX}${gfxMatch[1]}${extension === '.png' ? '' : extension}`;
+  }
 
   return null;
 }
@@ -40,13 +55,21 @@ export function toSpriteUri(fullPath: string): string | null {
 export function fromSpriteUri(uri: string): string {
   if (uri.startsWith(SPRITE_PREFIX)) {
     const spriteName = uri.slice(SPRITE_PREFIX.length);
-    return `./gfx/sprite/${spriteName}.png`;
+    return `./gfx/sprite/${appendDefaultImageExtension(spriteName)}`;
   }
   if (uri.startsWith(GFX_PREFIX)) {
     const gfxName = uri.slice(GFX_PREFIX.length);
-    return `./gfx/${gfxName}.png`;
+    return `./gfx/${appendDefaultImageExtension(gfxName)}`;
   }
   return uri;
+}
+
+function appendDefaultImageExtension(path: string): string {
+  return IMAGE_EXTENSIONS.some(extension =>
+    path.toLowerCase().endsWith(extension)
+  )
+    ? path
+    : `${path}.png`;
 }
 
 export interface ImageCache {
@@ -185,8 +208,8 @@ declare global {
           (path: string): Promise<Buffer>;
         };
         resolveGamePath: (
-          relativePath: string,
-          gameDir: string
+          gameDir: string,
+          relativePath: string
         ) => Promise<string>;
         writeFile: (
           path: string,

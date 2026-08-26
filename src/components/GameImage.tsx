@@ -23,6 +23,10 @@ export const GameImage: React.FC<GameImageProps> = ({
     let blobUrl: string | undefined;
     let canceled = false;
 
+    // Do not keep showing a revoked URL while the replacement image loads.
+    // oxlint-disable-next-line react/set-state-in-effect -- reset stale async image state.
+    setImageSrc('');
+
     const loadImage = async () => {
       try {
         const relativePath = uri;
@@ -31,7 +35,16 @@ export const GameImage: React.FC<GameImageProps> = ({
           relativePath
         );
         const buffer = await window.native.fs.readFile(fullPath);
-        const blob = new Blob([Uint8Array.from(buffer)], {type: 'image/png'});
+        const extension = relativePath
+          .toLowerCase()
+          .match(/\.(png|jpe?g|webp)$/)?.[1];
+        const mimeType =
+          extension === 'jpg' || extension === 'jpeg'
+            ? 'image/jpeg'
+            : extension === 'webp'
+              ? 'image/webp'
+              : 'image/png';
+        const blob = new Blob([Uint8Array.from(buffer)], {type: mimeType});
         blobUrl = URL.createObjectURL(blob);
         if (canceled) {
           URL.revokeObjectURL(blobUrl);
@@ -41,7 +54,7 @@ export const GameImage: React.FC<GameImageProps> = ({
         onLoad?.();
       } catch (err) {
         console.error('Failed to load image:', uri, err);
-        onError?.(err as Error);
+        onError?.(err instanceof Error ? err : new Error(String(err)));
       }
     };
 
@@ -59,5 +72,13 @@ export const GameImage: React.FC<GameImageProps> = ({
     return null;
   }
 
-  return <img src={imageSrc} className={className} style={style} />;
+  return (
+    <img
+      src={imageSrc}
+      alt={uri}
+      draggable={false}
+      className={className}
+      style={style}
+    />
+  );
 };

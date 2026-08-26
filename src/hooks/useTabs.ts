@@ -47,7 +47,12 @@ export function useTabs() {
   const [activeTabId, setActiveTabId] = useState<string>(tabs[0].skele.id);
 
   const updateTab = useCallback(
-    (base: SkeleNode, filePath?: string, fabData?: FabData) => {
+    (
+      base: SkeleNode,
+      filePath?: string,
+      fabData?: FabData,
+      markModified = true
+    ) => {
       setTabs(current => {
         // First try to find tab by ID
         const existingTab = current.find(tab => tab.skele.id === base.id);
@@ -58,7 +63,7 @@ export function useTabs() {
                   ...tab,
                   ...renderSkele(base),
                   skele: base,
-                  isModified: true,
+                  isModified: markModified ? true : existingTab.isModified,
                 }
               : tab
           );
@@ -74,7 +79,7 @@ export function useTabs() {
                     ...tab,
                     ...renderSkele(base),
                     skele: base,
-                    isModified: true,
+                    isModified: markModified ? true : fileTab.isModified,
                   }
                 : tab
             );
