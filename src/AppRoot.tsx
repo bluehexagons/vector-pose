@@ -85,6 +85,11 @@ export const AppRoot = () => {
     () => localStorage.getItem(SHOW_STARTUP_STORAGE_KEY) !== 'false'
   );
   const [startupScreenOpen, setStartupScreenOpen] = useState(showOnStartup);
+  const [rightSidebarPane, setRightSidebarPane] = useState<SidebarPane>(() =>
+    localStorage.getItem(RIGHT_SIDEBAR_PANE_STORAGE_KEY) === 'drawings'
+      ? 'drawings'
+      : 'nodes'
+  );
   const {
     tabs,
     activeTab,
@@ -454,6 +459,11 @@ export const AppRoot = () => {
       if (!result) return;
       tickSkele(result.skele);
       updateTab(result.skele, undefined, result.fabData, false);
+      setRightSidebarPane(
+        exampleId === 'shape-studies' || exampleId === 'winding-rules'
+          ? 'drawings'
+          : 'nodes'
+      );
       setStartupScreenOpen(false);
     },
     [tickSkele, updateTab]
@@ -498,11 +508,6 @@ export const AppRoot = () => {
   );
   const [rightWidth, setRightWidth] = useState(() =>
     storedPanelWidth(RIGHT_PANEL_WIDTH_STORAGE_KEY)
-  );
-  const [rightSidebarPane, setRightSidebarPane] = useState<SidebarPane>(() =>
-    localStorage.getItem(RIGHT_SIDEBAR_PANE_STORAGE_KEY) === 'drawings'
-      ? 'drawings'
-      : 'nodes'
   );
 
   useEffect(() => {

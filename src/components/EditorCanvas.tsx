@@ -3,6 +3,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 // Base scale factor: at scale 1.0, a 1x1 unit square will be this many pixels
 export const BASE_SCALE = 200;
+const INITIAL_CANVAS_SCALE = 0.9;
 
 export interface Viewport {
   scale: number;
@@ -32,8 +33,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   rotation,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  // Start zoomed out a bit more
-  const [scale, setScale] = useState(0.5);
+  // Keep typical starter artwork readable without cropping larger rigs.
+  const [scale, setScale] = useState(INITIAL_CANVAS_SCALE);
   const [offset, setOffset] = useState<vec2>(vec2.fromValues(0, 0));
   const [isDragging, setIsDragging] = useState(false);
   const [lastPos, setLastPos] = useState<vec2>();
@@ -117,7 +118,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   );
 
   const resetViewport = useCallback(() => {
-    setScale(0.5);
+    setScale(INITIAL_CANVAS_SCALE);
     centerViewport();
   }, [centerViewport]);
 

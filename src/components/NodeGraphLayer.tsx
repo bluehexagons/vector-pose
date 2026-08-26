@@ -38,7 +38,9 @@ export const NodeGraphLayer: React.FC<NodeGraphLayerProps> = ({
             transform: 'translate(-50%, -50%)',
           }}
         >
-          {node.id ? node.id : `node #${index + 1}`}
+          <span className="node-label-name">
+            {node.id ? node.id : `node #${index + 1}`}
+          </span>
         </div>
       ))}
     </div>

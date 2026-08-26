@@ -170,6 +170,7 @@
   margin-bottom: 8px;
   padding: 11px 12px;
   text-align: left;
+  color: var(--text-primary);
   border-color: var(--border-dim);
   border-radius: 8px;
   background: #202229;
@@ -265,18 +266,19 @@
 
 .startup-example-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .startup-example-card {
   position: relative;
   display: grid;
-  grid-template-rows: 90px auto;
+  grid-template-rows: 76px auto;
   min-width: 0;
   padding: 0;
   overflow: hidden;
   text-align: left;
+  color: var(--text-primary);
   border-color: var(--border-dim);
   border-radius: 10px;
   background: #202229;
@@ -355,6 +357,12 @@
   margin: 0;
   accent-color: var(--accent-primary);
   box-shadow: none;
+}
+
+@media (max-width: 980px) {
+  .startup-example-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 760px) {

@@ -22,10 +22,6 @@
 .node-graph > * {
   position: absolute;
   transform: translate(-50%, -50%);
-  background: var(--bg-glass);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-xs);
 }
 
 .editor-content {
@@ -222,21 +218,52 @@
 }
 
 .node-label {
-  background: var(--bg-glass);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-xs);
-  color: var(--text-primary);
+  width: 7px;
+  height: 7px;
+  border: 1px solid color-mix(in srgb, var(--accent-secondary) 72%, white);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--accent-secondary) 45%, transparent);
   pointer-events: none;
-  white-space: nowrap;
   opacity: 0.4;
   position: absolute;
 }
 
+.node-label-name {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  max-width: 190px;
+  overflow: hidden;
+  padding: 3px 7px;
+  border: 1px solid var(--border-dim);
+  border-radius: var(--border-radius-sm);
+  background: var(--bg-glass);
+  box-shadow: var(--shadow-small);
+  font-size: var(--font-size-xs);
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(-50%);
+}
+
 .node-label.active {
+  width: 10px;
+  height: 10px;
+  border-color: white;
+  background: var(--accent-primary);
   opacity: 1;
 }
 
 .node-label.last-active {
+  width: 9px;
+  height: 9px;
+  background: var(--accent-secondary);
   opacity: 0.9;
+}
+
+.node-label.active .node-label-name,
+.node-label.last-active .node-label-name {
+  opacity: 1;
 }
