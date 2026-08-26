@@ -177,12 +177,11 @@ Six bundled examples are under `example/data/fabs/vector`:
 The welcome screen opens these vector examples directly in both editions. The
 examples also appear automatically in the browser file explorer. In Electron,
 choose the repository's `example` directory as the game directory to browse the
-files alongside the sprite example. The `strawberry/test.fab.json` project is a
-hybrid example: a detailed transparent bitmap body is combined with outlined
-vector arms, legs, feet, and a soft shadow, all controlled by poseable joints.
-Clear **Show this screen on startup** if
-you prefer to launch directly into the editor; the **Welcome** header button
-always brings it back.
+files alongside the in-progress game's segmented sprite test. The
+`strawberry/test.fab.json` project uses the existing bottom and middle artwork
+pieces to exercise sprite attachment, nesting, scaling, sorting, and rotation.
+Clear **Show this screen on startup** if you prefer to launch directly into the
+editor; the **Welcome** header button always brings it back.
 
 ## Directory Structure
 

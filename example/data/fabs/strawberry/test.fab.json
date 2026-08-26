@@ -1,190 +1,75 @@
 {
-  "name": "Strawberry mascot",
-  "description": "A polished bitmap character combined with a lightweight vector limb rig. Drag or rotate the shoulder, elbow, hip, and knee joints to pose the mascot while the illustrated body stays crisp.",
-  "drawings": [
-    {
-      "id": "soft-ground-shadow",
-      "sort": -4,
-      "fill": "#111722",
-      "fillOpacity": 0.34,
-      "commands": [
-        {"type": "move", "point": "shadow_left"},
-        {
-          "type": "cubic",
-          "control1": "shadow_top_left",
-          "control2": "shadow_top_right",
-          "point": "shadow_right"
-        },
-        {
-          "type": "cubic",
-          "control1": "shadow_bottom_right",
-          "control2": "shadow_bottom_left",
-          "point": "shadow_left"
-        },
-        {"type": "close"}
-      ]
-    },
-    {
-      "id": "limb-outline",
-      "sort": -3,
-      "fill": "none",
-      "stroke": "#5d1830",
-      "strokeWidth": 0.072,
-      "strokeLinecap": "round",
-      "strokeLinejoin": "round",
-      "commands": [
-        {"type": "move", "point": "left_shoulder"},
-        {"type": "line", "point": "left_elbow"},
-        {"type": "line", "point": "left_hand"},
-        {"type": "move", "point": "right_shoulder"},
-        {"type": "line", "point": "right_elbow"},
-        {"type": "line", "point": "right_hand"},
-        {"type": "move", "point": "left_hip"},
-        {"type": "line", "point": "left_knee"},
-        {"type": "line", "point": "left_ankle"},
-        {"type": "line", "point": "left_toe"},
-        {"type": "move", "point": "right_hip"},
-        {"type": "line", "point": "right_knee"},
-        {"type": "line", "point": "right_ankle"},
-        {"type": "line", "point": "right_toe"}
-      ]
-    },
-    {
-      "id": "limb-color",
-      "sort": -2,
-      "fill": "none",
-      "stroke": "#e94a62",
-      "strokeWidth": 0.046,
-      "strokeLinecap": "round",
-      "strokeLinejoin": "round",
-      "commands": [
-        {"type": "move", "point": "left_shoulder"},
-        {"type": "line", "point": "left_elbow"},
-        {"type": "line", "point": "left_hand"},
-        {"type": "move", "point": "right_shoulder"},
-        {"type": "line", "point": "right_elbow"},
-        {"type": "line", "point": "right_hand"},
-        {"type": "move", "point": "left_hip"},
-        {"type": "line", "point": "left_knee"},
-        {"type": "line", "point": "left_ankle"},
-        {"type": "line", "point": "left_toe"},
-        {"type": "move", "point": "right_hip"},
-        {"type": "line", "point": "right_knee"},
-        {"type": "line", "point": "right_ankle"},
-        {"type": "line", "point": "right_toe"}
-      ]
-    }
-  ],
+  "name": "strawberry default pose",
   "skele": {
     "angle": 0,
     "mag": 1,
-    "id": "strawberry-root",
+    "id": "q3569oc",
     "children": [
       {
         "angle": 0,
-        "mag": 0.02,
-        "id": "body_anchor",
+        "mag": 0.3,
+        "id": "BB",
+        "uri": "sprite:strawberry/still/bottom/bb",
+        "props": {
+          "hueRot": 0
+        }
+      },
+      {
+        "angle": -358.260965926089,
+        "mag": 0.14147270925769265,
+        "id": "eegc71r",
         "children": [
           {
             "angle": 0,
-            "mag": 0.35,
-            "id": "strawberry_art",
-            "uri": "sprite:strawberry/strawberry-mascot"
+            "mag": 0.25,
+            "id": "MM",
+            "uri": "sprite:strawberry/still/middle/mm",
+            "props": {
+              "hueRot": 0
+            }
           }
         ]
       },
       {
-        "angle": -180,
-        "mag": 0.015,
-        "id": "pose_center",
+        "angle": -358.457028348512,
+        "mag": 0.2803093007878762,
+        "id": "5rlviol",
         "children": [
           {
-            "angle": 90,
-            "mag": 0.135,
-            "id": "left_shoulder",
+            "angle": -4.722801414723192,
+            "mag": 0.04149868797197053,
+            "id": "1sgc4u8",
             "children": [
               {
-                "angle": -35,
-                "mag": 0.1,
-                "id": "left_elbow",
-                "children": [{"angle": 0, "mag": 0.08, "id": "left_hand"}]
+                "angle": 0,
+                "mag": 0.05,
+                "id": "MT",
+                "uri": "sprite:strawberry/still/middle/mt"
               }
             ]
           },
           {
-            "angle": -90,
-            "mag": 0.135,
-            "id": "right_shoulder",
-            "children": [
-              {
-                "angle": 35,
-                "mag": 0.1,
-                "id": "right_elbow",
-                "children": [{"angle": 0, "mag": 0.08, "id": "right_hand"}]
-              }
-            ]
-          },
-          {
-            "angle": 24,
-            "mag": 0.132,
-            "id": "left_hip",
-            "children": [
-              {
-                "angle": -14,
-                "mag": 0.12,
-                "id": "left_knee",
-                "children": [
-                  {
-                    "angle": -6,
-                    "mag": 0.1,
-                    "id": "left_ankle",
-                    "children": [{"angle": 76, "mag": 0.055, "id": "left_toe"}]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "angle": -24,
-            "mag": 0.132,
-            "id": "right_hip",
-            "children": [
-              {
-                "angle": 14,
-                "mag": 0.12,
-                "id": "right_knee",
-                "children": [
-                  {
-                    "angle": 6,
-                    "mag": 0.1,
-                    "id": "right_ankle",
-                    "children": [
-                      {"angle": -76, "mag": 0.055, "id": "right_toe"}
-                    ]
-                  }
-                ]
-              }
-            ]
+            "angle": 0,
+            "mag": 0.05,
+            "id": "BT",
+            "uri": "sprite:strawberry/still/bottom/bt",
+            "sort": -1
           }
         ]
       },
       {
-        "angle": -180,
-        "mag": 0.34,
-        "id": "shadow_group",
+        "angle": -180.0694480884708,
+        "mag": 0.2638843805916364,
+        "id": "5myywe0",
         "children": [
           {
-            "angle": 270,
-            "mag": 0,
-            "id": "shadow_points",
-            "children": [
-              {"angle": 180, "mag": 0.18, "id": "shadow_left"},
-              {"angle": -135, "mag": 0.12, "id": "shadow_top_left"},
-              {"angle": -45, "mag": 0.12, "id": "shadow_top_right"},
-              {"angle": 0, "mag": 0.18, "id": "shadow_right"},
-              {"angle": 45, "mag": 0.12, "id": "shadow_bottom_right"},
-              {"angle": 135, "mag": 0.12, "id": "shadow_bottom_left"}
-            ]
+            "angle": 180,
+            "mag": 0.5,
+            "id": "MB",
+            "uri": "sprite:strawberry/still/middle/mb",
+            "props": {
+              "hueRot": 0
+            }
           }
         ]
       }
