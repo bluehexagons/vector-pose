@@ -41,6 +41,18 @@
       ]
     },
     {
+      "id": "leaf-branch",
+      "sort": -1,
+      "fill": "none",
+      "stroke": "#397a4c",
+      "strokeWidth": 0.052,
+      "strokeLinecap": "round",
+      "commands": [
+        {"type": "move", "point": "stem_mid"},
+        {"type": "line", "point": "leaf_joint"}
+      ]
+    },
+    {
       "id": "nested-leaf-subtree",
       "fill": "#50b96b",
       "fillOpacity": 0.9,
@@ -65,6 +77,22 @@
       ]
     },
     {
+      "id": "leaf-vein",
+      "fill": "none",
+      "stroke": "#d5f2b5",
+      "strokeWidth": 0.016,
+      "strokeOpacity": 0.72,
+      "strokeLinecap": "round",
+      "commands": [
+        {"type": "move", "point": "leaf_joint"},
+        {
+          "type": "quadratic",
+          "control": "leaf_vein_control",
+          "point": "leaf_tip"
+        }
+      ]
+    },
+    {
       "id": "rigid-bloom-point-group",
       "sort": 1,
       "fill": "#ffc857",
@@ -73,9 +101,28 @@
       "strokeLinejoin": "round",
       "commands": [
         {"type": "move", "point": "bloom_top"},
+        {"type": "line", "point": "bloom_upper_right"},
         {"type": "line", "point": "bloom_right"},
+        {"type": "line", "point": "bloom_lower_right"},
         {"type": "line", "point": "bloom_bottom"},
+        {"type": "line", "point": "bloom_lower_left"},
         {"type": "line", "point": "bloom_left"},
+        {"type": "line", "point": "bloom_upper_left"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "bloom-center",
+      "sort": 2,
+      "fill": "#f09b31",
+      "stroke": "#8f5c16",
+      "strokeWidth": 0.022,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "bloom_core_top"},
+        {"type": "line", "point": "bloom_core_right"},
+        {"type": "line", "point": "bloom_core_bottom"},
+        {"type": "line", "point": "bloom_core_left"},
         {"type": "close"}
       ]
     }
@@ -146,14 +193,54 @@
                                 "id": "bloom_right"
                               },
                               {
+                                "angle": 25.974394,
+                                "mag": 0.067,
+                                "id": "bloom_upper_right"
+                              },
+                              {
+                                "angle": 115.974394,
+                                "mag": 0.067,
+                                "id": "bloom_lower_right"
+                              },
+                              {
                                 "angle": 160.974394,
                                 "mag": 0.14,
                                 "id": "bloom_bottom"
                               },
                               {
+                                "angle": 205.974394,
+                                "mag": 0.067,
+                                "id": "bloom_lower_left"
+                              },
+                              {
                                 "angle": -109.025606,
                                 "mag": 0.14,
                                 "id": "bloom_left"
+                              },
+                              {
+                                "angle": -64.025606,
+                                "mag": 0.067,
+                                "id": "bloom_upper_left"
+                              },
+                              {
+                                "angle": -19.025606,
+                                "mag": 0.055,
+                                "id": "bloom_core_top"
+                              },
+                              {
+                                "angle": 70.974394,
+                                "mag": 0.055,
+                                "id": "bloom_core_right"
+                              },
+                              {
+                                "angle": 160.974394,
+                                "mag": 0.055,
+                                "id": "bloom_core_bottom"
+                              },
+                              {
+                                "angle": -109.025606,
+                                "mag": 0.055,
+                                "id": "bloom_core_left"
                               }
                             ]
                           }
@@ -178,6 +265,11 @@
                                 "angle": -25,
                                 "mag": 0.19,
                                 "id": "leaf_upper_2"
+                              },
+                              {
+                                "angle": 0,
+                                "mag": 0.12,
+                                "id": "leaf_vein_control"
                               },
                               {"angle": 0, "mag": 0.24, "id": "leaf_tip"},
                               {

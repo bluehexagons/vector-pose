@@ -3,6 +3,35 @@
   "description": "A simple humanoid rig organized from pelvis to spine, head, arms, and legs. Drag the end joints or rotate shoulder, elbow, hip, and knee nodes to try different poses.",
   "drawings": [
     {
+      "id": "limb-outline",
+      "sort": -2,
+      "fill": "none",
+      "stroke": "#303861",
+      "strokeWidth": 0.084,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "chest"},
+        {"type": "line", "point": "left_shoulder"},
+        {"type": "line", "point": "left_elbow"},
+        {"type": "line", "point": "left_hand"},
+        {"type": "move", "point": "chest"},
+        {"type": "line", "point": "right_shoulder"},
+        {"type": "line", "point": "right_elbow"},
+        {"type": "line", "point": "right_hand"},
+        {"type": "move", "point": "pelvis"},
+        {"type": "line", "point": "left_hip"},
+        {"type": "line", "point": "left_knee"},
+        {"type": "line", "point": "left_ankle"},
+        {"type": "line", "point": "left_toe"},
+        {"type": "move", "point": "pelvis"},
+        {"type": "line", "point": "right_hip"},
+        {"type": "line", "point": "right_knee"},
+        {"type": "line", "point": "right_ankle"},
+        {"type": "line", "point": "right_toe"}
+      ]
+    },
+    {
       "id": "torso-shape",
       "sort": -1,
       "fill": "#687bd8",
@@ -69,7 +98,8 @@
         {"type": "move", "point": "pelvis"},
         {"type": "line", "point": "left_hip"},
         {"type": "line", "point": "left_knee"},
-        {"type": "line", "point": "left_ankle"}
+        {"type": "line", "point": "left_ankle"},
+        {"type": "line", "point": "left_toe"}
       ]
     },
     {
@@ -83,7 +113,44 @@
         {"type": "move", "point": "pelvis"},
         {"type": "line", "point": "right_hip"},
         {"type": "line", "point": "right_knee"},
-        {"type": "line", "point": "right_ankle"}
+        {"type": "line", "point": "right_ankle"},
+        {"type": "line", "point": "right_toe"}
+      ]
+    },
+    {
+      "id": "costume-details",
+      "sort": 1,
+      "fill": "none",
+      "stroke": "#cbd4ff",
+      "strokeWidth": 0.018,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "collar_left"},
+        {"type": "line", "point": "chest"},
+        {"type": "line", "point": "collar_right"},
+        {"type": "move", "point": "left_hip"},
+        {"type": "line", "point": "right_hip"}
+      ]
+    },
+    {
+      "id": "friendly-face",
+      "sort": 2,
+      "fill": "none",
+      "stroke": "#5c3a22",
+      "strokeWidth": 0.018,
+      "strokeLinecap": "round",
+      "commands": [
+        {"type": "move", "point": "left_eye_top"},
+        {"type": "line", "point": "left_eye_bottom"},
+        {"type": "move", "point": "right_eye_top"},
+        {"type": "line", "point": "right_eye_bottom"},
+        {"type": "move", "point": "face_mouth_left"},
+        {
+          "type": "quadratic",
+          "control": "face_mouth_control",
+          "point": "face_mouth_right"
+        }
       ]
     },
     {
@@ -143,7 +210,26 @@
                           {"angle": 30, "mag": 0.075, "id": "head_lower_right"},
                           {"angle": 90, "mag": 0.08, "id": "head_bottom"},
                           {"angle": 150, "mag": 0.075, "id": "head_lower_left"},
-                          {"angle": 210, "mag": 0.075, "id": "head_upper_left"}
+                          {"angle": 210, "mag": 0.075, "id": "head_upper_left"},
+                          {"angle": -158, "mag": 0.024, "id": "left_eye_top"},
+                          {
+                            "angle": 168,
+                            "mag": 0.0225,
+                            "id": "left_eye_bottom"
+                          },
+                          {"angle": -22, "mag": 0.024, "id": "right_eye_top"},
+                          {
+                            "angle": 12,
+                            "mag": 0.0225,
+                            "id": "right_eye_bottom"
+                          },
+                          {"angle": 145, "mag": 0.023, "id": "face_mouth_left"},
+                          {
+                            "angle": 90,
+                            "mag": 0.028,
+                            "id": "face_mouth_control"
+                          },
+                          {"angle": 35, "mag": 0.023, "id": "face_mouth_right"}
                         ]
                       }
                     ]
@@ -175,6 +261,16 @@
                     "children": [{"angle": 0, "mag": 0.085, "id": "right_hand"}]
                   }
                 ]
+              },
+              {
+                "angle": -115,
+                "mag": 0.036,
+                "id": "collar_left"
+              },
+              {
+                "angle": 115,
+                "mag": 0.036,
+                "id": "collar_right"
               }
             ]
           },
@@ -187,7 +283,14 @@
                 "angle": -10,
                 "mag": 0.13,
                 "id": "left_knee",
-                "children": [{"angle": -5, "mag": 0.13, "id": "left_ankle"}]
+                "children": [
+                  {
+                    "angle": -5,
+                    "mag": 0.13,
+                    "id": "left_ankle",
+                    "children": [{"angle": 85, "mag": 0.055, "id": "left_toe"}]
+                  }
+                ]
               }
             ]
           },
@@ -200,7 +303,16 @@
                 "angle": 10,
                 "mag": 0.13,
                 "id": "right_knee",
-                "children": [{"angle": 5, "mag": 0.13, "id": "right_ankle"}]
+                "children": [
+                  {
+                    "angle": 5,
+                    "mag": 0.13,
+                    "id": "right_ankle",
+                    "children": [
+                      {"angle": -85, "mag": 0.055, "id": "right_toe"}
+                    ]
+                  }
+                ]
               }
             ]
           }

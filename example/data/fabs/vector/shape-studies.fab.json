@@ -120,6 +120,75 @@
           "point": "ground_right"
         }
       ]
+    },
+    {
+      "id": "shape-highlights",
+      "sort": 2,
+      "fill": "none",
+      "stroke": "#f6fbff",
+      "strokeWidth": 0.014,
+      "strokeOpacity": 0.58,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "triangle_inner_top"},
+        {"type": "line", "point": "triangle_inner_right"},
+        {"type": "line", "point": "triangle_inner_left"},
+        {"type": "close"},
+        {"type": "move", "point": "star_shine_start"},
+        {"type": "line", "point": "star_shine_end"},
+        {"type": "move", "point": "ring_shine_start"},
+        {"type": "line", "point": "ring_shine_end"}
+      ]
+    },
+    {
+      "id": "blob-face",
+      "sort": 2,
+      "fill": "none",
+      "stroke": "#682840",
+      "strokeWidth": 0.017,
+      "strokeLinecap": "round",
+      "commands": [
+        {"type": "move", "point": "blob_eye_left_top"},
+        {"type": "line", "point": "blob_eye_left_bottom"},
+        {"type": "move", "point": "blob_eye_right_top"},
+        {"type": "line", "point": "blob_eye_right_bottom"},
+        {"type": "move", "point": "blob_mouth_left"},
+        {
+          "type": "quadratic",
+          "control": "blob_mouth_control",
+          "point": "blob_mouth_right"
+        }
+      ]
+    },
+    {
+      "id": "house-door",
+      "sort": 2,
+      "fill": "#264a76",
+      "stroke": "#172f51",
+      "strokeWidth": 0.014,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "door_top_left"},
+        {"type": "line", "point": "door_top_right"},
+        {"type": "line", "point": "door_bottom_right"},
+        {"type": "line", "point": "door_bottom_left"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "house-window",
+      "sort": 2,
+      "fill": "#bfe9f5",
+      "stroke": "#264a76",
+      "strokeWidth": 0.012,
+      "commands": [
+        {"type": "move", "point": "window_top_left"},
+        {"type": "line", "point": "window_top_right"},
+        {"type": "line", "point": "window_bottom_right"},
+        {"type": "line", "point": "window_bottom_left"},
+        {"type": "close"}
+      ]
     }
   ],
   "skele": {
@@ -139,7 +208,10 @@
             "children": [
               {"angle": -90, "mag": 0.105, "id": "triangle_top"},
               {"angle": 35, "mag": 0.11, "id": "triangle_right"},
-              {"angle": 145, "mag": 0.11, "id": "triangle_left"}
+              {"angle": 145, "mag": 0.11, "id": "triangle_left"},
+              {"angle": -90, "mag": 0.06, "id": "triangle_inner_top"},
+              {"angle": 35, "mag": 0.065, "id": "triangle_inner_right"},
+              {"angle": 145, "mag": 0.065, "id": "triangle_inner_left"}
             ]
           }
         ]
@@ -163,7 +235,9 @@
               {"angle": 126, "mag": 0.115, "id": "star_7"},
               {"angle": 162, "mag": 0.047, "id": "star_8"},
               {"angle": 198, "mag": 0.115, "id": "star_9"},
-              {"angle": 234, "mag": 0.047, "id": "star_10"}
+              {"angle": 234, "mag": 0.047, "id": "star_10"},
+              {"angle": -125, "mag": 0.04, "id": "star_shine_start"},
+              {"angle": -92, "mag": 0.055, "id": "star_shine_end"}
             ]
           }
         ]
@@ -189,7 +263,14 @@
               {"angle": 160, "mag": 0.105, "id": "blob_left_bottom"},
               {"angle": 180, "mag": 0.095, "id": "blob_left"},
               {"angle": 205, "mag": 0.11, "id": "blob_left_top"},
-              {"angle": 250, "mag": 0.1, "id": "blob_top_left"}
+              {"angle": 250, "mag": 0.1, "id": "blob_top_left"},
+              {"angle": -160, "mag": 0.023, "id": "blob_eye_left_top"},
+              {"angle": 170, "mag": 0.021, "id": "blob_eye_left_bottom"},
+              {"angle": -20, "mag": 0.023, "id": "blob_eye_right_top"},
+              {"angle": 10, "mag": 0.021, "id": "blob_eye_right_bottom"},
+              {"angle": 145, "mag": 0.027, "id": "blob_mouth_left"},
+              {"angle": 90, "mag": 0.035, "id": "blob_mouth_control"},
+              {"angle": 35, "mag": 0.027, "id": "blob_mouth_right"}
             ]
           }
         ]
@@ -211,7 +292,9 @@
               {"angle": -135, "mag": 0.052, "id": "ring_inner_tl"},
               {"angle": -45, "mag": 0.052, "id": "ring_inner_tr"},
               {"angle": 45, "mag": 0.052, "id": "ring_inner_br"},
-              {"angle": 135, "mag": 0.052, "id": "ring_inner_bl"}
+              {"angle": 135, "mag": 0.052, "id": "ring_inner_bl"},
+              {"angle": -145, "mag": 0.09, "id": "ring_shine_start"},
+              {"angle": -110, "mag": 0.09, "id": "ring_shine_end"}
             ]
           }
         ]
@@ -230,7 +313,15 @@
               {"angle": -35, "mag": 0.105, "id": "house_right_top"},
               {"angle": 45, "mag": 0.12, "id": "house_right_bottom"},
               {"angle": 135, "mag": 0.12, "id": "house_left_bottom"},
-              {"angle": 215, "mag": 0.105, "id": "house_left_top"}
+              {"angle": 215, "mag": 0.105, "id": "house_left_top"},
+              {"angle": 135, "mag": 0.028, "id": "door_top_left"},
+              {"angle": 45, "mag": 0.028, "id": "door_top_right"},
+              {"angle": 75, "mag": 0.078, "id": "door_bottom_right"},
+              {"angle": 105, "mag": 0.078, "id": "door_bottom_left"},
+              {"angle": -169, "mag": 0.051, "id": "window_top_left"},
+              {"angle": -153, "mag": 0.022, "id": "window_top_right"},
+              {"angle": 135, "mag": 0.028, "id": "window_bottom_right"},
+              {"angle": 158, "mag": 0.054, "id": "window_bottom_left"}
             ]
           }
         ]

@@ -33,9 +33,30 @@
         {"type": "move", "point": "left_hip"},
         {"type": "line", "point": "left_knee"},
         {"type": "line", "point": "left_foot"},
+        {"type": "line", "point": "left_toe"},
         {"type": "move", "point": "right_hip"},
         {"type": "line", "point": "right_knee"},
-        {"type": "line", "point": "right_foot"}
+        {"type": "line", "point": "right_foot"},
+        {"type": "line", "point": "right_toe"}
+      ]
+    },
+    {
+      "id": "limb-highlights",
+      "sort": -1.8,
+      "fill": "none",
+      "stroke": "#a5ede5",
+      "strokeWidth": 0.022,
+      "strokeLinecap": "round",
+      "strokeOpacity": 0.62,
+      "commands": [
+        {"type": "move", "point": "left_shoulder"},
+        {"type": "line", "point": "left_elbow"},
+        {"type": "move", "point": "right_shoulder"},
+        {"type": "line", "point": "right_elbow"},
+        {"type": "move", "point": "left_hip"},
+        {"type": "line", "point": "left_knee"},
+        {"type": "move", "point": "right_hip"},
+        {"type": "line", "point": "right_knee"}
       ]
     },
     {
@@ -102,6 +123,33 @@
           "point": "mouth_right"
         }
       ]
+    },
+    {
+      "id": "robot-small-details",
+      "sort": 2,
+      "fill": "none",
+      "stroke": "#173942",
+      "strokeWidth": 0.024,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "antenna_base"},
+        {"type": "line", "point": "antenna_tip"},
+        {"type": "move", "point": "antenna_tip_left"},
+        {"type": "line", "point": "antenna_tip_right"},
+        {"type": "move", "point": "left_claw"},
+        {"type": "line", "point": "left_claw_upper"},
+        {"type": "move", "point": "left_claw"},
+        {"type": "line", "point": "left_claw_lower"},
+        {"type": "move", "point": "right_claw"},
+        {"type": "line", "point": "right_claw_upper"},
+        {"type": "move", "point": "right_claw"},
+        {"type": "line", "point": "right_claw_lower"},
+        {"type": "move", "point": "bolt_left_start"},
+        {"type": "line", "point": "bolt_left_end"},
+        {"type": "move", "point": "bolt_right_start"},
+        {"type": "line", "point": "bolt_right_end"}
+      ]
     }
   ],
   "skele": {
@@ -126,7 +174,11 @@
               {"angle": -90, "mag": 0.07, "id": "panel_top"},
               {"angle": 0, "mag": 0.075, "id": "panel_right"},
               {"angle": 90, "mag": 0.07, "id": "panel_bottom"},
-              {"angle": 180, "mag": 0.075, "id": "panel_left"}
+              {"angle": 180, "mag": 0.075, "id": "panel_left"},
+              {"angle": 205, "mag": 0.092, "id": "bolt_left_start"},
+              {"angle": 195, "mag": 0.08, "id": "bolt_left_end"},
+              {"angle": -25, "mag": 0.092, "id": "bolt_right_start"},
+              {"angle": -15, "mag": 0.08, "id": "bolt_right_end"}
             ]
           },
           {
@@ -145,13 +197,29 @@
                   {"angle": 40, "mag": 0.105, "id": "head_bottom_right"},
                   {"angle": 140, "mag": 0.105, "id": "head_bottom_left"},
                   {"angle": 180, "mag": 0.12, "id": "head_left"},
-                  {"angle": 205, "mag": 0.055, "id": "eye_left"},
-                  {"angle": 185, "mag": 0.055, "id": "eye_left_end"},
-                  {"angle": -25, "mag": 0.055, "id": "eye_right"},
-                  {"angle": -5, "mag": 0.055, "id": "eye_right_end"},
+                  {"angle": -168.1, "mag": 0.0485, "id": "eye_left"},
+                  {"angle": 168.1, "mag": 0.0485, "id": "eye_left_end"},
+                  {"angle": -11.9, "mag": 0.0485, "id": "eye_right"},
+                  {"angle": 11.9, "mag": 0.0485, "id": "eye_right_end"},
                   {"angle": 140, "mag": 0.05, "id": "mouth_left"},
                   {"angle": 90, "mag": 0.06, "id": "mouth_control"},
                   {"angle": 40, "mag": 0.05, "id": "mouth_right"}
+                ]
+              },
+              {
+                "angle": 0,
+                "mag": 0.105,
+                "id": "antenna_base",
+                "children": [
+                  {
+                    "angle": 0,
+                    "mag": 0.065,
+                    "id": "antenna_tip",
+                    "children": [
+                      {"angle": -90, "mag": 0.025, "id": "antenna_tip_left"},
+                      {"angle": 90, "mag": 0.025, "id": "antenna_tip_right"}
+                    ]
+                  }
                 ]
               }
             ]
@@ -165,7 +233,17 @@
                 "angle": -30,
                 "mag": 0.12,
                 "id": "left_elbow",
-                "children": [{"angle": 30, "mag": 0.09, "id": "left_claw"}]
+                "children": [
+                  {
+                    "angle": 30,
+                    "mag": 0.09,
+                    "id": "left_claw",
+                    "children": [
+                      {"angle": 30, "mag": 0.035, "id": "left_claw_upper"},
+                      {"angle": -30, "mag": 0.035, "id": "left_claw_lower"}
+                    ]
+                  }
+                ]
               }
             ]
           },
@@ -178,7 +256,17 @@
                 "angle": 30,
                 "mag": 0.12,
                 "id": "right_elbow",
-                "children": [{"angle": -30, "mag": 0.09, "id": "right_claw"}]
+                "children": [
+                  {
+                    "angle": -30,
+                    "mag": 0.09,
+                    "id": "right_claw",
+                    "children": [
+                      {"angle": -30, "mag": 0.035, "id": "right_claw_upper"},
+                      {"angle": 30, "mag": 0.035, "id": "right_claw_lower"}
+                    ]
+                  }
+                ]
               }
             ]
           },
@@ -191,7 +279,14 @@
                 "angle": -20,
                 "mag": 0.14,
                 "id": "left_knee",
-                "children": [{"angle": 5, "mag": 0.13, "id": "left_foot"}]
+                "children": [
+                  {
+                    "angle": 5,
+                    "mag": 0.13,
+                    "id": "left_foot",
+                    "children": [{"angle": 85, "mag": 0.06, "id": "left_toe"}]
+                  }
+                ]
               }
             ]
           },
@@ -204,7 +299,14 @@
                 "angle": 20,
                 "mag": 0.14,
                 "id": "right_knee",
-                "children": [{"angle": -5, "mag": 0.13, "id": "right_foot"}]
+                "children": [
+                  {
+                    "angle": -5,
+                    "mag": 0.13,
+                    "id": "right_foot",
+                    "children": [{"angle": -85, "mag": 0.06, "id": "right_toe"}]
+                  }
+                ]
               }
             ]
           }

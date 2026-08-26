@@ -1,7 +1,8 @@
 import {strict as assert} from 'node:assert';
-import {globSync, readFileSync} from 'node:fs';
+import {existsSync, globSync, readFileSync} from 'node:fs';
 import {test} from 'node:test';
 import type {FabData, VectorDrawing} from '../src/shared/types.ts';
+import {fromSpriteUri} from '../src/shared/types.ts';
 import {SkeleNode} from '../src/utils/SkeleNode.ts';
 import {buildVectorPath} from '../src/utils/vectorDrawing.ts';
 import {validate} from '../src/validation/fabSchema.ts';
@@ -30,6 +31,12 @@ void test('bundled FAB files validate and vector points resolve', () => {
         null,
         `${filePath}: ${drawing.id ?? 'unnamed drawing'} has a missing point`
       );
+    }
+
+    for (const node of skele.walk()) {
+      if (!node.uri) continue;
+      const assetPath = `example/${fromSpriteUri(node.uri).replace(/^\.\//, '')}`;
+      assert.ok(existsSync(assetPath), `${filePath}: missing ${assetPath}`);
     }
   }
 });
@@ -115,6 +122,59 @@ void test('character examples provide articulated limb chains', () => {
       'right_knee'
     );
   }
+});
+
+void test('character facial features remain level and mirrored', () => {
+  for (const fileName of ['gesture-figure.fab.json', 'robot-puppet.fab.json']) {
+    const character = SkeleNode.fromData(loadExample(fileName).skele);
+    character.tickMove(0, 0, 1, 270);
+
+    const position = (id: string) => {
+      const node = character.findId(id);
+      assert.ok(node, `${fileName}: missing ${id}`);
+      return node.state.transform;
+    };
+    const center = position('head_center');
+    const leftTop = position(
+      fileName.startsWith('gesture') ? 'left_eye_top' : 'eye_left'
+    );
+    const leftBottom = position(
+      fileName.startsWith('gesture') ? 'left_eye_bottom' : 'eye_left_end'
+    );
+    const rightTop = position(
+      fileName.startsWith('gesture') ? 'right_eye_top' : 'eye_right'
+    );
+    const rightBottom = position(
+      fileName.startsWith('gesture') ? 'right_eye_bottom' : 'eye_right_end'
+    );
+
+    assert.ok(Math.abs(leftTop[1] - rightTop[1]) < 0.001);
+    assert.ok(Math.abs(leftBottom[1] - rightBottom[1]) < 0.001);
+    assert.ok(Math.abs(leftTop[0] + rightTop[0] - center[0] * 2) < 0.001);
+    assert.ok(Math.abs(leftBottom[0] - leftTop[0]) < 0.001);
+    assert.ok(Math.abs(rightBottom[0] - rightTop[0]) < 0.001);
+  }
+});
+
+void test('shape study window corners stay rectangular', () => {
+  const shapes = SkeleNode.fromData(
+    loadExample('shape-studies.fab.json').skele
+  );
+  shapes.tickMove(0, 0, 1, 270);
+  const position = (id: string) => {
+    const node = shapes.findId(id);
+    assert.ok(node, `missing ${id}`);
+    return node.state.transform;
+  };
+  const topLeft = position('window_top_left');
+  const topRight = position('window_top_right');
+  const bottomRight = position('window_bottom_right');
+  const bottomLeft = position('window_bottom_left');
+
+  assert.ok(Math.abs(topLeft[0] - bottomLeft[0]) < 0.004);
+  assert.ok(Math.abs(topRight[0] - bottomRight[0]) < 0.004);
+  assert.ok(Math.abs(topLeft[1] - topRight[1]) < 0.004);
+  assert.ok(Math.abs(bottomLeft[1] - bottomRight[1]) < 0.004);
 });
 
 void test('nested motion pivots affect only their descendant artwork', () => {

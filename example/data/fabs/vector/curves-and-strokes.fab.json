@@ -42,6 +42,19 @@
       ]
     },
     {
+      "id": "friendly-eyes",
+      "fill": "none",
+      "stroke": "#68172f",
+      "strokeWidth": 0.045,
+      "strokeLinecap": "round",
+      "commands": [
+        {"type": "move", "point": "eye_left_top"},
+        {"type": "line", "point": "eye_left_bottom"},
+        {"type": "move", "point": "eye_right_top"},
+        {"type": "line", "point": "eye_right_bottom"}
+      ]
+    },
+    {
       "id": "cubic-highlight",
       "sort": 1,
       "fill": "none",
@@ -103,7 +116,11 @@
             "children": [
               {"angle": 176.423666, "mag": 0.240468, "id": "smile_left"},
               {"angle": 90, "mag": 0.285, "id": "smile_control"},
-              {"angle": 3.576334, "mag": 0.240468, "id": "smile_right"}
+              {"angle": 3.576334, "mag": 0.240468, "id": "smile_right"},
+              {"angle": -165, "mag": 0.078, "id": "eye_left_top"},
+              {"angle": 169, "mag": 0.0765, "id": "eye_left_bottom"},
+              {"angle": -15, "mag": 0.078, "id": "eye_right_top"},
+              {"angle": 11, "mag": 0.0765, "id": "eye_right_bottom"}
             ]
           },
           {

@@ -31,6 +31,13 @@ const examples: StarterExample[] = [
           d="M136 28c19-11 32 4 23 17 13 11 2 29-14 21-11 15-30 2-21-13-14-11-1-31 12-25Z"
           fill="#ef6f91"
         />
+        <path
+          d="M137 44v3m12-3v3m-13 6q7 7 14 0"
+          fill="none"
+          stroke="#6b2640"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+        />
       </svg>
     ),
   },
@@ -45,6 +52,13 @@ const examples: StarterExample[] = [
           <circle cx="90" cy="20" r="11" fill="#ffcf70" stroke="none" />
           <path d="M90 32v29M90 40 67 53 52 41M90 40l24 13 15-13M90 60 74 81M90 60l17 21" />
         </g>
+        <path
+          d="M86 18v2m8-2v2m-8 4q4 4 8 0"
+          fill="none"
+          stroke="#785123"
+          strokeLinecap="round"
+          strokeWidth="1.7"
+        />
         <g fill="#fff" opacity=".75">
           <circle cx="90" cy="40" r="3" />
           <circle cx="67" cy="53" r="3" />
@@ -62,10 +76,12 @@ const examples: StarterExample[] = [
       <svg viewBox="0 0 180 96" aria-hidden="true">
         <rect width="180" height="96" fill="#172f35" />
         <g stroke="#183d47" strokeWidth="3">
+          <path d="M90 15V7m-5 0h10" fill="none" />
           <rect x="73" y="15" width="34" height="25" rx="8" fill="#76d4c6" />
           <path d="M67 42h46l-5 32H72Z" fill="#4ca8b8" />
           <path d="m68 48-20 16 8 8 16-12M112 48l20 16-8 8-16-12" fill="none" />
           <path d="m82 73-7 18M99 73l7 18" />
+          <path d="m48 64-6-4m6 4-6 4m90-4 6-4m-6 4 6 4" fill="none" />
         </g>
         <circle cx="83" cy="27" r="3" fill="#15343a" />
         <circle cx="97" cy="27" r="3" fill="#15343a" />
