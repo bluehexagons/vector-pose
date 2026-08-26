@@ -14,6 +14,8 @@ trying the tool without installing it.
 - Undo/redo functionality
 - Custom file format (.fab.json) for saving poses and animations
 - Keyboard shortcuts for common operations
+- Guided welcome screen with new/open actions, first-step instructions, and
+  directly accessible learning projects
 
 ## Installation
 
@@ -151,7 +153,15 @@ settings and its ordered path commands. Point fields autocomplete skeletal node
 IDs and highlight references that do not exist in the current rig. Changes are
 rendered immediately and included in save and export operations.
 
-Three bundled examples are under `example/data/fabs/vector`:
+Six bundled examples are under `example/data/fabs/vector`:
+
+- `shape-studies.fab.json` is a compact tour of straight segments, open
+  quadratic strokes, cubic curves, stars, layered shapes, and a reversed inner
+  contour.
+- `gesture-figure.fab.json` is a simple humanoid skeleton with articulated
+  shoulders, elbows, hips, and knees for learning pose hierarchy.
+- `robot-puppet.fab.json` combines a second character skeleton with layered
+  vector body parts, a face, and independently poseable mechanical limbs.
 
 - `curves-and-strokes.fab.json` demonstrates filled cubic curves, an open
   quadratic line, nested control groups, caps, opacity, dashes, and ordered
@@ -164,9 +174,12 @@ Three bundled examples are under `example/data/fabs/vector`:
   rotating leaf subtree. Rotate `stem_sway`, `stem_mid`, `bloom_shape`, and
   `leaf_shape` to see how each nesting level scopes motion for animation poses.
 
-The examples appear automatically in the browser edition. In Electron, choose
-the repository's `example` directory as the game directory, then open them from
-the file explorer.
+The welcome screen opens these vector examples directly in both editions. The
+examples also appear automatically in the browser file explorer. In Electron,
+choose the repository's `example` directory as the game directory to browse the
+files alongside the sprite example. Clear **Show this screen on startup** if
+you prefer to launch directly into the editor; the **Welcome** header button
+always brings it back.
 
 ## Directory Structure
 
@@ -190,6 +203,7 @@ Global shortcuts:
 
 - ctrl+z: Undo
 - ctrl+y, ctrl+shift+z: Redo
+- ctrl+n (cmd+n on macOS): New project
 
 Node controls:
 

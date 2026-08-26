@@ -79,6 +79,44 @@ void test('vector examples organize points into nested control rigs', () => {
   assert.equal(motion.findId('leaf_tip')?.parent?.id, 'leaf_shape');
 });
 
+void test('shape studies cover straight, quadratic, cubic, and compound paths', () => {
+  const drawings = loadExample('shape-studies.fab.json').drawings ?? [];
+  const commandTypes = new Set(
+    drawings.flatMap(drawing => drawing.commands.map(command => command.type))
+  );
+
+  assert.deepEqual(
+    commandTypes,
+    new Set(['move', 'line', 'close', 'cubic', 'quadratic'])
+  );
+  assert.ok(
+    drawings.some(
+      drawing =>
+        drawing.fillRule === 'nonzero' &&
+        drawing.commands.filter(command => command.type === 'move').length > 1
+    )
+  );
+});
+
+void test('character examples provide articulated limb chains', () => {
+  for (const fileName of ['gesture-figure.fab.json', 'robot-puppet.fab.json']) {
+    const character = SkeleNode.fromData(loadExample(fileName).skele);
+
+    assert.equal(character.findId('left_elbow')?.parent?.id, 'left_shoulder');
+    assert.equal(
+      character.findId('left_hand')?.parent?.id ??
+        character.findId('left_claw')?.parent?.id,
+      'left_elbow'
+    );
+    assert.equal(character.findId('right_knee')?.parent?.id, 'right_hip');
+    assert.equal(
+      character.findId('right_ankle')?.parent?.id ??
+        character.findId('right_foot')?.parent?.id,
+      'right_knee'
+    );
+  }
+});
+
 void test('nested motion pivots affect only their descendant artwork', () => {
   const motion = SkeleNode.fromData(
     loadExample('nested-control-motion.fab.json').skele

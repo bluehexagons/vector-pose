@@ -85,8 +85,10 @@ export function useTabs() {
                 : tab
             );
           }
+        }
 
-          // Check for an open empty tab to use
+        if (fabData) {
+          // Reuse the initial blank tab for opened files and starter examples.
           const emptyTab = current.find(
             tab => !tab.filePath && !tab.isModified
           );
