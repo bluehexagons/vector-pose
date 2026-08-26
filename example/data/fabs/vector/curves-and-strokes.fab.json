@@ -1,0 +1,107 @@
+{
+  "name": "Vector curves and strokes",
+  "description": "A layered cubic fill, quadratic round-cap line, translucent highlight, and dashed cubic stroke, all driven by skeletal points.",
+  "drawings": [
+    {
+      "id": "cubic-heart",
+      "sort": -2,
+      "fill": "#ed3f73",
+      "stroke": "#68172f",
+      "strokeWidth": 0.045,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "heart_top"},
+        {
+          "type": "cubic",
+          "control1": "heart_c1",
+          "control2": "heart_c2",
+          "point": "heart_bottom"
+        },
+        {
+          "type": "cubic",
+          "control1": "heart_c3",
+          "control2": "heart_c4",
+          "point": "heart_top"
+        },
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "quadratic-smile",
+      "fill": "none",
+      "stroke": "#68172f",
+      "strokeWidth": 0.055,
+      "strokeLinecap": "round",
+      "commands": [
+        {"type": "move", "point": "smile_left"},
+        {
+          "type": "quadratic",
+          "control": "smile_control",
+          "point": "smile_right"
+        }
+      ]
+    },
+    {
+      "id": "cubic-highlight",
+      "sort": 1,
+      "fill": "none",
+      "stroke": "#ffffff",
+      "strokeWidth": 0.07,
+      "strokeOpacity": 0.7,
+      "strokeLinecap": "round",
+      "commands": [
+        {"type": "move", "point": "shine_start"},
+        {
+          "type": "cubic",
+          "control1": "shine_c1",
+          "control2": "shine_c2",
+          "point": "shine_end"
+        }
+      ]
+    },
+    {
+      "id": "dashed-flourish",
+      "sort": 2,
+      "fill": "none",
+      "stroke": "#f4c542",
+      "strokeWidth": 0.04,
+      "strokeLinecap": "square",
+      "strokeDasharray": [0.12, 0.07, 0.025, 0.07],
+      "strokeDashoffset": 0.03,
+      "opacity": 0.9,
+      "commands": [
+        {"type": "move", "point": "dash_left"},
+        {
+          "type": "cubic",
+          "control1": "dash_c1",
+          "control2": "dash_c2",
+          "point": "dash_right"
+        }
+      ]
+    }
+  ],
+  "skele": {
+    "angle": 0,
+    "mag": 1,
+    "id": "curves-root",
+    "children": [
+      {"angle": 0, "mag": 0.275, "id": "heart_top"},
+      {"angle": -31.75948, "mag": 0.617454, "id": "heart_c1"},
+      {"angle": -85.426079, "mag": 0.626997, "id": "heart_c2"},
+      {"angle": -180, "mag": 0.425, "id": "heart_bottom"},
+      {"angle": 85.426079, "mag": 0.626997, "id": "heart_c3"},
+      {"angle": 31.75948, "mag": 0.617454, "id": "heart_c4"},
+      {"angle": -93.576334, "mag": 0.240468, "id": "smile_left"},
+      {"angle": -180, "mag": 0.285, "id": "smile_control"},
+      {"angle": 93.576334, "mag": 0.240468, "id": "smile_right"},
+      {"angle": -131.185925, "mag": 0.797261, "id": "dash_left"},
+      {"angle": -163.300756, "mag": 0.783023, "id": "dash_c1"},
+      {"angle": 143.130102, "mag": 0.375, "id": "dash_c2"},
+      {"angle": 131.185925, "mag": 0.797261, "id": "dash_right"},
+      {"angle": -22.479434, "mag": 0.313847, "id": "shine_start"},
+      {"angle": -35.837653, "mag": 0.444072, "id": "shine_c1"},
+      {"angle": -68.039436, "mag": 0.334253, "id": "shine_c2"},
+      {"angle": -82.874984, "mag": 0.201556, "id": "shine_end"}
+    ]
+  }
+}

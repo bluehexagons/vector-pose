@@ -1,0 +1,101 @@
+{
+  "name": "Vector winding rules",
+  "description": "Left: nonzero with opposite contours makes a hole. Middle: nonzero with matching contours stays filled. Right: evenodd makes a hole regardless of direction.",
+  "drawings": [
+    {
+      "id": "nonzero-opposite-winding",
+      "sort": -1,
+      "fill": "#36c98f",
+      "fillRule": "nonzero",
+      "stroke": "#123e32",
+      "strokeWidth": 0.035,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "left_otl"},
+        {"type": "line", "point": "left_otr"},
+        {"type": "line", "point": "left_obr"},
+        {"type": "line", "point": "left_obl"},
+        {"type": "close"},
+        {"type": "move", "point": "left_itl"},
+        {"type": "line", "point": "left_ibl"},
+        {"type": "line", "point": "left_ibr"},
+        {"type": "line", "point": "left_itr"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "nonzero-matching-winding",
+      "fill": "#5887ff",
+      "fillRule": "nonzero",
+      "fillOpacity": 0.9,
+      "stroke": "#172b63",
+      "strokeWidth": 0.035,
+      "strokeLinejoin": "bevel",
+      "commands": [
+        {"type": "move", "point": "middle_otl"},
+        {"type": "line", "point": "middle_otr"},
+        {"type": "line", "point": "middle_obr"},
+        {"type": "line", "point": "middle_obl"},
+        {"type": "close"},
+        {"type": "move", "point": "middle_itl"},
+        {"type": "line", "point": "middle_itr"},
+        {"type": "line", "point": "middle_ibr"},
+        {"type": "line", "point": "middle_ibl"},
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "evenodd-matching-winding",
+      "sort": 1,
+      "fill": "#ffad42",
+      "fillRule": "evenodd",
+      "stroke": "#6b3b08",
+      "strokeWidth": 0.035,
+      "strokeLinejoin": "miter",
+      "strokeMiterlimit": 3,
+      "commands": [
+        {"type": "move", "point": "right_otl"},
+        {"type": "line", "point": "right_otr"},
+        {"type": "line", "point": "right_obr"},
+        {"type": "line", "point": "right_obl"},
+        {"type": "close"},
+        {"type": "move", "point": "right_itl"},
+        {"type": "line", "point": "right_itr"},
+        {"type": "line", "point": "right_ibr"},
+        {"type": "line", "point": "right_ibl"},
+        {"type": "close"}
+      ]
+    }
+  ],
+  "skele": {
+    "angle": 0,
+    "mag": 1,
+    "id": "winding-root",
+    "children": [
+      {"angle": -67.0679, "mag": 0.70578, "id": "left_otl"},
+      {"angle": -42.273689, "mag": 0.371652, "id": "left_otr"},
+      {"angle": -116.565051, "mag": 0.279508, "id": "left_obr"},
+      {"angle": -100.885527, "mag": 0.66191, "id": "left_obl"},
+      {"angle": -73.009177, "mag": 0.564646, "id": "left_itl"},
+      {"angle": -65.376435, "mag": 0.396011, "id": "left_itr"},
+      {"angle": -92.385944, "mag": 0.360312, "id": "left_ibr"},
+      {"angle": -91.59114, "mag": 0.540208, "id": "left_ibl"},
+      {"angle": -36.027373, "mag": 0.340037, "id": "middle_otl"},
+      {"angle": 36.027373, "mag": 0.340037, "id": "middle_otr"},
+      {"angle": 122.005383, "mag": 0.23585, "id": "middle_obr"},
+      {"angle": -122.005383, "mag": 0.23585, "id": "middle_obl"},
+      {"angle": -28.61046, "mag": 0.187949, "id": "middle_itl"},
+      {"angle": 28.61046, "mag": 0.187949, "id": "middle_itr"},
+      {"angle": 99.462322, "mag": 0.091241, "id": "middle_ibr"},
+      {"angle": -99.462322, "mag": 0.091241, "id": "middle_ibl"},
+      {"angle": 42.273689, "mag": 0.371652, "id": "right_otl"},
+      {"angle": 67.0679, "mag": 0.70578, "id": "right_otr"},
+      {"angle": 100.885527, "mag": 0.66191, "id": "right_obr"},
+      {"angle": 116.565051, "mag": 0.279508, "id": "right_obl"},
+      {"angle": 65.376435, "mag": 0.396011, "id": "right_itl"},
+      {"angle": 73.009177, "mag": 0.564646, "id": "right_itr"},
+      {"angle": 91.59114, "mag": 0.540208, "id": "right_ibr"},
+      {"angle": 92.385944, "mag": 0.360312, "id": "right_ibl"}
+    ]
+  }
+}

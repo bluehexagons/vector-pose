@@ -57,6 +57,7 @@ const serializeFabData = (tab: TabData): FabData => {
   return {
     name: tab.name,
     description: tab.description,
+    drawings: tab.fabData?.drawings,
     skele,
   };
 };
@@ -426,7 +427,9 @@ export const AppRoot = () => {
     if (success) {
       setTabs(current =>
         current.map(tab =>
-          tab.skele.id === activeTabId ? {...tab, isModified: false} : tab
+          tab.skele.id === activeTabId
+            ? {...tab, fabData, isModified: false}
+            : tab
         )
       );
     }
@@ -690,6 +693,8 @@ export const AppRoot = () => {
           <EditorPane
             renderedInfo={activeTab.renderedInfo}
             renderedNodes={activeTab.renderedNodes}
+            drawings={activeTab.fabData?.drawings}
+            skele={activeTab.skele}
             activeNode={activeTab.activeNode}
             lastActiveNode={activeTab.lastActiveNode}
             focusNode={focusNode}

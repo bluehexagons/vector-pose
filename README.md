@@ -7,6 +7,7 @@ trying the tool without installing it.
 ## Features
 
 - Vector-based skeletal rigging system
+- Skeletal vector paths with fills, strokes, curves, and winding rules
 - Real-time preview and manipulation
 - Node-based hierarchy system
 - Undo/redo functionality
@@ -86,12 +87,73 @@ npm run format
 
 ## File Format
 
-vector-pose uses the .fab file format for storing pose and animation data. Files contain:
+vector-pose uses the `.fab.json` format for storing pose and artwork data. Files contain:
 
 - Node hierarchy information
 - Transform data (position, rotation, scale)
 - Sprite references
-- Animation keyframes
+- Vector drawings whose commands reference skeletal node IDs
+
+### Vector drawings
+
+The optional top-level `drawings` array renders paths from the current world
+positions of points in `skele`. Each `move`, `line`, `quadratic`, and `cubic`
+command names skeletal nodes instead of embedding fixed coordinates. Moving the
+nodes therefore changes the path. A `close` command closes the current contour.
+
+```json
+{
+  "drawings": [
+    {
+      "id": "curved-shape",
+      "sort": 1,
+      "fill": "#ff6688",
+      "fillRule": "evenodd",
+      "stroke": "#441122",
+      "strokeWidth": 0.025,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "start"},
+        {"type": "line", "point": "corner"},
+        {
+          "type": "quadratic",
+          "control": "rounding-control",
+          "point": "curve-end"
+        },
+        {
+          "type": "cubic",
+          "control1": "return-control-1",
+          "control2": "return-control-2",
+          "point": "start"
+        },
+        {"type": "close"}
+      ]
+    }
+  ],
+  "skele": {"angle": 0, "mag": 1}
+}
+```
+
+Paint values use SVG syntax. Supported path styling includes `fill`,
+`fillRule` (`nonzero` or `evenodd`), `fillOpacity`, `stroke`, `strokeWidth`,
+`strokeOpacity`, `strokeLinecap`, `strokeLinejoin`, `strokeMiterlimit`,
+`strokeDasharray`, `strokeDashoffset`, and overall `opacity`. Stroke widths and
+dash lengths are measured in world units and zoom with the drawing. `sort`
+orders drawings together with sprite nodes; `hidden` disables a drawing. A
+drawing with a missing point reference is omitted instead of rendering a
+partially connected path.
+
+Two bundled examples are under `example/data/fabs/vector`:
+
+- `curves-and-strokes.fab.json` demonstrates filled cubic curves, an open
+  quadratic line, caps, opacity, dashes, and ordered layers.
+- `winding-rules.fab.json` compares matching and opposite contour directions
+  using both supported fill rules.
+
+The examples appear automatically in the browser edition. In Electron, choose
+the repository's `example` directory as the game directory, then open them from
+the file explorer.
 
 ## Directory Structure
 

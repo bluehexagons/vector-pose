@@ -1,6 +1,7 @@
-import type {UiNode} from '../shared/types';
+import type {UiNode, VectorDrawing} from '../shared/types';
 import {fromSpriteUri} from '../shared/types';
-import type {RenderInfo} from '../utils/SkeleNode';
+import type {RenderInfo, SkeleNode} from '../utils/SkeleNode';
+import {buildVectorPath} from '../utils/vectorDrawing';
 import type {Viewport} from './EditorCanvas';
 import {GameImage} from './GameImage';
 import './SpriteLayer.css';
@@ -11,6 +12,8 @@ export interface SpriteLayerProps {
   lastActiveNode?: UiNode;
   gameDirectory: string;
   viewport: Viewport;
+  drawings?: VectorDrawing[];
+  skele: SkeleNode;
   spriteHolderRef: React.RefObject<HTMLDivElement | null>;
   onTransformStart?: (
     nodeId: string,
@@ -26,19 +29,74 @@ export const SpriteLayer: React.FC<SpriteLayerProps> = ({
   lastActiveNode,
   gameDirectory,
   viewport,
+  drawings = [],
+  skele,
   spriteHolderRef,
   onTransformStart,
 }) => {
+  const layers = [
+    ...renderedInfo.map((renderInfo, index) => ({
+      type: 'sprite' as const,
+      sort: renderInfo.sort,
+      index,
+      order: index,
+      renderInfo,
+    })),
+    ...drawings.map((drawing, index) => ({
+      type: 'drawing' as const,
+      sort: drawing.sort ?? 0,
+      index,
+      order: renderedInfo.length + index,
+      drawing,
+    })),
+  ].sort((a, b) => a.sort - b.sort || a.order - b.order);
+
   return (
     <div className="sprite-holder" ref={spriteHolderRef}>
-      {renderedInfo.map(node => {
+      {layers.map(layer => {
+        if (layer.type === 'drawing') {
+          const {drawing} = layer;
+          if (drawing.hidden) return null;
+
+          const path = buildVectorPath(drawing, skele);
+          if (!path) return null;
+
+          return (
+            <svg
+              key={`drawing:${drawing.id ?? layer.index}`}
+              className="vector-drawing"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <g transform={`scale(${viewport.scale})`}>
+                <path
+                  d={path}
+                  fill={drawing.fill ?? 'none'}
+                  fillRule={drawing.fillRule ?? 'nonzero'}
+                  fillOpacity={drawing.fillOpacity}
+                  stroke={drawing.stroke ?? 'none'}
+                  strokeWidth={drawing.strokeWidth ?? 0.01}
+                  strokeOpacity={drawing.strokeOpacity}
+                  strokeLinecap={drawing.strokeLinecap}
+                  strokeLinejoin={drawing.strokeLinejoin}
+                  strokeMiterlimit={drawing.strokeMiterlimit}
+                  strokeDasharray={drawing.strokeDasharray?.join(' ')}
+                  strokeDashoffset={drawing.strokeDashoffset}
+                  opacity={drawing.opacity}
+                />
+              </g>
+            </svg>
+          );
+        }
+
+        const node = layer.renderInfo;
         const isActive =
           node.node.id === lastActiveNode?.node.id &&
           node.node.id !== activeNode?.node.id;
 
         return (
           <div
-            key={node.node.id}
+            key={`sprite:${node.node.id}`}
             className={`${node.uri ? 'sprite-node' : 'vector-node'} ${
               node.node.id === lastActiveNode?.node.id ? 'last-active' : ''
             } ${node.node.id === activeNode?.node.id ? 'active' : ''}`}

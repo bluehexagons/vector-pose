@@ -11,7 +11,12 @@ import {SpriteLayer, SpriteLayerProps} from './SpriteLayer';
 
 interface EditorPaneProps extends Pick<
   SpriteLayerProps,
-  'renderedInfo' | 'gameDirectory' | 'spriteHolderRef' | 'onTransformStart'
+  | 'renderedInfo'
+  | 'gameDirectory'
+  | 'spriteHolderRef'
+  | 'onTransformStart'
+  | 'drawings'
+  | 'skele'
 > {
   renderedNodes: SkeleNode[];
   activeNode?: {node: SkeleNode};
