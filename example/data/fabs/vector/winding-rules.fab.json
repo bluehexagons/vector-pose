@@ -1,25 +1,26 @@
 {
-  "name": "Vector winding rules",
-  "description": "Left: nonzero with opposite contours makes a hole. Middle: nonzero with matching contours stays filled. Right: evenodd makes a hole regardless of direction.",
+  "name": "Vector winding and paint options",
+  "description": "Top: nonzero and evenodd winding behavior with fill and join variations. Bottom: butt, round, and square caps with solid, dashed, quadratic, and joined strokes. Each sample has its own nested movable group.",
   "drawings": [
     {
       "id": "nonzero-opposite-winding",
       "sort": -1,
       "fill": "#36c98f",
       "fillRule": "nonzero",
+      "fillOpacity": 0.82,
       "stroke": "#123e32",
       "strokeWidth": 0.035,
       "strokeLinejoin": "round",
       "commands": [
-        {"type": "move", "point": "left_otl"},
-        {"type": "line", "point": "left_otr"},
-        {"type": "line", "point": "left_obr"},
-        {"type": "line", "point": "left_obl"},
+        {"type": "move", "point": "opposite_otl"},
+        {"type": "line", "point": "opposite_otr"},
+        {"type": "line", "point": "opposite_obr"},
+        {"type": "line", "point": "opposite_obl"},
         {"type": "close"},
-        {"type": "move", "point": "left_itl"},
-        {"type": "line", "point": "left_ibl"},
-        {"type": "line", "point": "left_ibr"},
-        {"type": "line", "point": "left_itr"},
+        {"type": "move", "point": "opposite_itl"},
+        {"type": "line", "point": "opposite_ibl"},
+        {"type": "line", "point": "opposite_ibr"},
+        {"type": "line", "point": "opposite_itr"},
         {"type": "close"}
       ]
     },
@@ -27,20 +28,20 @@
       "id": "nonzero-matching-winding",
       "fill": "#5887ff",
       "fillRule": "nonzero",
-      "fillOpacity": 0.9,
       "stroke": "#172b63",
       "strokeWidth": 0.035,
+      "strokeOpacity": 0.65,
       "strokeLinejoin": "bevel",
       "commands": [
-        {"type": "move", "point": "middle_otl"},
-        {"type": "line", "point": "middle_otr"},
-        {"type": "line", "point": "middle_obr"},
-        {"type": "line", "point": "middle_obl"},
+        {"type": "move", "point": "matching_otl"},
+        {"type": "line", "point": "matching_otr"},
+        {"type": "line", "point": "matching_obr"},
+        {"type": "line", "point": "matching_obl"},
         {"type": "close"},
-        {"type": "move", "point": "middle_itl"},
-        {"type": "line", "point": "middle_itr"},
-        {"type": "line", "point": "middle_ibr"},
-        {"type": "line", "point": "middle_ibl"},
+        {"type": "move", "point": "matching_itl"},
+        {"type": "line", "point": "matching_itr"},
+        {"type": "line", "point": "matching_ibr"},
+        {"type": "line", "point": "matching_ibl"},
         {"type": "close"}
       ]
     },
@@ -53,17 +54,60 @@
       "strokeWidth": 0.035,
       "strokeLinejoin": "miter",
       "strokeMiterlimit": 3,
+      "opacity": 0.9,
       "commands": [
-        {"type": "move", "point": "right_otl"},
-        {"type": "line", "point": "right_otr"},
-        {"type": "line", "point": "right_obr"},
-        {"type": "line", "point": "right_obl"},
+        {"type": "move", "point": "evenodd_otl"},
+        {"type": "line", "point": "evenodd_otr"},
+        {"type": "line", "point": "evenodd_obr"},
+        {"type": "line", "point": "evenodd_obl"},
         {"type": "close"},
-        {"type": "move", "point": "right_itl"},
-        {"type": "line", "point": "right_itr"},
-        {"type": "line", "point": "right_ibr"},
-        {"type": "line", "point": "right_ibl"},
+        {"type": "move", "point": "evenodd_itl"},
+        {"type": "line", "point": "evenodd_itr"},
+        {"type": "line", "point": "evenodd_ibr"},
+        {"type": "line", "point": "evenodd_ibl"},
         {"type": "close"}
+      ]
+    },
+    {
+      "id": "solid-butt-cap",
+      "fill": "none",
+      "stroke": "#f05d5e",
+      "strokeWidth": 0.085,
+      "strokeLinecap": "butt",
+      "commands": [
+        {"type": "move", "point": "butt_start"},
+        {"type": "line", "point": "butt_end"}
+      ]
+    },
+    {
+      "id": "dashed-round-quadratic",
+      "fill": "none",
+      "stroke": "#9b6cff",
+      "strokeWidth": 0.07,
+      "strokeLinecap": "round",
+      "strokeDasharray": [0.1, 0.055],
+      "strokeDashoffset": 0.03,
+      "commands": [
+        {"type": "move", "point": "round_start"},
+        {
+          "type": "quadratic",
+          "control": "round_control",
+          "point": "round_end"
+        }
+      ]
+    },
+    {
+      "id": "square-cap-joined-line",
+      "fill": "none",
+      "stroke": "#2cc8d3",
+      "strokeWidth": 0.065,
+      "strokeLinecap": "square",
+      "strokeLinejoin": "round",
+      "opacity": 0.75,
+      "commands": [
+        {"type": "move", "point": "square_start"},
+        {"type": "line", "point": "square_corner"},
+        {"type": "line", "point": "square_end"}
       ]
     }
   ],
@@ -72,30 +116,122 @@
     "mag": 1,
     "id": "winding-root",
     "children": [
-      {"angle": -67.0679, "mag": 0.70578, "id": "left_otl"},
-      {"angle": -42.273689, "mag": 0.371652, "id": "left_otr"},
-      {"angle": -116.565051, "mag": 0.279508, "id": "left_obr"},
-      {"angle": -100.885527, "mag": 0.66191, "id": "left_obl"},
-      {"angle": -73.009177, "mag": 0.564646, "id": "left_itl"},
-      {"angle": -65.376435, "mag": 0.396011, "id": "left_itr"},
-      {"angle": -92.385944, "mag": 0.360312, "id": "left_ibr"},
-      {"angle": -91.59114, "mag": 0.540208, "id": "left_ibl"},
-      {"angle": -36.027373, "mag": 0.340037, "id": "middle_otl"},
-      {"angle": 36.027373, "mag": 0.340037, "id": "middle_otr"},
-      {"angle": 122.005383, "mag": 0.23585, "id": "middle_obr"},
-      {"angle": -122.005383, "mag": 0.23585, "id": "middle_obl"},
-      {"angle": -28.61046, "mag": 0.187949, "id": "middle_itl"},
-      {"angle": 28.61046, "mag": 0.187949, "id": "middle_itr"},
-      {"angle": 99.462322, "mag": 0.091241, "id": "middle_ibr"},
-      {"angle": -99.462322, "mag": 0.091241, "id": "middle_ibl"},
-      {"angle": 42.273689, "mag": 0.371652, "id": "right_otl"},
-      {"angle": 67.0679, "mag": 0.70578, "id": "right_otr"},
-      {"angle": 100.885527, "mag": 0.66191, "id": "right_obr"},
-      {"angle": 116.565051, "mag": 0.279508, "id": "right_obl"},
-      {"angle": 65.376435, "mag": 0.396011, "id": "right_itl"},
-      {"angle": 73.009177, "mag": 0.564646, "id": "right_itr"},
-      {"angle": 91.59114, "mag": 0.540208, "id": "right_ibr"},
-      {"angle": 92.385944, "mag": 0.360312, "id": "right_ibl"}
+      {
+        "angle": -66.149526,
+        "mag": 0.519351,
+        "id": "opposite_group",
+        "children": [
+          {
+            "angle": 156.149526,
+            "mag": 0,
+            "id": "opposite_group_axes",
+            "children": [
+              {"angle": -135, "mag": 0.226274, "id": "opposite_otl"},
+              {"angle": -45, "mag": 0.226274, "id": "opposite_otr"},
+              {"angle": 45, "mag": 0.226274, "id": "opposite_obr"},
+              {"angle": 135, "mag": 0.226274, "id": "opposite_obl"},
+              {"angle": -135, "mag": 0.098995, "id": "opposite_itl"},
+              {"angle": -45, "mag": 0.098995, "id": "opposite_itr"},
+              {"angle": 45, "mag": 0.098995, "id": "opposite_ibr"},
+              {"angle": 135, "mag": 0.098995, "id": "opposite_ibl"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": 0,
+        "mag": 0.21,
+        "id": "matching_group",
+        "children": [
+          {
+            "angle": 90,
+            "mag": 0,
+            "id": "matching_group_axes",
+            "children": [
+              {"angle": -135, "mag": 0.226274, "id": "matching_otl"},
+              {"angle": -45, "mag": 0.226274, "id": "matching_otr"},
+              {"angle": 45, "mag": 0.226274, "id": "matching_obr"},
+              {"angle": 135, "mag": 0.226274, "id": "matching_obl"},
+              {"angle": -135, "mag": 0.098995, "id": "matching_itl"},
+              {"angle": -45, "mag": 0.098995, "id": "matching_itr"},
+              {"angle": 45, "mag": 0.098995, "id": "matching_ibr"},
+              {"angle": 135, "mag": 0.098995, "id": "matching_ibl"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": 66.149526,
+        "mag": 0.519351,
+        "id": "evenodd_group",
+        "children": [
+          {
+            "angle": 23.850474,
+            "mag": 0,
+            "id": "evenodd_group_axes",
+            "children": [
+              {"angle": -135, "mag": 0.226274, "id": "evenodd_otl"},
+              {"angle": -45, "mag": 0.226274, "id": "evenodd_otr"},
+              {"angle": 45, "mag": 0.226274, "id": "evenodd_obr"},
+              {"angle": 135, "mag": 0.226274, "id": "evenodd_obl"},
+              {"angle": -135, "mag": 0.098995, "id": "evenodd_itl"},
+              {"angle": -45, "mag": 0.098995, "id": "evenodd_itr"},
+              {"angle": 45, "mag": 0.098995, "id": "evenodd_ibr"},
+              {"angle": 135, "mag": 0.098995, "id": "evenodd_ibl"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": -121.405164,
+        "mag": 0.556529,
+        "id": "butt_line_group",
+        "children": [
+          {
+            "angle": -148.594836,
+            "mag": 0,
+            "id": "butt_line_group_axes",
+            "children": [
+              {"angle": -180, "mag": 0.16, "id": "butt_start"},
+              {"angle": 0, "mag": 0.16, "id": "butt_end"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": -180,
+        "mag": 0.29,
+        "id": "round_curve_group",
+        "children": [
+          {
+            "angle": -90,
+            "mag": 0,
+            "id": "round_curve_group_axes",
+            "children": [
+              {"angle": 162.645975, "mag": 0.167631, "id": "round_start"},
+              {"angle": -90, "mag": 0.09, "id": "round_control"},
+              {"angle": 17.354025, "mag": 0.167631, "id": "round_end"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": 121.405164,
+        "mag": 0.556529,
+        "id": "square_join_group",
+        "children": [
+          {
+            "angle": -31.405164,
+            "mag": 0,
+            "id": "square_join_group_axes",
+            "children": [
+              {"angle": 156.370622, "mag": 0.174642, "id": "square_start"},
+              {"angle": -90, "mag": 0.09, "id": "square_corner"},
+              {"angle": 23.629378, "mag": 0.174642, "id": "square_end"}
+            ]
+          }
+        ]
+      }
     ]
   }
 }

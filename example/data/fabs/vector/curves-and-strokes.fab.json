@@ -1,6 +1,6 @@
 {
   "name": "Vector curves and strokes",
-  "description": "A layered cubic fill, quadratic round-cap line, translucent highlight, and dashed cubic stroke, all driven by skeletal points.",
+  "description": "A layered cubic fill, quadratic line, nested face/highlight controls, and a separately movable dashed flourish group.",
   "drawings": [
     {
       "id": "cubic-heart",
@@ -85,23 +85,58 @@
     "mag": 1,
     "id": "curves-root",
     "children": [
-      {"angle": 0, "mag": 0.275, "id": "heart_top"},
-      {"angle": -31.75948, "mag": 0.617454, "id": "heart_c1"},
-      {"angle": -85.426079, "mag": 0.626997, "id": "heart_c2"},
-      {"angle": -180, "mag": 0.425, "id": "heart_bottom"},
-      {"angle": 85.426079, "mag": 0.626997, "id": "heart_c3"},
-      {"angle": 31.75948, "mag": 0.617454, "id": "heart_c4"},
-      {"angle": -93.576334, "mag": 0.240468, "id": "smile_left"},
-      {"angle": -180, "mag": 0.285, "id": "smile_control"},
-      {"angle": 93.576334, "mag": 0.240468, "id": "smile_right"},
-      {"angle": -131.185925, "mag": 0.797261, "id": "dash_left"},
-      {"angle": -163.300756, "mag": 0.783023, "id": "dash_c1"},
-      {"angle": 143.130102, "mag": 0.375, "id": "dash_c2"},
-      {"angle": 131.185925, "mag": 0.797261, "id": "dash_right"},
-      {"angle": -22.479434, "mag": 0.313847, "id": "shine_start"},
-      {"angle": -35.837653, "mag": 0.444072, "id": "shine_c1"},
-      {"angle": -68.039436, "mag": 0.334253, "id": "shine_c2"},
-      {"angle": -82.874984, "mag": 0.201556, "id": "shine_end"}
+      {
+        "angle": 90,
+        "mag": 0,
+        "id": "heart_rig",
+        "children": [
+          {"angle": -90, "mag": 0.275, "id": "heart_top"},
+          {"angle": -121.75948, "mag": 0.617454, "id": "heart_c1"},
+          {"angle": -175.426079, "mag": 0.626997, "id": "heart_c2"},
+          {"angle": 90, "mag": 0.425, "id": "heart_bottom"},
+          {"angle": -4.573921, "mag": 0.626997, "id": "heart_c3"},
+          {"angle": -58.24052, "mag": 0.617454, "id": "heart_c4"},
+          {
+            "angle": 0,
+            "mag": 0,
+            "id": "face_controls",
+            "children": [
+              {"angle": 176.423666, "mag": 0.240468, "id": "smile_left"},
+              {"angle": 90, "mag": 0.285, "id": "smile_control"},
+              {"angle": 3.576334, "mag": 0.240468, "id": "smile_right"}
+            ]
+          },
+          {
+            "angle": 0,
+            "mag": 0,
+            "id": "highlight_controls",
+            "children": [
+              {"angle": -112.479434, "mag": 0.313847, "id": "shine_start"},
+              {"angle": -125.837653, "mag": 0.444072, "id": "shine_c1"},
+              {"angle": -158.039436, "mag": 0.334253, "id": "shine_c2"},
+              {"angle": -172.874984, "mag": 0.201556, "id": "shine_end"}
+            ]
+          }
+        ]
+      },
+      {
+        "angle": -180,
+        "mag": 0.45,
+        "id": "flourish_anchor",
+        "children": [
+          {
+            "angle": -90,
+            "mag": 0,
+            "id": "flourish_controls",
+            "children": [
+              {"angle": 172.874984, "mag": 0.604669, "id": "dash_left"},
+              {"angle": 126.869898, "mag": 0.375, "id": "dash_c1"},
+              {"angle": -33.690068, "mag": 0.270416, "id": "dash_c2"},
+              {"angle": 7.125016, "mag": 0.604669, "id": "dash_right"}
+            ]
+          }
+        ]
+      }
     ]
   }
 }

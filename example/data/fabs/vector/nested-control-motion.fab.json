@@ -1,0 +1,207 @@
+{
+  "name": "Nested vector control and motion rig",
+  "description": "Rotate stem_sway to bend the whole plant around its base, stem_mid to move the bloom and leaf, bloom_shape to turn the rigid blossom in place, or leaf_shape to move only the Bézier leaf. Curve handles are nested under the joints they follow.",
+  "drawings": [
+    {
+      "id": "joint-chain-guide",
+      "sort": -2,
+      "fill": "none",
+      "stroke": "#91a38b",
+      "strokeWidth": 0.018,
+      "strokeDasharray": [0.035, 0.035],
+      "strokeOpacity": 0.65,
+      "commands": [
+        {"type": "move", "point": "stem_base"},
+        {"type": "line", "point": "stem_mid"},
+        {"type": "line", "point": "bloom_center"}
+      ]
+    },
+    {
+      "id": "nested-cubic-stem",
+      "sort": -1,
+      "fill": "none",
+      "stroke": "#397a4c",
+      "strokeWidth": 0.075,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "stem_base"},
+        {
+          "type": "cubic",
+          "control1": "base_handle",
+          "control2": "mid_in_handle",
+          "point": "stem_mid"
+        },
+        {
+          "type": "cubic",
+          "control1": "mid_out_handle",
+          "control2": "bloom_in_handle",
+          "point": "bloom_center"
+        }
+      ]
+    },
+    {
+      "id": "nested-leaf-subtree",
+      "fill": "#50b96b",
+      "fillOpacity": 0.9,
+      "stroke": "#245d36",
+      "strokeWidth": 0.025,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "leaf_joint"},
+        {
+          "type": "cubic",
+          "control1": "leaf_upper_1",
+          "control2": "leaf_upper_2",
+          "point": "leaf_tip"
+        },
+        {
+          "type": "cubic",
+          "control1": "leaf_lower_2",
+          "control2": "leaf_lower_1",
+          "point": "leaf_joint"
+        },
+        {"type": "close"}
+      ]
+    },
+    {
+      "id": "rigid-bloom-point-group",
+      "sort": 1,
+      "fill": "#ffc857",
+      "stroke": "#8f5c16",
+      "strokeWidth": 0.035,
+      "strokeLinejoin": "round",
+      "commands": [
+        {"type": "move", "point": "bloom_top"},
+        {"type": "line", "point": "bloom_right"},
+        {"type": "line", "point": "bloom_bottom"},
+        {"type": "line", "point": "bloom_left"},
+        {"type": "close"}
+      ]
+    }
+  ],
+  "skele": {
+    "angle": 0,
+    "mag": 1,
+    "id": "nested-motion-root",
+    "children": [
+      {
+        "angle": 90,
+        "mag": 0,
+        "id": "plant_rig",
+        "children": [
+          {
+            "angle": 90,
+            "mag": 0.36,
+            "id": "stem_base",
+            "children": [
+              {
+                "angle": -90,
+                "mag": 0,
+                "id": "stem_sway",
+                "children": [
+                  {
+                    "angle": -100.124672,
+                    "mag": 0.142215,
+                    "id": "base_handle"
+                  },
+                  {
+                    "angle": -102.528808,
+                    "mag": 0.276586,
+                    "id": "stem_mid",
+                    "children": [
+                      {
+                        "angle": -158.00887,
+                        "mag": 0.091241,
+                        "id": "mid_in_handle"
+                      },
+                      {
+                        "angle": 25.057616,
+                        "mag": 0.092195,
+                        "id": "mid_out_handle"
+                      },
+                      {
+                        "angle": 31.554414,
+                        "mag": 0.306757,
+                        "id": "bloom_center",
+                        "children": [
+                          {
+                            "angle": 173.77866,
+                            "mag": 0.112805,
+                            "id": "bloom_in_handle"
+                          },
+                          {
+                            "angle": 0,
+                            "mag": 0,
+                            "id": "bloom_shape",
+                            "children": [
+                              {
+                                "angle": -19.025606,
+                                "mag": 0.16,
+                                "id": "bloom_top"
+                              },
+                              {
+                                "angle": 70.974394,
+                                "mag": 0.14,
+                                "id": "bloom_right"
+                              },
+                              {
+                                "angle": 160.974394,
+                                "mag": 0.14,
+                                "id": "bloom_bottom"
+                              },
+                              {
+                                "angle": -109.025606,
+                                "mag": 0.14,
+                                "id": "bloom_left"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "angle": -54.851327,
+                        "mag": 0.195,
+                        "id": "leaf_joint",
+                        "children": [
+                          {
+                            "angle": 0,
+                            "mag": 0,
+                            "id": "leaf_shape",
+                            "children": [
+                              {
+                                "angle": -52,
+                                "mag": 0.12,
+                                "id": "leaf_upper_1"
+                              },
+                              {
+                                "angle": -25,
+                                "mag": 0.19,
+                                "id": "leaf_upper_2"
+                              },
+                              {"angle": 0, "mag": 0.24, "id": "leaf_tip"},
+                              {
+                                "angle": 25,
+                                "mag": 0.19,
+                                "id": "leaf_lower_2"
+                              },
+                              {
+                                "angle": 52,
+                                "mag": 0.12,
+                                "id": "leaf_lower_1"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

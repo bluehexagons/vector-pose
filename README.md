@@ -144,12 +144,18 @@ orders drawings together with sprite nodes; `hidden` disables a drawing. A
 drawing with a missing point reference is omitted instead of rendering a
 partially connected path.
 
-Two bundled examples are under `example/data/fabs/vector`:
+Three bundled examples are under `example/data/fabs/vector`:
 
 - `curves-and-strokes.fab.json` demonstrates filled cubic curves, an open
-  quadratic line, caps, opacity, dashes, and ordered layers.
-- `winding-rules.fab.json` compares matching and opposite contour directions
-  using both supported fill rules.
+  quadratic line, nested control groups, caps, opacity, dashes, and ordered
+  layers.
+- `winding-rules.fab.json` compares matching and opposite contour directions,
+  both fill rules, fill/stroke opacity, all line caps and joins, solid and
+  dashed strokes, and group-local point layouts.
+- `nested-control-motion.fab.json` shows an articulated node chain with Bézier
+  handles owned by their joints, a rigid bloom point group, and a separately
+  rotating leaf subtree. Rotate `stem_sway`, `stem_mid`, `bloom_shape`, and
+  `leaf_shape` to see how each nesting level scopes motion for animation poses.
 
 The examples appear automatically in the browser edition. In Electron, choose
 the repository's `example` directory as the game directory, then open them from
