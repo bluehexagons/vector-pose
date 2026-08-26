@@ -199,7 +199,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       <div
         style={{
           position: 'absolute',
-          // Remove scale from transform, we're applying it to children now
+          inset: 0,
+          width: '100%',
+          height: '100%',
           transform: `translate(${offset[0]}px, ${offset[1]}px)`,
           transformOrigin: '0 0',
         }}

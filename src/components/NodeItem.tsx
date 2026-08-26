@@ -92,12 +92,27 @@ export const NodeItem: React.FC<NodeItemProps> = ({
     e.stopPropagation();
     handleDragLeave(e);
 
-    const data = JSON.parse(e.dataTransfer.getData('application/json'));
+    let data: {nodeId?: string};
+    try {
+      data = JSON.parse(e.dataTransfer.getData('application/json')) as {
+        nodeId?: string;
+      };
+    } catch {
+      return;
+    }
+
+    if (!data.nodeId) return;
+
     const sourceNode = skele.findIdFromRoot(data.nodeId);
     const targetNode = node;
 
     // Add validation for circular references
-    if (!sourceNode || !targetNode || sourceNode === targetNode) {
+    if (
+      !sourceNode ||
+      !targetNode ||
+      sourceNode === targetNode ||
+      sourceNode.includes(targetNode)
+    ) {
       console.warn('Invalid drop operation');
       return;
     }
@@ -134,7 +149,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
         }
       }
 
-      onNodeUpdate(clone, `Dragged node ${sourceNode.id} to ${clone.id}`);
+      onNodeUpdate(clone, `Dragged node ${sourceNode.id} to ${targetNode.id}`);
     } catch (err) {
       console.warn('Drop operation failed:', err);
     }
@@ -214,8 +229,11 @@ export const NodeItem: React.FC<NodeItemProps> = ({
                     if (!updatedNode) return;
 
                     const oldId = node.id;
-                    updatedNode.id =
-                      evt.target.value || updatedNode.generateId();
+                    const newId = evt.target.value.trim();
+                    if (newId && newId !== oldId && clone.findId(newId)) {
+                      return;
+                    }
+                    updatedNode.id = newId || updatedNode.generateId();
                     onNodeUpdate(
                       clone,
                       `Updated node ${updatedNode.id} ID (was ${oldId})`,
@@ -323,7 +341,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
           <NodeItem
             activeNode={activeNode}
             lastActiveNode={lastActiveNode}
-            key={childIndex}
+            key={child.id}
             node={child}
             index={childIndex}
             depth={depth + 1}

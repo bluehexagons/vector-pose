@@ -10,6 +10,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
+    "test": "node --experimental-strip-types --test test/*.test.ts",
     "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives .",
     "lint:fix": "oxlint --type-aware --fix .",
     "format": "oxfmt .",

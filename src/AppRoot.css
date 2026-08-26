@@ -75,7 +75,7 @@ body {
 .footer {
   grid-area: footer;
   padding: 0 var(--spacing-sm);
-  background-color: var(--bg-parimary);
+  background-color: var(--bg-primary);
   color: var(--text-secondary);
   font-size: 12px;
   line-height: var(--footer-height);

@@ -40,7 +40,15 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
     e.preventDefault();
     e.currentTarget.classList.remove('drag-over');
 
-    const data = JSON.parse(e.dataTransfer.getData('application/json'));
+    let data: {nodeId?: string};
+    try {
+      data = JSON.parse(e.dataTransfer.getData('application/json')) as {
+        nodeId?: string;
+      };
+    } catch {
+      return;
+    }
+
     if (!data.nodeId) return;
 
     const original = skele.findIdFromRoot(data.nodeId);
@@ -48,6 +56,7 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
 
     const clone = skele.clone();
     const sourceNode = clone.findIdFromRoot(data.nodeId);
+    if (!sourceNode) return;
 
     try {
       sourceNode.remove();
@@ -78,7 +87,7 @@ export const LayersPane: React.FC<LayersPaneProps> = ({
         >
           {renderedNodes.map((node, index) => (
             <NodeItem
-              key={index}
+              key={node.id}
               node={node}
               index={index}
               onNodeUpdate={onNodeUpdate}

@@ -8,7 +8,7 @@ interface AngleInputProps {
   title?: string;
 }
 
-const isValidAngle = (angle: number) => !isNaN(angle);
+const isValidAngle = (angle: number) => Number.isFinite(angle);
 
 export const AngleInput: React.FC<AngleInputProps> = ({
   value,
@@ -31,19 +31,20 @@ export const AngleInput: React.FC<AngleInputProps> = ({
     setDisplayValue(newValue);
 
     // Allow incomplete numbers like "-", "." etc during typing
-    if (
-      newValue === '-' ||
-      newValue === '.' ||
-      newValue === '-.' ||
-      newValue === ''
-    ) {
+    if (newValue === '-' || newValue === '.' || newValue === '-.') {
       return;
     }
 
-    const parsed = parseFloat(newValue);
+    const parsed = Number(newValue);
     if (isValidAngle(parsed)) {
       lastValueRef.current = parsed;
       onChange(parsed);
+    }
+  };
+
+  const handleBlur = () => {
+    if (!isValidAngle(Number(displayValue))) {
+      setDisplayValue(value.toFixed(3));
     }
   };
 
@@ -53,6 +54,7 @@ export const AngleInput: React.FC<AngleInputProps> = ({
       inputMode="decimal"
       value={displayValue}
       onChange={handleChange}
+      onBlur={handleBlur}
       className="angle-input"
       {...inputProps}
     />

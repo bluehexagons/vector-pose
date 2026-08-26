@@ -38,6 +38,8 @@ export const nodeActions = {
   createChild: ({node, updateNode}: NodeActionParams) => {
     const clone = node.root.clone();
     const targetNode = clone.findId(node.id);
+    if (!targetNode) return;
+
     const newNode = new SkeleNode();
     targetNode.add(newNode);
     updateNode(
@@ -139,7 +141,7 @@ export function getNodeActions({
             parent.children.unshift(targetNode);
             updateNode(
               clone,
-              `Moved node ${targetNode.id} to top of ${parent.id}`
+              `Moved node ${targetNode.id} to bottom of ${parent.id}`
             );
           }
         }

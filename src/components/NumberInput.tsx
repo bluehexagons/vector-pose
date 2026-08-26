@@ -11,7 +11,7 @@ interface NumberInputProps extends Omit<
   precision?: number;
 }
 
-const isValidNumber = (num: number) => !isNaN(num) && isFinite(num);
+const isValidNumber = (num: number) => Number.isFinite(num);
 
 export const NumberInput: React.FC<NumberInputProps> = ({
   value,
@@ -39,22 +39,30 @@ export const NumberInput: React.FC<NumberInputProps> = ({
     setDisplayValue(newValue);
 
     // Allow incomplete numbers during typing
-    if (
-      newValue === '-' ||
-      newValue === '.' ||
-      newValue === '-.' ||
-      newValue === ''
-    ) {
+    if (newValue === '') {
+      if (allowUndefined) {
+        lastValueRef.current = undefined;
+        onChange(undefined);
+      }
       return;
     }
 
-    const parsed = parseFloat(newValue);
+    if (newValue === '-' || newValue === '.' || newValue === '-.') {
+      return;
+    }
+
+    const parsed = Number(newValue);
     if (isValidNumber(parsed)) {
       lastValueRef.current = parsed;
       onChange(parsed);
-    } else if (allowUndefined && newValue === '') {
-      lastValueRef.current = undefined;
-      onChange(undefined);
+    }
+  };
+
+  const handleBlur = () => {
+    if (displayValue === '' && allowUndefined) return;
+
+    if (!isValidNumber(Number(displayValue))) {
+      setDisplayValue(value?.toFixed(precision) ?? '');
     }
   };
 
@@ -64,6 +72,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
       inputMode="decimal"
       value={displayValue}
       onChange={handleChange}
+      onBlur={handleBlur}
       className={`number-input ${className}`}
       {...inputProps}
     />

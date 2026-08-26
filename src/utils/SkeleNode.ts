@@ -1,7 +1,7 @@
 import {lerp} from '@bluehexagons/easing';
 import {vec2} from 'gl-matrix';
-import {lerpAngleRad, toDegrees, toRadians} from './Equa';
-import type {ImagePropsRef} from './Renderer';
+import {lerpAngleRad, toDegrees, toRadians} from './Equa.ts';
+import type {ImagePropsRef} from './Renderer.d.ts';
 
 export interface SkeleData {
   /** Degrees */
@@ -62,9 +62,6 @@ export class SkeleNode {
     },
   };
 
-  private nodeCache = new Map<string, SkeleNode>();
-  private nodeCacheGeneration = 0;
-
   add(node: SkeleNode) {
     if (node === this) {
       throw new Error('Cannot add node to itself');
@@ -89,8 +86,6 @@ export class SkeleNode {
     for (const child of node.walk()) {
       child.root = this.root;
     }
-
-    this.clearNodeCache();
   }
 
   remove() {
@@ -107,14 +102,7 @@ export class SkeleNode {
       child.root = this;
     }
 
-    this.parent.clearNodeCache();
     this.parent = null;
-    this.clearNodeCache();
-  }
-
-  clearNodeCache() {
-    this.nodeCache.clear();
-    this.nodeCacheGeneration++;
   }
 
   includes(node: SkeleNode) {
@@ -125,6 +113,8 @@ export class SkeleNode {
         return true;
       }
     }
+
+    return false;
   }
 
   stateAt(pct: number) {
@@ -226,25 +216,18 @@ export class SkeleNode {
     for (const child of this.children) child.tick();
   }
 
-  nodeLookupCache = new Map<string, SkeleNode>();
-
-  findIdFromRoot(nodeId: string): SkeleNode {
+  findIdFromRoot(nodeId: string): SkeleNode | null {
     return this.root.findId(nodeId);
   }
 
-  findId(nodeId: string, generation?: number): SkeleNode {
-    if (generation === this.nodeCacheGeneration && this.nodeCache.has(nodeId)) {
-      return this.nodeCache.get(nodeId)!;
-    }
-
+  findId(nodeId: string): SkeleNode | null {
     for (const node of this.walk()) {
       if (node.id === nodeId) {
-        this.nodeCache.set(nodeId, node);
         return node;
       }
     }
 
-    return null as never;
+    return null;
   }
 
   // simple recursive walk with no guaranteed order
@@ -439,7 +422,9 @@ export class SkeleNode {
 
     // For sprites, use their visual size plus padding
     const hitSize = this.uri
-      ? Math.sqrt(vec2.dot(this.transform, this.transform)) + minSize * 0.5
+      ? Math.sqrt(vec2.dot(this.transform, this.transform)) *
+          Math.abs(this.parent?.state.scale ?? 1) +
+        minSize * 0.5
       : minSize;
 
     // Return distance if within bounds, null if outside
@@ -471,40 +456,6 @@ export class SkeleNode {
     return closest?.node ?? null;
   }
 
-  static test() {
-    const testData: SkeleData = {
-      angle: 45,
-      mag: 5,
-      children: [
-        {
-          angle: 45,
-          mag: 20,
-        },
-        {
-          angle: -45,
-          mag: 10,
-          children: [
-            {
-              angle: 45,
-              mag: 10,
-              uri: 'gfx/weapon_icons/no_icon.png',
-            },
-          ],
-        },
-      ],
-    };
-
-    const out = SkeleNode.fromData(testData);
-    out.tickMove(100, 100, 10, 0);
-    console.log(out);
-    console.log(out.render(1, props => props));
-    console.log('walking');
-    for (const node of out.walk()) {
-      console.log(node);
-    }
-    return out;
-  }
-
   /**
    * Adjusts sprite rotation relative to its parent
    */
@@ -531,6 +482,3 @@ export class SkeleNode {
     return vec2.clone(this.parent.state.transform);
   }
 }
-
-// console.log('-- testing skelenode --');
-// console.log('result:', SkeleNode.test());

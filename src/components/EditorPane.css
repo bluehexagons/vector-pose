@@ -14,6 +14,7 @@
 
 .node-graph {
   position: absolute;
+  inset: 0;
   pointer-events: none;
 }
 
@@ -28,6 +29,8 @@
 
 .editor-content {
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 /* Add grid background for visual reference */
@@ -53,7 +56,7 @@
   pointer-events: none;
   white-space: nowrap;
   opacity: 0.4;
-  position: 'absolute';
+  position: absolute;
 }
 
 .node-label.active {

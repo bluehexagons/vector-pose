@@ -11,7 +11,7 @@ export class HistoryManager<T> {
   private readonly maxHistory: number;
 
   constructor(maxHistory = 100) {
-    this.maxHistory = maxHistory;
+    this.maxHistory = Math.max(1, Math.floor(maxHistory));
   }
 
   getCurrentState() {
@@ -20,7 +20,11 @@ export class HistoryManager<T> {
 
   pushState(state: T, description: string, continuityKey?: string) {
     // Handle continuity - replace last entry if keys match
-    if (continuityKey && continuityKey === this.lastContinuityKey) {
+    if (
+      continuityKey &&
+      continuityKey === this.lastContinuityKey &&
+      this.currentIndex >= 0
+    ) {
       this.entries[this.currentIndex] = {state, description, continuityKey};
       return;
     }
@@ -75,7 +79,7 @@ export class HistoryManager<T> {
   }
 
   getEntries() {
-    return this.entries;
+    return [...this.entries];
   }
 
   getCurrentIndex() {
