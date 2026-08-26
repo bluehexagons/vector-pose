@@ -194,147 +194,167 @@ export const NodeItem: React.FC<NodeItemProps> = ({
         } ${node.hidden ? 'hidden' : ''}`}
       >
         <div className="node-header" draggable onDragStart={handleDragStart}>
+          <button
+            type="button"
+            className="node-collapse"
+            disabled={node.children.length === 0}
+            aria-label={
+              isCollapsed ? 'Expand child nodes' : 'Collapse child nodes'
+            }
+            title={
+              node.children.length > 0
+                ? isCollapsed
+                  ? 'Expand child nodes'
+                  : 'Collapse child nodes'
+                : 'No child nodes'
+            }
+            onPointerDown={event => event.stopPropagation()}
+            onClick={() => setIsCollapsed(value => !value)}
+          >
+            {node.children.length > 0 ? (isCollapsed ? '►' : '▼') : '•'}
+          </button>
           <span className="node-title">
-            <span className="collapse-indicator">
-              {node.children.length > 0 ? (isCollapsed ? '►' : '▼') : ''}
-            </span>
             {node.id ? node.id : `node #${index + 1}`}
           </span>
           {renderActions()}
         </div>
-        <div
-          className="node-content"
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          {isShrunken && node.uri && (
-            <span className="inline-uri" title={node.uri}>
-              {node.uri}
-            </span>
-          )}
-          {!isShrunken && (
-            <>
-              <div className="input-group">
-                <label>ID:</label>
-                <input
-                  type="text"
-                  className="text-input"
-                  value={node.id || ''}
-                  draggable={false}
-                  title="Set node ID, used to reference in animations"
-                  onChange={evt => {
-                    const clone = skele.clone();
-                    const updatedNode = clone.findIdFromRoot(node.id);
-                    if (!updatedNode) return;
+        {(!isShrunken || node.uri) && (
+          <div
+            className="node-content"
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            {isShrunken && node.uri && (
+              <span className="inline-uri" title={node.uri}>
+                {node.uri}
+              </span>
+            )}
+            {!isShrunken && (
+              <>
+                <div className="input-group">
+                  <label>ID:</label>
+                  <input
+                    type="text"
+                    className="text-input"
+                    value={node.id || ''}
+                    draggable={false}
+                    title="Set node ID, used to reference in animations"
+                    onChange={evt => {
+                      const clone = skele.clone();
+                      const updatedNode = clone.findIdFromRoot(node.id);
+                      if (!updatedNode) return;
 
-                    const oldId = node.id;
-                    const newId = evt.target.value.trim();
-                    if (newId && newId !== oldId && clone.findId(newId)) {
-                      return;
-                    }
-                    updatedNode.id = newId || updatedNode.generateId();
-                    onNodeUpdate(
-                      clone,
-                      `Updated node ${updatedNode.id} ID (was ${oldId})`,
-                      `update_id_${oldId}`
-                    );
-                  }}
-                />
-              </div>
-              <div className="input-group">
-                <label>Sort:</label>
-                <NumberInput
-                  value={node.sort}
-                  allowUndefined
-                  title="The sort value overrides the normal z sorting for this specific node, and not children"
-                  onChange={val => {
-                    const clone = skele.clone();
-                    const updatedNode = clone.findIdFromRoot(node.id);
-                    if (!updatedNode) return;
+                      const oldId = node.id;
+                      const newId = evt.target.value.trim();
+                      if (newId && newId !== oldId && clone.findId(newId)) {
+                        return;
+                      }
+                      updatedNode.id = newId || updatedNode.generateId();
+                      onNodeUpdate(
+                        clone,
+                        `Updated node ${updatedNode.id} ID (was ${oldId})`,
+                        `update_id_${oldId}`
+                      );
+                    }}
+                  />
+                </div>
+                <div className="input-group">
+                  <label>Sort:</label>
+                  <NumberInput
+                    value={node.sort}
+                    allowUndefined
+                    title="The sort value overrides the normal z sorting for this specific node, and not children"
+                    onChange={val => {
+                      const clone = skele.clone();
+                      const updatedNode = clone.findIdFromRoot(node.id);
+                      if (!updatedNode) return;
 
-                    const oldSort = node.sort;
-                    updatedNode.sort = val ?? 0;
-                    onNodeUpdate(
-                      clone,
-                      `Updated node ${node.id} sort to ${updatedNode.sort} (was ${oldSort})`,
-                      `update_sort_${node.id}`
-                    );
-                  }}
-                />
-              </div>
-              <div className="input-group">
-                <label>Angle:</label>
-                <AngleInput
-                  value={toDegrees(node.rotation)}
-                  draggable={false}
-                  title="Enter the angle that this node turns by"
-                  onChange={v => {
-                    const clone = skele.clone();
-                    const updatedNode = clone.findIdFromRoot(node.id);
-                    if (!updatedNode) return;
+                      const oldSort = node.sort;
+                      updatedNode.sort = val ?? 0;
+                      onNodeUpdate(
+                        clone,
+                        `Updated node ${node.id} sort to ${updatedNode.sort} (was ${oldSort})`,
+                        `update_sort_${node.id}`
+                      );
+                    }}
+                  />
+                </div>
+                <div className="input-group">
+                  <label>Angle:</label>
+                  <AngleInput
+                    value={toDegrees(node.rotation)}
+                    draggable={false}
+                    title="Enter the angle that this node turns by"
+                    onChange={v => {
+                      const clone = skele.clone();
+                      const updatedNode = clone.findIdFromRoot(node.id);
+                      if (!updatedNode) return;
 
-                    const oldRotation = node.rotation;
-                    updatedNode.rotation = toRadians(v);
-                    updatedNode.updateTransform();
-                    onNodeUpdate(
-                      clone,
-                      `Updated node ${node.id} angle to ${toDegrees(
-                        updatedNode.rotation
-                      ).toFixed(2)} (was ${toDegrees(oldRotation).toFixed(2)})`,
-                      `update_rotation_${node.id}`
-                    );
-                  }}
-                />
-              </div>
-              <div className="input-group">
-                <label>Magnitude:</label>
-                <NumberInput
-                  value={node.mag}
-                  step={0.1}
-                  title="Enter the magnitude (length or size) of this node"
-                  onChange={val => {
-                    const clone = skele.clone();
-                    const updatedNode = clone.findIdFromRoot(node.id);
-                    if (!updatedNode) return;
+                      const oldRotation = node.rotation;
+                      updatedNode.rotation = toRadians(v);
+                      updatedNode.updateTransform();
+                      onNodeUpdate(
+                        clone,
+                        `Updated node ${node.id} angle to ${toDegrees(
+                          updatedNode.rotation
+                        ).toFixed(
+                          2
+                        )} (was ${toDegrees(oldRotation).toFixed(2)})`,
+                        `update_rotation_${node.id}`
+                      );
+                    }}
+                  />
+                </div>
+                <div className="input-group">
+                  <label>Magnitude:</label>
+                  <NumberInput
+                    value={node.mag}
+                    step={0.1}
+                    title="Enter the magnitude (length or size) of this node"
+                    onChange={val => {
+                      const clone = skele.clone();
+                      const updatedNode = clone.findIdFromRoot(node.id);
+                      if (!updatedNode) return;
 
-                    const oldMag = node.mag;
-                    updatedNode.mag = Math.max(0, val ?? 0);
-                    updatedNode.updateTransform();
-                    onNodeUpdate(
-                      clone,
-                      `Updated node ${node.id} magnitude to ${updatedNode.mag} (was ${oldMag})`,
-                      `update_mag_${node.id}`
-                    );
-                  }}
-                />
-              </div>
-              <div className="input-group">
-                <label>URI:</label>
-                <input
-                  type="text"
-                  className="text-input"
-                  value={node.uri || ''}
-                  draggable={false}
-                  title="The URI marks a sprite node and points to the image location"
-                  onChange={evt => {
-                    const clone = skele.clone();
-                    const updatedNode = clone.findIdFromRoot(node.id);
-                    if (!updatedNode) return;
+                      const oldMag = node.mag;
+                      updatedNode.mag = Math.max(0, val ?? 0);
+                      updatedNode.updateTransform();
+                      onNodeUpdate(
+                        clone,
+                        `Updated node ${node.id} magnitude to ${updatedNode.mag} (was ${oldMag})`,
+                        `update_mag_${node.id}`
+                      );
+                    }}
+                  />
+                </div>
+                <div className="input-group">
+                  <label>URI:</label>
+                  <input
+                    type="text"
+                    className="text-input"
+                    value={node.uri || ''}
+                    draggable={false}
+                    title="The URI marks a sprite node and points to the image location"
+                    onChange={evt => {
+                      const clone = skele.clone();
+                      const updatedNode = clone.findIdFromRoot(node.id);
+                      if (!updatedNode) return;
 
-                    const oldUri = node.uri;
-                    updatedNode.uri = evt.target.value || null;
-                    onNodeUpdate(
-                      clone,
-                      `Updated node ${node.id} URI to ${updatedNode.uri} (was ${oldUri})`,
-                      `update_uri_${node.id}`
-                    );
-                  }}
-                />
-              </div>
-            </>
-          )}
-        </div>
+                      const oldUri = node.uri;
+                      updatedNode.uri = evt.target.value || null;
+                      onNodeUpdate(
+                        clone,
+                        `Updated node ${node.id} URI to ${updatedNode.uri} (was ${oldUri})`,
+                        `update_uri_${node.id}`
+                      );
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
       {!isCollapsed &&
         node.children.map((child, childIndex) => (

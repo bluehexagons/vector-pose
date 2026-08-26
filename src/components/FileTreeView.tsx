@@ -33,7 +33,8 @@ export const FileTreeView: React.FC<FileTreeViewProps> = ({
         <div key={node.path} title={node.path}>
           {node.type === 'directory' ? (
             <>
-              <div
+              <button
+                type="button"
                 className="tree-item directory"
                 style={{paddingLeft: `${level * 20}px`}}
                 onClick={() =>
@@ -47,7 +48,7 @@ export const FileTreeView: React.FC<FileTreeViewProps> = ({
                   {expandAll || expandedDirs[node.path] ? '📂' : '📁'}
                 </span>
                 {node.name}
-              </div>
+              </button>
               {(expandAll || expandedDirs[node.path]) &&
                 node.children.length > 0 && (
                   <FileTreeView
@@ -60,7 +61,8 @@ export const FileTreeView: React.FC<FileTreeViewProps> = ({
                 )}
             </>
           ) : (
-            <div
+            <button
+              type="button"
               className={`tree-item file ${
                 activeFile === node.path ? 'selected' : ''
               }`}
@@ -68,8 +70,8 @@ export const FileTreeView: React.FC<FileTreeViewProps> = ({
               onClick={() => onFileClick(node)}
             >
               <span className={`file-icon file-type-${node.type}`} />
-              {node.name}
-            </div>
+              <span className="file-name">{node.name}</span>
+            </button>
           )}
         </div>
       ))}

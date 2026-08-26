@@ -46,6 +46,21 @@ const INITIAL_ROTATION = 0;
 const INITIAL_OBJECT_POSITION = vec2.fromValues(0, 0);
 const INITIAL_VIEW_ROTATION = 270;
 const SHOW_STARTUP_STORAGE_KEY = 'showStartupScreen';
+const LEFT_PANEL_WIDTH_STORAGE_KEY = 'leftPanelWidth';
+const RIGHT_PANEL_WIDTH_STORAGE_KEY = 'rightPanelWidth';
+const RIGHT_SIDEBAR_PANE_STORAGE_KEY = 'rightSidebarPane';
+const DEFAULT_PANEL_WIDTH = 300;
+const MIN_PANEL_WIDTH = 220;
+
+const clampPanelWidth = (width: number) =>
+  Math.min(window.innerWidth * 0.45, Math.max(MIN_PANEL_WIDTH, width));
+
+const storedPanelWidth = (key: string) => {
+  const stored = Number(localStorage.getItem(key));
+  return Number.isFinite(stored) && stored > 0
+    ? clampPanelWidth(stored)
+    : DEFAULT_PANEL_WIDTH;
+};
 
 const starterExamples: Record<StarterExampleId, FabData> = {
   'shape-studies': shapeStudies as FabData,
@@ -478,10 +493,29 @@ export const AppRoot = () => {
     }
   }, [gameDirectory, loadDirectoryContent]);
 
-  const [leftWidth, setLeftWidth] = useState(300);
-  const [rightWidth, setRightWidth] = useState(300);
-  const [rightSidebarPane, setRightSidebarPane] =
-    useState<SidebarPane>('nodes');
+  const [leftWidth, setLeftWidth] = useState(() =>
+    storedPanelWidth(LEFT_PANEL_WIDTH_STORAGE_KEY)
+  );
+  const [rightWidth, setRightWidth] = useState(() =>
+    storedPanelWidth(RIGHT_PANEL_WIDTH_STORAGE_KEY)
+  );
+  const [rightSidebarPane, setRightSidebarPane] = useState<SidebarPane>(() =>
+    localStorage.getItem(RIGHT_SIDEBAR_PANE_STORAGE_KEY) === 'drawings'
+      ? 'drawings'
+      : 'nodes'
+  );
+
+  useEffect(() => {
+    localStorage.setItem(LEFT_PANEL_WIDTH_STORAGE_KEY, String(leftWidth));
+  }, [leftWidth]);
+
+  useEffect(() => {
+    localStorage.setItem(RIGHT_PANEL_WIDTH_STORAGE_KEY, String(rightWidth));
+  }, [rightWidth]);
+
+  useEffect(() => {
+    localStorage.setItem(RIGHT_SIDEBAR_PANE_STORAGE_KEY, rightSidebarPane);
+  }, [rightSidebarPane]);
 
   const handleSaveAs = useCallback(async () => {
     if (!activeTab) return;
@@ -746,11 +780,11 @@ export const AppRoot = () => {
   );
 
   const onResizeLeft = useCallback(
-    (delta: number) => setLeftWidth(w => Math.max(100, w + delta)),
+    (delta: number) => setLeftWidth(width => clampPanelWidth(width + delta)),
     []
   );
   const onResizeRight = useCallback(
-    (delta: number) => setRightWidth(w => Math.max(100, w - delta)),
+    (delta: number) => setRightWidth(width => clampPanelWidth(width - delta)),
     []
   );
 
@@ -805,7 +839,10 @@ export const AppRoot = () => {
           />
         </div>
 
-        <Resizer onResize={onResizeLeft} onReset={() => setLeftWidth(300)} />
+        <Resizer
+          onResize={onResizeLeft}
+          onReset={() => setLeftWidth(DEFAULT_PANEL_WIDTH)}
+        />
 
         <div className="pane middle-pane">
           <EditorPane
@@ -830,7 +867,10 @@ export const AppRoot = () => {
           />
         </div>
 
-        <Resizer onResize={onResizeRight} onReset={() => setRightWidth(300)} />
+        <Resizer
+          onResize={onResizeRight}
+          onReset={() => setRightWidth(DEFAULT_PANEL_WIDTH)}
+        />
 
         <div className="pane right-pane" style={rightPanelStyle}>
           <RightSidebar

@@ -76,7 +76,7 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
           </button>
         )}
       </div>
-      <ul className="file-list">
+      <div className="file-list">
         {availableFileNodes.length > 0 ? (
           <FileTreeView
             nodes={availableFileNodes}
@@ -85,7 +85,7 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
             expandAll={Boolean(search.trim())}
           />
         ) : (
-          <li className="file-empty-state">
+          <div className="file-empty-state">
             <span aria-hidden="true">{search ? '⌕' : '◇'}</span>
             <strong>
               {search ? 'No matching files' : 'No files here yet'}
@@ -97,9 +97,9 @@ export const FileExplorerPane: React.FC<FileExplorerPaneProps> = ({
                   ? 'Import a project or image to get started.'
                   : 'Choose a workspace or add a project file.'}
             </small>
-          </li>
+          </div>
         )}
-      </ul>
+      </div>
 
       <div className="file-explorer-actions">
         <button

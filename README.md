@@ -205,6 +205,17 @@ Global shortcuts:
 - ctrl+y, ctrl+shift+z: Redo
 - ctrl+n (cmd+n on macOS): New project
 
+Canvas controls:
+
+- Mouse wheel or `+` / `-`: Zoom around the pointer or canvas center
+- Middle-button drag: Pan the canvas
+- `0`: Reset zoom and center the canvas
+
+The left file panel can filter projects and artwork by name. Side panels can be
+resized with a mouse or the arrow keys while a divider is focused; double-click
+a divider to restore its default width. Panel widths and the selected inspector
+tab are remembered between launches.
+
 Node controls:
 
 - delete, backspace: Remove node and children

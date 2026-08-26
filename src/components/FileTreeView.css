@@ -1,5 +1,6 @@
 .file-list-item,
 .tree-item {
+  width: 100%;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--border-radius-sm);
   gap: var(--spacing-sm);
@@ -7,6 +8,17 @@
   cursor: pointer;
   display: flex;
   align-items: center;
+  border: 0;
+  color: var(--text-primary);
+  background: transparent;
+  box-shadow: none;
+  font: inherit;
+  text-align: left;
+}
+
+.tree-item:focus-visible {
+  outline: 1px solid var(--accent-secondary);
+  outline-offset: -1px;
 }
 
 .file-list-item:hover,
@@ -21,6 +33,13 @@
 
 .file-tree-list {
   user-select: none;
+}
+
+.file-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .file-type-fab::before,
