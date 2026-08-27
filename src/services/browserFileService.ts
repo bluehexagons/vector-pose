@@ -1,13 +1,14 @@
 import type {FabData, FileEntry} from '../shared/types';
 import {FAB_EXTENSIONS, IMAGE_EXTENSIONS} from '../shared/types';
+import {shouldRefreshBundledFile} from '../utils/bundledFileSync';
 
 const DATABASE_NAME = 'vector-pose-workspace';
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION = 3;
 const FILE_STORE = 'files';
 const BROWSER_FAB_DIRECTORY = './data/fabs/browser';
 const BROWSER_SPRITE_DIRECTORY = './gfx/sprite/browser';
 
-const VERSION_TWO_RESET_PATHS = [
+const OBSOLETE_BUNDLED_PATHS = [
   './data/fabs/strawberry/test.fab.json',
   './gfx/sprite/strawberry/strawberry-mascot.png',
 ];
@@ -16,6 +17,7 @@ interface StoredWorkspaceFile {
   path: string;
   blob: Blob;
   updatedAt: number;
+  bundledUrl?: string;
 }
 
 const exampleAssetUrls = import.meta.glob<string>(
@@ -33,9 +35,12 @@ function openDatabase(): Promise<IDBDatabase> {
     request.addEventListener('upgradeneeded', event => {
       if (!request.result.objectStoreNames.contains(FILE_STORE)) {
         request.result.createObjectStore(FILE_STORE, {keyPath: 'path'});
-      } else if (event.oldVersion < 2) {
+      } else if (event.oldVersion < 3) {
         const fileStore = request.transaction?.objectStore(FILE_STORE);
-        VERSION_TWO_RESET_PATHS.forEach(path => fileStore?.delete(path));
+        const bundledPaths = Object.keys(exampleAssetUrls).map(examplePath);
+        [...bundledPaths, ...OBSOLETE_BUNDLED_PATHS].forEach(path =>
+          fileStore?.delete(path)
+        );
       }
     });
     request.addEventListener('success', () => resolve(request.result));
@@ -84,13 +89,18 @@ async function getStoredFile(
   );
 }
 
-async function putStoredFile(path: string, blob: Blob): Promise<void> {
+async function putStoredFile(
+  path: string,
+  blob: Blob,
+  bundledUrl?: string
+): Promise<void> {
   const database = await openDatabase();
   const transaction = database.transaction(FILE_STORE, 'readwrite');
   transaction.objectStore(FILE_STORE).put({
     path: normalizeWorkspacePath(path),
     blob,
     updatedAt: Date.now(),
+    bundledUrl,
   } satisfies StoredWorkspaceFile);
   await transactionDone(transaction);
 }
@@ -108,19 +118,20 @@ function examplePath(modulePath: string): string {
 }
 
 async function seedExamples(): Promise<void> {
-  const currentPaths = new Set(
-    (await getAllStoredFiles()).map(file => file.path)
+  const currentFiles = new Map(
+    (await getAllStoredFiles()).map(file => [file.path, file])
   );
   await Promise.all(
     Object.entries(exampleAssetUrls).map(async ([modulePath, assetUrl]) => {
       const path = examplePath(modulePath);
-      if (currentPaths.has(path)) return;
+      const currentFile = currentFiles.get(path);
+      if (!shouldRefreshBundledFile(currentFile, assetUrl)) return;
 
       const response = await fetch(assetUrl);
       if (!response.ok) {
         throw new Error(`Failed to load bundled example ${path}`);
       }
-      await putStoredFile(path, await response.blob());
+      await putStoredFile(path, await response.blob(), assetUrl);
     })
   );
 }

@@ -1,3 +1,4 @@
+import {DialogFocus} from './DialogFocus';
 import './StartupScreen.css';
 
 export type StarterExampleId =
@@ -154,12 +155,7 @@ export const StartupScreen = ({
   onClose: () => void;
 }) => (
   <div className="startup-backdrop" role="presentation">
-    <main
-      className="startup-screen"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="startup-title"
-    >
+    <DialogFocus className="startup-screen" labelledBy="startup-title">
       <header className="startup-hero">
         <div className="startup-mark" aria-hidden="true">
           <span />
@@ -187,7 +183,11 @@ export const StartupScreen = ({
       <div className="startup-body">
         <section className="startup-actions" aria-labelledby="start-heading">
           <h2 id="start-heading">Start</h2>
-          <button className="startup-primary-action" onClick={onNewProject}>
+          <button
+            className="startup-primary-action"
+            onClick={onNewProject}
+            data-dialog-autofocus
+          >
             <span className="startup-action-icon">＋</span>
             <span>
               <strong>New project</strong>
@@ -281,6 +281,6 @@ export const StartupScreen = ({
         </label>
         <span>Tip: reopen it any time with the Welcome button.</span>
       </footer>
-    </main>
+    </DialogFocus>
   </div>
 );

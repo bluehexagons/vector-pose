@@ -433,33 +433,22 @@ export const AppRoot = () => {
     const newDir = await selectDirectory();
     if (newDir) {
       setGameDirectory(newDir);
-      if (reopenLastWorkspace) {
-        localStorage.setItem('gameDirectory', newDir);
-      }
+      localStorage.setItem('gameDirectory', newDir);
       await loadDirectoryContent(newDir);
       return true;
     }
     return false;
-  }, [browserWorkspace, loadDirectoryContent, reopenLastWorkspace]);
+  }, [browserWorkspace, loadDirectoryContent]);
 
-  const handleReopenLastWorkspaceChange = useCallback(
-    (reopen: boolean) => {
-      setReopenLastWorkspace(reopen);
-      if (browserWorkspace) return;
-      if (reopen && gameDirectory) {
-        localStorage.setItem('gameDirectory', gameDirectory);
-      } else {
-        localStorage.removeItem('gameDirectory');
-      }
-    },
-    [browserWorkspace, gameDirectory]
-  );
+  const handleReopenLastWorkspaceChange = useCallback((reopen: boolean) => {
+    setReopenLastWorkspace(reopen);
+  }, []);
 
   const handleBrowserWorkspaceReset = useCallback(async () => {
     if (!browserWorkspace) return;
     if (
       !window.confirm(
-        'Clear all vector-pose data stored in this browser?\n\n' +
+        'Clear all vector-pose workspace files stored in this browser?\n\n' +
           'This removes imported images, browser-saved projects, and unsaved changes in open tabs. Bundled examples will be restored. This cannot be undone.'
       )
     ) {

@@ -1,4 +1,5 @@
 import type {SidebarPane} from './RightSidebar';
+import {DialogFocus} from './DialogFocus';
 import './SettingsScreen.css';
 
 export type NodeLabelMode = 'selected' | 'markers' | 'all';
@@ -58,12 +59,7 @@ export const SettingsScreen = ({
   onClose: () => void;
 }) => (
   <div className="settings-backdrop" role="presentation">
-    <main
-      className="settings-screen"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="settings-title"
-    >
+    <DialogFocus className="settings-screen" labelledBy="settings-title">
       <header className="settings-header">
         <div>
           <p>VECTOR-POSE</p>
@@ -76,6 +72,7 @@ export const SettingsScreen = ({
           onClick={onClose}
           aria-label="Close settings"
           title="Close settings"
+          data-dialog-autofocus
         >
           ×
         </button>
@@ -283,19 +280,19 @@ export const SettingsScreen = ({
             <span aria-hidden="true">⌑</span>
             <div>
               <h2 id="workspace-settings">Workspace</h2>
-              <p>Restore interface defaults or manage browser storage.</p>
+              <p>Restore all preferences or manage browser storage.</p>
             </div>
           </div>
 
           <div className="settings-action-row">
             <span className="settings-copy">
-              <strong>Reset interface</strong>
+              <strong>Restore defaults</strong>
               <small>
-                Restore preferences and panel widths to their defaults.
+                Reset preferences and panel widths to their original values.
               </small>
             </span>
             <button type="button" onClick={onResetInterface}>
-              Reset interface
+              Restore defaults
             </button>
           </div>
 
@@ -326,6 +323,6 @@ export const SettingsScreen = ({
           Done
         </button>
       </footer>
-    </main>
+    </DialogFocus>
   </div>
 );
