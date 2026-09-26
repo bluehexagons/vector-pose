@@ -1,0 +1,31 @@
+name: Publish Windows release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Publish release assets
+        run: npm run publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Publish GitHub release
+        run: gh release edit "$env:GITHUB_REF_NAME" --title "$env:GITHUB_REF_NAME - Alpha" --draft=false --prerelease=false
+        env:
+          GH_TOKEN: ${{ github.token }}
