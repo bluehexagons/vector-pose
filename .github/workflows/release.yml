@@ -24,7 +24,7 @@ jobs:
       - name: Publish release assets
         run: npm run publish
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Publish GitHub release
         run: gh release edit "$env:GITHUB_REF_NAME" --title "$env:GITHUB_REF_NAME - Alpha" --draft=false --prerelease=false
         env:
