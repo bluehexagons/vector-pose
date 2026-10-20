@@ -32,6 +32,10 @@ of browser-created prefab files.
 - Node.js 22.12 or higher
 - npm 10.9 or higher
 
+Use Node 24 (`.nvmrc`) for development and CI. Ordinary NVM can select it with
+`nvm use`; on Basaltwater, `basaltw node exec -- npm run check` selects it without
+changing the host default.
+
 ## Development
 
 Basaltwater on Debian is the reference development environment. Follow its
@@ -45,7 +49,7 @@ Clone the repository and install dependencies:
 ```bash
 git clone https://github.com/bluehexagons/vector-pose.git
 cd vector-pose
-npm install
+npm ci
 ```
 
 Useful scripts:
@@ -59,6 +63,9 @@ npm run package
 
 # Build the browser edition
 npm run build:web
+
+# Develop the browser edition without starting Electron
+npm run dev:web
 
 # Preview a completed browser build
 npm run preview:web
@@ -84,6 +91,22 @@ npm run check
 # Apply formatting
 npm run format
 ```
+
+The browser bundle uses relative asset URLs for GitHub Pages, root hosting and
+Basaltwater gateway subdirectories. The optional `basaltwater.json` describes
+only the browser edition; it does not package or deploy the Electron app.
+For an authorized managed HTTPS preview, follow `basaltwater-web-gateway` with
+an explicit command for this project's separate Vite config:
+
+```bash
+basaltwater-web preview start vector-pose --project . -- \
+  npm run dev:web -- --host '{host}' --port '{port}' --strictPort
+```
+
+The native `dev:web` and `preview:web` commands remain available without
+Basaltwater. Pull requests and main pushes run `npm run check`, `npm test` and
+`npm run build:web`; only main publishes the Pages site. Windows release
+packaging remains a separate tag workflow.
 
 ## Local output and cleanup
 

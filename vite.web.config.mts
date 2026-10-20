@@ -1,7 +1,7 @@
 import {defineConfig} from 'vite';
 
 export default defineConfig({
-  base: '/vector-pose/',
+  base: './',
   build: {
     outDir: 'dist-web',
   },

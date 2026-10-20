@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "name": "web",
+      "type": "static",
+      "domain": "{{domain}}",
+      "build": ["npm ci", "npm run build:web"],
+      "output": "dist-web"
+    }
+  ],
+  "ci": {
+    "install": [{"argv": ["npm", "ci"]}],
+    "build": [{"argv": ["npm", "run", "build:web"]}],
+    "test": [{"argv": ["npm", "run", "check"]}, {"argv": ["npm", "test"]}]
+  }
+}
