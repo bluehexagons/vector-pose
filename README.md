@@ -34,6 +34,12 @@ of browser-created prefab files.
 
 ## Development
 
+Basaltwater on Debian is the reference development environment. Follow its
+[shared standards and skills](https://github.com/bluehexagons/basaltwater/blob/main/docs/agents/project-standards.md)
+for environment support. The native commands below also work with manually
+installed prerequisites; verify native Windows behavior separately from Linux
+checks and packaging.
+
 Clone the repository and install dependencies:
 
 ```bash
@@ -78,6 +84,31 @@ npm run check
 # Apply formatting
 npm run format
 ```
+
+## Local output and cleanup
+
+`.basaltwater/cleanup.json` documents generated `out/`, `dist-web/` and `.vite/`
+directories. Forge packaging and Vite rebuild them. Stop the editor, preview,
+build and packaging jobs first; retain any package needed for a release or review.
+On an updated Basaltwater installation, preview using:
+
+```bash
+basaltw agent storage project "$PWD" --json
+basaltw agent storage clean-generated "$PWD" --rule generated-output
+```
+
+Removal needs explicit cleanup authorization and `--apply`, including writes to
+the project root for isolation. Without Basaltwater, review the same exact paths
+and Git tracking and use native filesystem tools for authorized removal.
+Keep source artwork, `example/`, user prefab files and browser workspace data.
+
+Put new review captures/logs in ignored `artifacts/review/` when no better local
+convention exists. Follow the shared
+[curation guidance](https://github.com/bluehexagons/basaltwater/blob/main/docs/agents/project-cleanup.md)
+to preserve selected originals in `artifacts/archive/` with provenance and
+checksums. Mixed evidence needs agent review, not scripted deletion; use bounded
+Luna high/standard workers for large inventories when available. Archiving on the
+same disk does not free space. These rules grant no standing deletion permission.
 
 ## Project Structure
 

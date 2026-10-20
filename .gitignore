@@ -96,3 +96,8 @@ out/
 
 # .zip version of example directory
 example.zip
+
+# Local review media and shared cleanup metadata
+/artifacts/
+/.basaltwater/*
+!/.basaltwater/cleanup.json

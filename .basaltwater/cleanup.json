@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "instructions": "Read README.md. Use native Electron Forge/Vite commands; stop editor, preview, build and packaging jobs before cleanup. These rules describe scope, not standing permission to delete.",
+  "preserve": ["src", "example", "test", "artifacts/archive"],
+  "rules": [
+    {
+      "name": "generated-output",
+      "strategy": "generated",
+      "paths": ["out", "dist-web", ".vite"],
+      "instructions": "Reproduce using npm run package/make and npm run build:web. Retain packages needed for release or review before authorizing removal. Preview the shared remover; apply needs project-root writes for isolation. User artwork and prefab files are never generated output."
+    },
+    {
+      "name": "review-evidence",
+      "strategy": "agent",
+      "paths": ["artifacts/review"],
+      "archive": "artifacts/archive",
+      "instructions": "Review captures/logs for useful milestones or regressions. Use bounded Luna high/standard classification when useful. Preserve selected originals with known revision, source path, caption and checksum before proposing exact removals. Unknown provenance and same-disk archive size must remain explicit."
+    }
+  ]
+}
