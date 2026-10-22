@@ -29,10 +29,10 @@ of browser-created prefab files.
 
 ## Prerequisites
 
-- Node.js 22.12 or higher
+- Node.js 24.22.1+ within 24.x (LTS) or 26.12.1+ within 26.x (Current)
 - npm 10.9 or higher
 
-Use Node 24 (`.nvmrc`) for development and CI. Ordinary NVM can select it with
+Use Node 24.22.1 (`.nvmrc`) for development and CI. Ordinary NVM can select it with
 `nvm use`; on Basaltwater, `basaltw node exec -- npm run check` selects it without
 changing the host default.
 
